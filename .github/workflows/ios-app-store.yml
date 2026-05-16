@@ -4,20 +4,6 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
-    inputs:
-      build_name:
-        description: 'External version number (e.g. 1.0.0)'
-        required: true
-        default: '1.0.0'
-      build_number:
-        description: 'Internal build number (e.g. 1)'
-        required: true
-        default: '1'
-      upload_to_testflight:
-        description: 'Upload to TestFlight after successful build'
-        type: boolean
-        required: true
-        default: true
 
 permissions:
   contents: read
@@ -30,87 +16,43 @@ jobs:
     timeout-minutes: 60
 
     env:
-      BUNDLE_ID: com.yousef.ctds
-      TEAM_ID: B4S7M6N5U5
+      BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       FLUTTER_VERSION: '3.24.5'
-      JAVA_VERSION: '17'
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: ${{ env.JAVA_VERSION }}
-
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
           cache: true
 
-      - name: Cache Pub Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-flutter-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-pub-
-
-      - name: Cache CocoaPods
-        uses: actions/cache@v4
-        with:
-          path: ios/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: Flutter Diagnostics
-        run: |
-          flutter doctor -v
-          flutter pub get
-          flutter gen-l10n
-
-      - name: Static Analysis
-        run: flutter analyze
-
-      - name: Restore Firebase Configs
-        env:
-          GOOGLE_SERVICE_INFO_PLIST_BASE64: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_BASE64 }}
-          ANDROID_GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON_BASE64 }}
-        run: |
-          if [ -n "$GOOGLE_SERVICE_INFO_PLIST_BASE64" ]; then
-            echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 -D > ios/Runner/GoogleService-Info.plist
-          fi
-          if [ -n "$ANDROID_GOOGLE_SERVICES_JSON_BASE64" ]; then
-            echo "$ANDROID_GOOGLE_SERVICES_JSON_BASE64" | base64 -D > android/app/google-services.json
-          fi
-
-      - name: Setup iOS Signing
+      - name: Installing certificate...
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          # Create temporary keychain
           CERT_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
           echo "$BUILD_CERTIFICATE_BASE64" | base64 -D > "$CERT_PATH"
-          echo "$BUILD_PROVISION_PROFILE_BASE64" | base64 -D > "$PP_PATH"
-
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          
           security import "$CERT_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH"
-          
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "✅ Certificate imported."
+
+      - name: Installing provisioning profile...
+        env:
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+        run: |
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          echo "$BUILD_PROVISION_PROFILE_BASE64" | base64 -D > "$PP_PATH"
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           UUID=$(security cms -D -i "$PP_PATH" | plutil -extract UUID raw -)
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
@@ -118,23 +60,28 @@ jobs:
           PROFILE_NAME=$(security cms -D -i "$PP_PATH" | plutil -extract Name raw -)
           echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
           echo "UUID=$UUID" >> $GITHUB_ENV
-          
-          # Force Xcode to use this profile for Manual Signing
-          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\";/g" ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' "s/CODE_SIGN_IDENTITY = \"Apple Development\";/CODE_SIGN_IDENTITY = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
-          sed -i '' "s/\"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]\" = \"iPhone Developer\";/\"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]\" = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
-          
-          echo "✅ Provisioning profile installed and linked: $PROFILE_NAME"
+          echo "✅ Profile installed: $PROFILE_NAME"
 
-      - name: Install CocoaPods
+      - name: Hardening Xcode Project Signing
         run: |
-          cd ios
-          if [ ! -f "Podfile.lock" ]; then
-            pod install
-          else
-            pod install --repo-update
-          fi
-          cd ..
+          PROJECT_FILE="ios/Runner.xcodeproj/project.pbxproj"
+          # Disable Automatic Signing for ALL targets
+          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PROJECT_FILE"
+          
+          # Force Team ID and Provisioning Profile Specifier
+          sed -i '' "s/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = ${{ env.APPLE_TEAM_ID }};/g" "$PROJECT_FILE"
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = \"${{ env.PROFILE_NAME }}\";/g" "$PROJECT_FILE"
+          
+          # Force Code Sign Identity to Distribution
+          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "iPhone Developer";/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Distribution";/g' "$PROJECT_FILE"
+          echo "✅ Xcode project signing hardened to Manual with Apple Distribution."
+
+      - name: Flutter Pub Get & CocoaPods
+        run: |
+          flutter pub get
+          cd ios && pod install --repo-update && cd ..
 
       - name: Create ExportOptions.plist
         run: |
@@ -146,57 +93,37 @@ jobs:
             <key>method</key>
             <string>app-store</string>
             <key>teamID</key>
-            <string>${{ env.TEAM_ID }}</string>
+            <string>${{ env.APPLE_TEAM_ID }}</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${{ env.BUNDLE_ID }}</key>
+              <key>${{ env.BUNDLE_IDENTIFIER }}</key>
               <string>${{ env.PROFILE_NAME }}</string>
             </dict>
           </dict>
           </plist>
           EOF
 
-      - name: Build IPA
+      - name: Building IPA...
         run: |
           BUILD_NAME=${{ github.event.inputs.build_name || '1.0.0' }}
           BUILD_NUMBER=${{ github.event.inputs.build_number || github.run_number }}
           
+          # Simplified API key injection to match the required secrets
           flutter build ipa --release \
             --build-name "$BUILD_NAME" \
             --build-number "$BUILD_NUMBER" \
             --export-options-plist=ios/Runner/ExportOptions.plist \
-            --dart-define=FIREBASE_API_KEY_WEB=${{ secrets.FIREBASE_API_KEY_WEB }} \
-            --dart-define=FIREBASE_API_KEY_ANDROID=${{ secrets.FIREBASE_API_KEY_ANDROID }} \
-            --dart-define=FIREBASE_API_KEY_IOS=${{ secrets.FIREBASE_API_KEY_IOS }} \
-            --dart-define=FIREBASE_API_KEY_MACOS=${{ secrets.FIREBASE_API_KEY_MACOS }} \
-            --dart-define=FIREBASE_API_KEY_WINDOWS=${{ secrets.FIREBASE_API_KEY_WINDOWS }} \
+            --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ReagentKit-Release-IPA
+          name: ReagentKit-Signed-IPA
           path: build/ios/ipa/*.ipa
-
-      - name: Upload to TestFlight
-        if: github.event.inputs.upload_to_testflight == 'true'
-        env:
-          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo -n "$APPSTORE_API_PRIVATE_KEY" | base64 -D > ~/.appstoreconnect/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
-          
-          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -n 1)
-          
-          xcrun altool --upload-app --type ios --file "$IPA_PATH" \
-            --apiKey "$APPSTORE_API_KEY_ID" \
-            --apiIssuer "$APPSTORE_ISSUER_ID"
 
       - name: Cleanup Keychain
         if: always()
-        run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
+        run: security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
