@@ -1,0 +1,902 @@
+{
+  "Marquis": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated sulfuric acid",
+      "Causes severe chemical burns",
+      "Dangerous fumes - formaldehyde",
+      "Exothermic reaction"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض الكبريتيك المركز",
+      "يسبب حروق كيميائية شديدة",
+      "أبخرة خطيرة - الفورمالديهايد",
+      "تفاعل طارد للحرارة"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Marquis reagent to the sample",
+      "Observe the color change for 1 minutes",
+      "Compare the resulting color with expected results below",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف ماركيز إلى العينة",
+      "مراقبة تغير اللون لمدة دقيقة واحدة",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Gallic": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Gallic reagent to the sample",
+      "Observe the color change",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف غاليك إلى العينة",
+      "مراقبة تغير اللون",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Morris": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Place a small sample into a test tube",
+      "Add 1-2 drops of Morris A, shake for 10 seconds",
+      "Add 1-2 drops of Morris B, shake and observe color change",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "وضع عينة صغيرة في أنبوب اختبار",
+      "إضافة 1-2 قطرة من موريس أ، الهز لمدة 10 ثوان",
+      "إضافة 1-2 قطرة من موريس ب، الهز ومراقبة تغير اللون",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Scott": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Toxic - contains Cobalt(II) thiocyanate",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "سام - يحتوي على ثيوسيانات الكوبالت (II)",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Place a small sample into a test tube",
+      "Add a few drops of Scott A, observe color",
+      "Add a few drops of Scott B, shake, observe",
+      "Add a few drops of Scott C, shake, observe final color",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "وضع عينة صغيرة في أنبوب اختبار",
+      "إضافة بضع قطرات من سكوت أ، مراقبة اللون",
+      "إضافة بضع قطرات من سكوت أ، مراقبة اللون",
+      "إضافة بضع قطرات من سكوت أ، مراقبة اللون",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Robadope": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Place a small sample into a test tube",
+      "Add 2 drops of Robadope A",
+      "Add 1 drop of Robadope B and observe color change",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "وضع عينة صغيرة في أنبوب اختبار",
+      "إضافة قطرتين من روبادوب أ",
+      "إضافة قطرة واحدة من روبادوب ب ومراقبة تغير اللون",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Froehde": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated acid",
+      "Causes severe chemical burns"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض مركز",
+      "يسبب حروق كيميائية شديدة"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Froehde reagent to the sample",
+      "Observe the color change for 1 minute",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف فروهده إلى العينة",
+      "مراقبة تغير اللون لمدة دقيقة واحدة",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Mandelin": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated acid",
+      "Causes severe chemical burns"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض مركز",
+      "يسبب حروق كيميائية شديدة"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Mandelin reagent to the sample",
+      "Observe the color change for 1 minute",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف مانديلين إلى العينة",
+      "مراقبة تغير اللون لمدة دقيقة واحدة",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Folin": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Place a small sample into a test tube",
+      "Add 1 drop of Folin A",
+      "Add 1 drop of Folin B and observe color change",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "وضع عينة صغيرة في أنبوب اختبار",
+      "إضافة قطرة واحدة من فولين أ",
+      "إضافة قطرة واحدة من فولين ب ومراقبة تغير اللون",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Hofmann": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Hofmann reagent to the sample",
+      "Observe the color change for up to 2 minutes",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف هوفمان إلى العينة",
+      "مراقبة تغير اللون لمدة تصل إلى دقيقتين",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Zimmermann": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط"
+    ],
+    "specificHazards": [
+      "Corrosive",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "مسبب للتآكل",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Place a small sample into a test tube",
+      "Add 2 drops of Zimmermann A, shake",
+      "Add 1 drop of Zimmermann B and observe color change",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "وضع عينة صغيرة في أنبوب اختبار",
+      "إضافة قطرتين من زيمرمان أ",
+      "إضافة قطرة واحدة من زيمرمان ب ومراقبة تغير اللون",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Ehrlich": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated acid",
+      "Causes severe chemical burns",
+      "Dangerous fumes"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض مركز",
+      "يسبب حروق كيميائية شديدة",
+      "أبخرة خطيرة"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Ehrlich reagent to the sample",
+      "Observe the color change for up to 5 minutes",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف إيرليخ إلى العينة",
+      "مراقبة تغير اللون لمدة تصل إلى 5 دقائق",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Liebermann": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated acid",
+      "Causes severe chemical burns"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض مركز",
+      "يسبب حروق كيميائية شديدة"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Liebermann reagent to the sample",
+      "Observe the color change for 1 minute",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف ليبرمان إلى العينة",
+      "مراقبة تغير اللون لمدة دقيقة واحدة",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Mecke": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Highly corrosive - contains concentrated acid",
+      "Causes severe chemical burns",
+      "Toxic - contains Selenous Acid"
+    ],
+    "specificHazards_ar": [
+      "شديد التآكل - يحتوي على حمض مركز",
+      "يسبب حروق كيميائية شديدة",
+      "سام - يحتوي على حمض السيلينوز"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "In dedicated acid storage cabinet",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "في خزانة تخزين أحماض مخصصة",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1-2 drops of Mecke reagent to the sample",
+      "Observe the color change for 1 minute",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة 1-2 قطرة من كاشف ميكي إلى العينة",
+      "مراقبة تغير اللون لمدة دقيقة واحدة",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  },
+  "Simon's": {
+    "equipment": [
+      "Chemical-resistant safety goggles",
+      "Chemical-resistant gloves (nitrile or neoprene)",
+      "Lab coat with long sleeves",
+      "Closed-toe chemical-resistant shoes",
+      "Respirator when necessary"
+    ],
+    "equipment_ar": [
+      "نظارات أمان مقاومة للمواد الكيميائية",
+      "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+      "معطف مختبر بأكمام طويلة",
+      "أحذية مغلقة مقاومة للمواد الكيميائية",
+      "جهاز تنفس عند الضرورة"
+    ],
+    "handlingProcedures": [
+      "Work under fume hood mandatory",
+      "Wear acid-resistant gloves",
+      "Use safety goggles and face shield",
+      "Keep sodium bicarbonate handy for neutralization",
+      "Use only small drops",
+      "Never mix reagent directly with water"
+    ],
+    "handlingProcedures_ar": [
+      "العمل تحت غطاء الدخان إجباري",
+      "ارتداء قفازات مقاومة للأحماض",
+      "استخدام نظارات الأمان وواقي الوجه",
+      "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+      "استخدام قطرات صغيرة فقط",
+      "عدم خلط الكاشف مباشرة مع الماء"
+    ],
+    "specificHazards": [
+      "Causes irritation",
+      "Handle with care"
+    ],
+    "specificHazards_ar": [
+      "يسبب تهيج",
+      "التعامل بحذر"
+    ],
+    "storage": [
+      "Store in cool, dry place",
+      "Away from flammable materials",
+      "Label with clear warning"
+    ],
+    "storage_ar": [
+      "التخزين في مكان بارد وجاف",
+      "بعيداً عن المواد القابلة للاشتعال",
+      "وضع ملصق تحذيري واضح"
+    ],
+    "instructions": [
+      "Prepare a small sample of the substance to test",
+      "Add 1 drop of Simon's A followed by 1 drop of Simon's B",
+      "Observe the color change",
+      "Compare the resulting color with expected results",
+      "Record your observations and dispose of materials safely"
+    ],
+    "instructions_ar": [
+      "تحضير عينة صغيرة من المادة للاختبار",
+      "إضافة قطرة واحدة من سايمون ب ومراقبة تغير اللون",
+      "مراقبة تغير اللون",
+      "مقارنة اللون الناتج مع النتائج المتوقعة",
+      "تسجيل الملاحظات والتخلص من المواد بأمان"
+    ]
+  }
+}

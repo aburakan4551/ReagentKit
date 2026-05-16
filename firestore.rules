@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection rules - for authentication and user registration
+    match /users/{documentId} {
+      // Allow reading documents for username availability checks (even without auth)
+      // This is essential for registration flow where we check if username exists BEFORE creating account
+      allow read: if true;
+      
+      // Allow updating user's own document only (requires authentication)
+      allow update: if request.auth != null && 
+                    resource != null &&
+                    resource.data.uid == request.auth.uid &&
+                    request.resource.data.uid == request.auth.uid;
+      
+      // Allow creating user documents during registration (requires authentication)
+      // Must match authenticated user's UID
+      allow create: if request.auth != null && 
+                    request.resource.data.uid == request.auth.uid;
+      
+      // Allow deleting user's own document only (requires authentication)
+      allow delete: if request.auth != null && 
+                    resource != null &&
+                    resource.data.uid == request.auth.uid;
+      
+      // Allow listing for username availability checks (even without auth)
+      allow list: if true;
+    }
+
+    // Result History collection rules - using email as document ID for test data
+    match /resultHistory/{userEmail} {
+      // Allow authenticated users to create their own user document
+      // Check that the document ID (userEmail) matches their authenticated email
+      allow create: if request.auth != null && 
+                    userEmail == request.auth.token.email &&
+                    request.resource.data.uid == request.auth.uid;
+      
+      // Users can read their own user document
+      // Check that the document ID (userEmail) matches their authenticated email
+      allow read: if request.auth != null && 
+                  userEmail == request.auth.token.email;
+      
+      // Users can update their own user document
+      allow update: if request.auth != null && 
+                    userEmail == request.auth.token.email &&
+                    request.resource.data.uid == request.auth.uid;
+      
+      // Users can delete their own user document
+      allow delete: if request.auth != null && 
+                    userEmail == request.auth.token.email;
+
+      // Tests subcollection rules
+      match /tests/{testId} {
+        // Users can create tests in their own subcollection
+        allow create: if request.auth != null && 
+                      userEmail == request.auth.token.email;
+        
+        // Users can read tests from their own subcollection
+        allow read: if request.auth != null && 
+                    userEmail == request.auth.token.email;
+        
+        // Users can update tests in their own subcollection
+        allow update: if request.auth != null && 
+                      userEmail == request.auth.token.email;
+        
+        // Users can delete tests from their own subcollection
+        allow delete: if request.auth != null && 
+                      userEmail == request.auth.token.email;
+      }
+    }
+  }
+} 

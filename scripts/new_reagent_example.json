@@ -1,0 +1,60 @@
+{
+  "reagentName": "Benedict",
+  "reagentName_ar": "بنديكت",
+  "description": "Detects reducing sugars and some alkaloids",
+  "description_ar": "يكشف السكريات المختزلة وبعض القلويدات",
+  "safetyLevel": "MEDIUM",
+  "safetyLevel_ar": "متوسط",
+  "testDuration": 3,
+  "chemicals": [
+    "Copper Sulfate",
+    "Sodium Carbonate",
+    "Sodium Citrate"
+  ],
+  "drugResults": [
+    {
+      "drugName": "Cocaine",
+      "color": "blue > green",
+      "color_ar": "أزرق > أخضر"
+    },
+    {
+      "drugName": "Heroin",
+      "color": "orange > red",
+      "color_ar": "برتقالي > أحمر"
+    },
+    {
+      "drugName": "Morphine",
+      "color": "yellow > orange",
+      "color_ar": "أصفر > برتقالي"
+    }
+  ],
+  "equipment": [
+    "Chemical-resistant safety goggles",
+    "Chemical-resistant gloves",
+    "Lab coat",
+    "Heat source (optional)"
+  ],
+  "handlingProcedures": [
+    "Wear protective equipment",
+    "Use in well-ventilated area",
+    "Avoid skin contact",
+    "Heat gently if required"
+  ],
+  "specificHazards": [
+    "Contains copper compounds",
+    "May cause skin irritation",
+    "Avoid ingestion"
+  ],
+  "storage": [
+    "Store in cool, dry place",
+    "Keep container tightly closed",
+    "Away from incompatible materials"
+  ],
+  "instructions": [
+    "Prepare a small sample of the substance to test",
+    "Add 2-3 drops of Benedict reagent to the sample",
+    "Heat gently for 2-3 minutes if needed",
+    "Observe the color change",
+    "Compare with expected results below"
+  ]
+} 
