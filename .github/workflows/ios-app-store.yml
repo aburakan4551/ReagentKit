@@ -61,14 +61,20 @@ jobs:
           echo "✅ Certificate imported."
 
       - name: Installing provisioning profile...
+        env:
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_DATA }}
         run: |
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           
           cat <<'EOF' > pp_base64.txt
-          ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          ${{ secrets.PROVISIONING_PROFILE_DATA }}
           EOF
           
           tr -cd 'A-Za-z0-9+/=' < pp_base64.txt | base64 -D > "$PP_PATH"
+          
+          echo "📊 Diagnostic Info:"
+          ls -lh "$PP_PATH"
+          file "$PP_PATH"
           
           if [ ! -s "$PP_PATH" ]; then echo "❌ Provisioning profile file is empty!"; exit 1; fi
           
