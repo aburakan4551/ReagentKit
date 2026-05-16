@@ -18,7 +18,7 @@ import 'app_localizations_en.dart';
 /// `supportedLocales` list. For example:
 ///
 /// ```dart
-/// import 'gen_l10n/app_localizations.dart';
+/// import 'l10n/app_localizations.dart';
 ///
 /// return MaterialApp(
 ///   localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -918,12 +918,21 @@ abstract class AppLocalizations {
   String get analysisNotes;
 
   /// No description provided for @analysisIntelligenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis intelligence'**
   String get analysisIntelligenceTitle;
 
   /// No description provided for @analysisIntelligenceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI verified the reaction color against thousands of reference samples to ensure maximum accuracy.'**
   String get analysisIntelligenceDescription;
 
   /// No description provided for @switchLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch language'**
   String get switchLanguage;
 
   /// No description provided for @high.
@@ -1190,12 +1199,6 @@ abstract class AppLocalizations {
   /// **'Join Laboratory'**
   String get joinLaboratory;
 
-  /// No description provided for @laboratoryTechnician.
-  ///
-  /// In en, this message translates to:
-  /// **'Laboratory Technician'**
-  String get laboratoryTechnician;
-
   /// No description provided for @verified.
   ///
   /// In en, this message translates to:
@@ -1243,6 +1246,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recent Activity'**
   String get recentActivity;
+
+  /// No description provided for @noRecentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent activity recorded yet.'**
+  String get noRecentActivity;
 
   /// No description provided for @hoursAgo.
   ///

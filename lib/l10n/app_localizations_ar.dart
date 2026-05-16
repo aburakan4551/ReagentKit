@@ -435,8 +435,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get analysisIntelligenceTitle => 'ذكاء التحليل';
 
   @override
-  String get analysisIntelligenceDescription =>
-      'تحقق الذكاء الاصطناعي من لون التفاعل مقابل آلاف العينات المرجعية لضمان أقصى دقة.';
+  String get analysisIntelligenceDescription => 'تحقق الذكاء الاصطناعي من لون التفاعل مقابل آلاف العينات المرجعية لضمان أقصى دقة.';
 
   @override
   String get switchLanguage => 'تغيير اللغة';
@@ -574,9 +573,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get joinLaboratory => 'الانضمام للمختبر';
 
   @override
-  String get laboratoryTechnician => 'فني مختبر';
-
-  @override
   String get verified => 'موثق';
 
   @override
@@ -599,6 +595,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get recentActivity => 'النشاط الأخير';
+
+  @override
+  String get noRecentActivity => 'لا يوجد نشاط مسجل حتى الآن.';
 
   @override
   String get hoursAgo => 'منذ ساعات';

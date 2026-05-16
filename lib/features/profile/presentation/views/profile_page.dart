@@ -5,6 +5,9 @@ import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../auth/presentation/states/auth_state.dart';
 import '../../../../core/services/notification_service.dart';
 
+import '../../../reagent_testing/presentation/providers/reagent_testing_providers.dart';
+import '../../../reagent_testing/presentation/states/test_result_history_state.dart';
+import '../../../reagent_testing/domain/entities/test_result_entity.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -295,11 +298,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
+    final historyState = ref.watch(testResultHistoryControllerProvider);
     final theme = Theme.of(context);
 
     // Set context for the auth controller
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
       // Show top notification for errors and success messages
       if (authState is AuthError) {
         NotificationService.showError(
@@ -315,7 +318,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _buildModernAppBar(authState, theme),
-      body: _buildBody(authState, theme),
+      body: _buildBody(authState, historyState, theme),
     );
   }
 
@@ -372,10 +375,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return _isLoginMode ? l10n.labAccess : l10n.joinLaboratory;
   }
 
-  Widget _buildBody(AuthState authState, ThemeData theme) {
+  Widget _buildBody(
+    AuthState authState,
+    TestResultHistoryState historyState,
+    ThemeData theme,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     if (authState is AuthAuthenticated) {
-      return _buildModernProfileView(authState.user, theme);
+      return _buildModernProfileView(authState.user, historyState, theme);
     }
 
     return SingleChildScrollView(
@@ -395,16 +402,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildModernProfileView(user, ThemeData theme) {
+  Widget _buildModernProfileView(
+    user,
+    TestResultHistoryState historyState,
+    ThemeData theme,
+  ) {
     final l10n = AppLocalizations.of(context)!;
+    final List<TestResultEntity> results = historyState.maybeWhen(
+      loaded: (res) => res,
+      orElse: () => [],
+    );
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildProfileHeader(user, l10n, theme),
+          _buildProfileHeader(user, results.length, l10n, theme),
           const SizedBox(height: 24),
-          _buildRecentActivity(l10n, theme),
+          _buildRecentActivity(results, l10n, theme),
           const SizedBox(height: 24),
           _buildSafetySection(l10n, theme),
           const SizedBox(height: 24),
@@ -416,7 +432,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildProfileHeader(user, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildProfileHeader(
+    user,
+    int totalTests,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -482,17 +503,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.laboratoryTechnician,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '$totalTests ${l10n.totalTests}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-
               ],
             ),
           ),
@@ -501,7 +530,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildRecentActivity(AppLocalizations l10n, ThemeData theme) {
+  Widget _buildRecentActivity(
+    List<TestResultEntity> results,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -525,34 +558,44 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ],
           ),
-          child: Column(
-            children: [
-              _buildActivityItem(
-                'Marquis Test',
-                'MDMA Sample',
-                '2 hours ago',
-                const Color(0xFF10B981), // Green
-                theme,
-              ),
-              _buildActivityItem(
-                'Ehrlich Test',
-                'LSD Sample',
-                '1 day ago',
-                const Color(0xFF3B82F6), // Blue
-                theme,
-              ),
-              _buildActivityItem(
-                'Scott Test',
-                'Cocaine Sample',
-                '2 days ago',
-                const Color(0xFF8B5CF6), // Purple
-                theme,
-              ),
-            ],
-          ),
+          child: results.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Center(
+                    child: Text(
+                      l10n.noRecentActivity,
+                      style: TextStyle(color: Colors.grey[500]),
+                    ),
+                  ),
+                )
+              : Column(
+                  children: results.take(3).map((result) {
+                    return _buildActivityItem(
+                      result.reagentName,
+                      result.possibleSubstances.join(', '),
+                      _formatTimeAgo(result.testCompletedAt),
+                      _getConfidenceColor(result.confidencePercentage),
+                      theme,
+                    );
+                  }).toList(),
+                ),
         ),
       ],
     );
+  }
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final diff = DateTime.now().difference(dateTime);
+    if (diff.inDays > 0) return '${diff.inDays}d ago';
+    if (diff.inHours > 0) return '${diff.inHours}h ago';
+    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
+    return 'Just now';
+  }
+
+  Color _getConfidenceColor(int confidence) {
+    if (confidence >= 80) return const Color(0xFF10B981); // Green
+    if (confidence >= 60) return const Color(0xFF3B82F6); // Blue
+    return const Color(0xFFEF4444); // Red
   }
 
   Widget _buildActivityItem(

@@ -435,8 +435,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analysisIntelligenceTitle => 'Analysis intelligence';
 
   @override
-  String get analysisIntelligenceDescription =>
-      'The AI verified the reaction color against thousands of reference samples to ensure maximum accuracy.';
+  String get analysisIntelligenceDescription => 'The AI verified the reaction color against thousands of reference samples to ensure maximum accuracy.';
 
   @override
   String get switchLanguage => 'Switch language';
@@ -574,9 +573,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinLaboratory => 'Join Laboratory';
 
   @override
-  String get laboratoryTechnician => 'Laboratory Technician';
-
-  @override
   String get verified => 'Verified';
 
   @override
@@ -599,6 +595,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recentActivity => 'Recent Activity';
+
+  @override
+  String get noRecentActivity => 'No recent activity recorded yet.';
 
   @override
   String get hoursAgo => 'hours ago';
