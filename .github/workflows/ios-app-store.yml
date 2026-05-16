@@ -78,26 +78,35 @@ jobs:
           
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
-          # Try to get UUID using security, if it fails, try manual extraction
-          if UUID=$(security cms -D -i "$PP_PATH" | plutil -extract UUID raw - 2>/dev/null); then
-            echo "✅ CMS decoding successful."
+          # Try to get XML payload using openssl as a more robust alternative
+          if openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$RUNNER_TEMP/payload.xml" 2>/dev/null; then
+            echo "✅ OpenSSL decoding successful."
+            PAYLOAD="$RUNNER_TEMP/payload.xml"
+          elif security cms -D -i "$PP_PATH" > "$RUNNER_TEMP/payload.xml" 2>/dev/null; then
+            echo "✅ Security CMS decoding successful."
+            PAYLOAD="$RUNNER_TEMP/payload.xml"
           else
-            echo "⚠️ CMS decoding failed, attempting manual UUID extraction..."
-            UUID=$(grep -aA1 "UUID" "$PP_PATH" | grep -ao "[-A-Z0-9]\{36\}" | head -n1)
+            echo "⚠️ All decoding methods failed, attempting strings extraction..."
+            strings "$PP_PATH" > "$RUNNER_TEMP/payload.xml"
+            PAYLOAD="$RUNNER_TEMP/payload.xml"
           fi
           
-          if [ -z "$UUID" ]; then echo "❌ Could not find UUID in profile!"; exit 1; fi
+          # Debug: show what we found
+          echo "📝 Payload Preview:"
+          head -n 20 "$PAYLOAD"
           
-          # Extract Profile Name manually if needed
-          if PROFILE_NAME=$(security cms -D -i "$PP_PATH" | plutil -extract Name raw - 2>/dev/null); then
-             echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-          else
-             PROFILE_NAME=$(grep -aA1 "Name" "$PP_PATH" | grep -oa "<string>.*</string>" | head -n1 | sed 's|<string>||;s|</string>||')
-             echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
+          # Extract UUID and Name from the decoded payload
+          UUID=$(grep -aA1 "UUID" "$PAYLOAD" | grep -oa "[-A-Z0-9]\{36\}" | head -n1)
+          PROFILE_NAME=$(grep -aA1 "Name" "$PAYLOAD" | grep -oa "<string>.*</string>" | head -n1 | sed 's|<string>||;s|</string>||')
+          
+          if [ -z "$UUID" ]; then 
+            echo "❌ Could not find UUID in payload!"
+            exit 1
           fi
           
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           echo "UUID=$UUID" >> $GITHUB_ENV
+          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
           echo "✅ Profile installed: $PROFILE_NAME ($UUID)"
           echo "UUID=$UUID" >> $GITHUB_ENV
           echo "✅ Profile installed: $PROFILE_NAME"
