@@ -118,6 +118,13 @@ jobs:
           PROFILE_NAME=$(security cms -D -i "$PP_PATH" | plutil -extract Name raw -)
           echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
           echo "UUID=$UUID" >> $GITHUB_ENV
+          
+          # Force Xcode to use this profile for Manual Signing
+          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = \"\";/PROVISIONING_PROFILE_SPECIFIER = \"$PROFILE_NAME\";/g" ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' "s/CODE_SIGN_IDENTITY = \"Apple Development\";/CODE_SIGN_IDENTITY = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' "s/\"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]\" = \"iPhone Developer\";/\"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]\" = \"Apple Distribution\";/g" ios/Runner.xcodeproj/project.pbxproj
+          
+          echo "✅ Provisioning profile installed and linked: $PROFILE_NAME"
 
       - name: Install CocoaPods
         run: |
