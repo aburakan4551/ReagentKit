@@ -41,7 +41,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY_WEB'),
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_WEB', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
     appId: '1:76342007759:web:ec5cd1f83580a0fb3164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY_ANDROID'),
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_ANDROID', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
     appId: '1:76342007759:android:1d8bec4e1e5955d43164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY_IOS'),
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_IOS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
     appId: '1:76342007759:ios:2842920a81dc24613164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -69,7 +69,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY_MACOS'),
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_MACOS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
     appId: '1:76342007759:ios:2842920a81dc24613164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -79,7 +79,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_API_KEY_WINDOWS'),
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_WINDOWS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
     appId: '1:76342007759:web:0318c3f7a6adef6e3164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
