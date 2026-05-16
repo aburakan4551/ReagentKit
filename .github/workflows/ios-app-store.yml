@@ -41,8 +41,13 @@ jobs:
         run: |
           CERT_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          # Use printf to handle large strings more reliably than echo
-          printf "%s" "$BUILD_CERTIFICATE_BASE64" | tr -d '\n ' | base64 -D > "$CERT_PATH"
+          
+          # Write Base64 to a temp file first (safest for large strings)
+          cat <<EOF > cert_base64.txt
+          ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          EOF
+          
+          tr -d '\n ' < cert_base64.txt | base64 -D > "$CERT_PATH"
           
           if [ ! -s "$CERT_PATH" ]; then echo "❌ Certificate file is empty!"; exit 1; fi
           
@@ -55,11 +60,14 @@ jobs:
           echo "✅ Certificate imported."
 
       - name: Installing provisioning profile...
-        env:
-          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
         run: |
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-          printf "%s" "$BUILD_PROVISION_PROFILE_BASE64" | tr -d '\n ' | base64 -D > "$PP_PATH"
+          
+          cat <<EOF > pp_base64.txt
+          ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          EOF
+          
+          tr -d '\n ' < pp_base64.txt | base64 -D > "$PP_PATH"
           
           if [ ! -s "$PP_PATH" ]; then echo "❌ Provisioning profile file is empty!"; exit 1; fi
           
