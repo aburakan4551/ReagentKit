@@ -95,21 +95,23 @@ jobs:
           echo "📝 Payload Preview:"
           head -n 20 "$PAYLOAD"
           
-          # Extract UUID and Name from the decoded payload
-          UUID=$(grep -aA1 "UUID" "$PAYLOAD" | grep -oa "[-A-Z0-9]\{36\}" | head -n1)
+          # Extract UUID and Name from the decoded payload using robust regex
+          UUID=$(grep -ioE "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" "$PAYLOAD" | head -n1)
           PROFILE_NAME=$(grep -aA1 "Name" "$PAYLOAD" | grep -oa "<string>.*</string>" | head -n1 | sed 's|<string>||;s|</string>||')
           
           if [ -z "$UUID" ]; then 
-            echo "❌ Could not find UUID in payload!"
+            echo "❌ Could not find UUID in payload! Here is more content for debugging:"
+            cat "$PAYLOAD" | head -n 100
             exit 1
           fi
+          
+          echo "🆔 Found UUID: $UUID"
+          echo "📛 Found Profile Name: $PROFILE_NAME"
           
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
           echo "UUID=$UUID" >> $GITHUB_ENV
           echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-          echo "✅ Profile installed: $PROFILE_NAME ($UUID)"
-          echo "UUID=$UUID" >> $GITHUB_ENV
-          echo "✅ Profile installed: $PROFILE_NAME"
+          echo "✅ Profile installed successfully."
 
       - name: Hardening Xcode Project Signing
         run: |
