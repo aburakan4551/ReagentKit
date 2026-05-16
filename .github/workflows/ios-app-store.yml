@@ -42,12 +42,13 @@ jobs:
           CERT_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           
-          # Write Base64 to a temp file first (safest for large strings)
-          cat <<EOF > cert_base64.txt
+          # Use quoted EOF to prevent any variable expansion
+          cat <<'EOF' > cert_base64.txt
           ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           EOF
           
-          tr -d '\n ' < cert_base64.txt | base64 -D > "$CERT_PATH"
+          # Strictly filter only Base64 characters to remove any hidden noise
+          tr -cd 'A-Za-z0-9+/=' < cert_base64.txt | base64 -D > "$CERT_PATH"
           
           if [ ! -s "$CERT_PATH" ]; then echo "❌ Certificate file is empty!"; exit 1; fi
           
@@ -63,11 +64,11 @@ jobs:
         run: |
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           
-          cat <<EOF > pp_base64.txt
+          cat <<'EOF' > pp_base64.txt
           ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           EOF
           
-          tr -d '\n ' < pp_base64.txt | base64 -D > "$PP_PATH"
+          tr -cd 'A-Za-z0-9+/=' < pp_base64.txt | base64 -D > "$PP_PATH"
           
           if [ ! -s "$PP_PATH" ]; then echo "❌ Provisioning profile file is empty!"; exit 1; fi
           
