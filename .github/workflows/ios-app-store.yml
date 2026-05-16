@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     name: Build & Export iOS IPA
-    runs-on: macos-15
+    runs-on: macos-14
     timeout-minutes: 60
 
     env:
@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set up Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -65,18 +68,22 @@ jobs:
       - name: Hardening Xcode Project Signing
         run: |
           PROJECT_FILE="ios/Runner.xcodeproj/project.pbxproj"
-          # Disable Automatic Signing for ALL targets
-          sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
-          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PROJECT_FILE"
           
-          # Force Team ID and Provisioning Profile Specifier
+          # Force Manual Signing across ALL configurations
+          sed -i '' 's/ProvisioningStyle = [^;]*;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
+          sed -i '' 's/CODE_SIGN_STYLE = [^;]*;/CODE_SIGN_STYLE = Manual;/g' "$PROJECT_FILE"
+          
+          # Force Team ID
           sed -i '' "s/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = ${{ env.APPLE_TEAM_ID }};/g" "$PROJECT_FILE"
+          
+          # Force Provisioning Profile Specifier
           sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = \"${{ env.PROFILE_NAME }}\";/g" "$PROJECT_FILE"
           
-          # Force Code Sign Identity to Distribution
-          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
-          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "iPhone Developer";/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Distribution";/g' "$PROJECT_FILE"
-          echo "✅ Xcode project signing hardened to Manual with Apple Distribution."
+          # Set Code Sign Identity to Distribution
+          sed -i '' 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = [^;]*;/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Distribution";/g' "$PROJECT_FILE"
+          
+          echo "✅ Xcode project signing forced to Manual Distribution."
 
       - name: Flutter Pub Get & CocoaPods
         run: |
@@ -110,7 +117,6 @@ jobs:
           BUILD_NAME=${{ github.event.inputs.build_name || '1.0.0' }}
           BUILD_NUMBER=${{ github.event.inputs.build_number || github.run_number }}
           
-          # Simplified API key injection to match the required secrets
           flutter build ipa --release \
             --build-name "$BUILD_NAME" \
             --build-number "$BUILD_NUMBER" \
