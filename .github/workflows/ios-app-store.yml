@@ -42,13 +42,10 @@ jobs:
           CERT_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           
-          # Use quoted EOF to prevent any variable expansion
-          cat <<'EOF' > cert_base64.txt
-          ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          EOF
-          
-          # Strictly filter only Base64 characters to remove any hidden noise
-          tr -cd 'A-Za-z0-9+/=' < cert_base64.txt | base64 -D > "$CERT_PATH"
+          # Use Python for 100% reliable decoding of large strings
+          python3 -c "import base64, os; data = os.environ['B64'].replace('\n', '').replace(' ', ''); open('$CERT_PATH', 'wb').write(base64.b64decode(data))"
+          env:
+            B64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           
           if [ ! -s "$CERT_PATH" ]; then echo "❌ Certificate file is empty!"; exit 1; fi
           
@@ -61,16 +58,13 @@ jobs:
           echo "✅ Certificate imported."
 
       - name: Installing provisioning profile...
-        env:
-          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_DATA }}
         run: |
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           
-          cat <<'EOF' > pp_base64.txt
-          ${{ secrets.PROVISIONING_PROFILE_DATA }}
-          EOF
-          
-          tr -cd 'A-Za-z0-9+/=' < pp_base64.txt | base64 -D > "$PP_PATH"
+          # Use Python for 100% reliable decoding of large strings
+          python3 -c "import base64, os; data = os.environ['B64'].replace('\n', '').replace(' ', ''); open('$PP_PATH', 'wb').write(base64.b64decode(data))"
+          env:
+            B64: ${{ secrets.PROVISIONING_PROFILE_DATA }}
           
           echo "📊 Diagnostic Info:"
           ls -lh "$PP_PATH"
