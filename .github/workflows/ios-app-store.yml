@@ -76,19 +76,25 @@ jobs:
           
           if [ ! -s "$PP_PATH" ]; then echo "❌ Provisioning profile file is empty!"; exit 1; fi
           
+          FILE_MAGIC=$(xxd -p -l 2 "$PP_PATH" | tr -d '[:space:]')
+          echo "🔍 File magic: $FILE_MAGIC"
+          if [ "$FILE_MAGIC" != "3082" ]; then
+            echo "⚠️ Unexpected provisioning profile file header. The decoded secret may be invalid or double-encoded."
+          fi
+          
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
-          # Try to get XML payload using openssl or security cms
+          # Try to get XML payload using security cms first, then openssl.
           PAYLOAD="$RUNNER_TEMP/payload.xml"
-          if openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
-            echo "✅ OpenSSL CMS decoding successful. (method: openssl cms)"
-          elif security cms -D -i "$PP_PATH" > "$PAYLOAD" 2>/dev/null; then
-            echo "✅ Security CMS decoding successful. (method: security cms)"
+          if security cms -D -i "$PP_PATH" > "$PAYLOAD" 2>/dev/null; then
+            echo "✅ Security CMS decoding successful."
+          elif openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
+            echo "✅ OpenSSL CMS decoding successful."
           elif openssl smime -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
-            echo "✅ OpenSSL SMIME decoding successful. (method: openssl smime)"
+            echo "✅ OpenSSL SMIME decoding successful."
           else
-            echo "⚠️ All decoding methods failed, attempting strings extraction... (method: strings)"
-            strings "$PP_PATH" > "$PAYLOAD"
+            echo "⚠️ All decoding methods failed. Using raw profile bytes for UUID extraction."
+            cp "$PP_PATH" "$PAYLOAD"
           fi
           
           # Debug: show what we found
@@ -98,33 +104,33 @@ jobs:
           # Extract UUID from raw provisioning profile bytes first,
           # then from decoded payload if available.
           UUID=$(python3 - <<'PY'
-import re
-import sys
-paths = sys.argv[1:]
-for path in paths:
-    data = open(path, 'rb').read()
-    m = re.search(br'<key>UUID</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
-    if m:
-        print(m.group(1).decode('utf-8', 'ignore').strip())
-        break
-    m = re.search(rb'([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', data)
-    if m:
-        print(m.group(1).decode('utf-8', 'ignore').strip())
-        break
-PY
-"$PP_PATH" "$PAYLOAD")
+          import re
+          import sys
+          paths = sys.argv[1:]
+          for path in paths:
+              data = open(path, 'rb').read()
+              m = re.search(br'<key>UUID</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
+              if m:
+                  print(m.group(1).decode('utf-8', 'ignore').strip())
+                  break
+              m = re.search(rb'([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', data)
+              if m:
+                  print(m.group(1).decode('utf-8', 'ignore').strip())
+                  break
+          PY
+          "$PP_PATH" "$PAYLOAD")
           PROFILE_NAME=$(python3 - <<'PY'
-import re
-import sys
-paths = sys.argv[1:]
-for path in paths:
-    data = open(path, 'rb').read()
-    m = re.search(br'<key>Name</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
-    if m:
-        print(m.group(1).decode('utf-8', 'ignore').strip())
-        break
-PY
-"$PP_PATH" "$PAYLOAD")
+          import re
+          import sys
+          paths = sys.argv[1:]
+          for path in paths:
+              data = open(path, 'rb').read()
+              m = re.search(br'<key>Name</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
+              if m:
+                  print(m.group(1).decode('utf-8', 'ignore').strip())
+                  break
+          PY
+          "$PP_PATH" "$PAYLOAD")
 
           if [ -z "$UUID" ]; then 
             echo "❌ Could not find UUID in payload! Here is more content for debugging:"
