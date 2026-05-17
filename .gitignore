@@ -54,3 +54,5 @@ macos/Runner/ExportOptions.plist
 # Misc
 .DS_Store
 *.log
+docs/github-actions-ios-secrets.md
+docs/github-actions-ios.md
