@@ -17,12 +17,15 @@
 | `IOS_DISTRIBUTION_CERTIFICATE_BASE64` | محتوى شهادة Apple Distribution بصيغة `.p12` بعد تحويله إلى Base64. |
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | كلمة مرور شهادة `.p12`. |
 | `IOS_KEYCHAIN_PASSWORD` | أي كلمة مرور قوية ومؤقتة للـ keychain داخل GitHub Actions. |
-| `IOS_PROVISIONING_PROFILE_BASE64` | محتوى App Store provisioning profile بصيغة `.mobileprovision` بعد تحويله إلى Base64. |
-| `PROVISIONING_PROFILE_DATA` or `BUILD_PROVISION_PROFILE_BASE64` | (اختياري) اسم بديل قد يستخدمه workflow إذا كانت الأسرار موجودة تحت هذا الاسم.
+| `IOS_PROVISIONING_PROFILE_BASE64` | محتوى App Store provisioning profile بصيغة `.mobileprovision` بعد تحويله إلى Base64. استخدم هذا السر فقط لتجنب الالتباس. |
 | `IOS_GOOGLE_SERVICE_INFO_PLIST_BASE64` | اختياري لكنه مفضل: محتوى `ios/Runner/GoogleService-Info.plist` بعد تحويله إلى Base64. |
 | `APP_STORE_CONNECT_API_KEY_ID` | مطلوب فقط إذا فعّلت رفع TestFlight من داخل workflow. |
 | `APP_STORE_CONNECT_API_ISSUER_ID` | مطلوب فقط إذا فعّلت رفع TestFlight من داخل workflow. |
 | `APP_STORE_CONNECT_API_KEY_BASE64` | مطلوب فقط إذا فعّلت رفع TestFlight: محتوى ملف `.p8` بعد تحويله إلى Base64. |
+
+> ملاحظة: إذا كانت القيم الثلاث متوفرة، فسيقوم workflow بعد بناء `.ipa` برفعه تلقائيًا إلى App Store Connect باستخدام `xcrun altool`.
+>
+> تأكد من أن `IOS_PROVISIONING_PROFILE_BASE64` يحتوي على ملف `.mobileprovision` واحد فقط. لا تضع أكثر من provisioning profile في سر واحد، ولا تستخدم أسرار بديلة في نفس الوقت.
 
 ## تحويل الملفات إلى Base64
 
