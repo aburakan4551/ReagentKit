@@ -4,6 +4,15 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      build_name:
+        description: 'Build name to use for the iOS IPA'
+        required: false
+        default: '1.0.0'
+      build_number:
+        description: 'Build number to use for the iOS IPA'
+        required: false
+        default: '1'
 
 permissions:
   contents: read
