@@ -45,11 +45,16 @@ post_install do |installer|
     end
   end
 
-  # Fix invalid generated FirebaseSharedSwift source for current Swift compiler.
-  firebase_encoder = File.join(installer.sandbox.root, 'FirebaseSharedSwift', 'FirebaseSharedSwift', 'Sources', 'third_party', 'FirebaseDataEncoder', 'FirebaseDataEncoder.swift')
-  if File.exist?(firebase_encoder)
-    text = File.read(firebase_encoder)
-    fixed = text.gsub('throws -> sending Any', 'throws -> Any')
-    File.write(firebase_encoder, fixed) if text != fixed
+  # Normalize generated Firebase Swift source to current compiler compatibility.
+  Dir.glob(File.join(installer.sandbox.root, '**', '*.swift')).each do |path|
+    next unless File.exist?(path)
+
+    text = File.read(path)
+    fixed = text
+      .gsub(/\bthrows -> sending Any\b/, 'throws -> Any')
+      .gsub(/\binitialState: sending State\b/, 'initialState: State')
+      .gsub(/^\s*internal import /, 'import ')
+
+    File.write(path, fixed) if text != fixed
   end
 end
