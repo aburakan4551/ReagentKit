@@ -215,13 +215,16 @@ jobs:
           path: build/ios/ipa/*.ipa
 
       - name: Upload to App Store Connect
-        if: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 && secrets.APP_STORE_CONNECT_API_KEY_ID && secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
           API_PRIVATE_KEYS_DIR: $RUNNER_TEMP/.appstoreconnect/private_keys
         run: |
+          if [ -z "$API_KEY_ID" ] || [ -z "$API_ISSUER_ID" ] || [ -z "$API_KEY_BASE64" ]; then
+            echo "🔶 App Store Connect secrets missing; skipping upload."
+            exit 0
+          fi
           IPA_PATH=$(ls build/ios/ipa/*.ipa | head -n 1)
           if [ -z "$IPA_PATH" ]; then
             echo "❌ No IPA found to upload."
