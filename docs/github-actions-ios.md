@@ -18,6 +18,7 @@
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | كلمة مرور شهادة `.p12`. |
 | `IOS_KEYCHAIN_PASSWORD` | أي كلمة مرور قوية ومؤقتة للـ keychain داخل GitHub Actions. |
 | `IOS_PROVISIONING_PROFILE_BASE64` | محتوى App Store provisioning profile بصيغة `.mobileprovision` بعد تحويله إلى Base64. |
+| `PROVISIONING_PROFILE_DATA` or `BUILD_PROVISION_PROFILE_BASE64` | (اختياري) اسم بديل قد يستخدمه workflow إذا كانت الأسرار موجودة تحت هذا الاسم.
 | `IOS_GOOGLE_SERVICE_INFO_PLIST_BASE64` | اختياري لكنه مفضل: محتوى `ios/Runner/GoogleService-Info.plist` بعد تحويله إلى Base64. |
 | `APP_STORE_CONNECT_API_KEY_ID` | مطلوب فقط إذا فعّلت رفع TestFlight من داخل workflow. |
 | `APP_STORE_CONNECT_API_ISSUER_ID` | مطلوب فقط إذا فعّلت رفع TestFlight من داخل workflow. |

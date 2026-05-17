@@ -35,9 +35,9 @@ jobs:
 
       - name: Installing certificate...
         env:
-          B64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          B64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 || secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD || secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD || secrets.KEYCHAIN_PASSWORD }}
         run: |
           CERT_PATH=$RUNNER_TEMP/build_certificate.p12
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
@@ -57,7 +57,7 @@ jobs:
 
       - name: Installing provisioning profile...
         env:
-          B64: ${{ secrets.PROVISIONING_PROFILE_DATA || secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 || secrets.PROVISIONING_PROFILE_DATA || secrets.BUILD_PROVISION_PROFILE_BASE64 }}
         run: |
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           
@@ -78,33 +78,63 @@ jobs:
           
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           
-          # Try to get XML payload using openssl as a more robust alternative
-          if openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$RUNNER_TEMP/payload.xml" 2>/dev/null; then
-            echo "✅ OpenSSL decoding successful."
-            PAYLOAD="$RUNNER_TEMP/payload.xml"
-          elif security cms -D -i "$PP_PATH" > "$RUNNER_TEMP/payload.xml" 2>/dev/null; then
-            echo "✅ Security CMS decoding successful."
-            PAYLOAD="$RUNNER_TEMP/payload.xml"
+          # Try to get XML payload using openssl or security cms
+          PAYLOAD="$RUNNER_TEMP/payload.xml"
+          if openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
+            echo "✅ OpenSSL CMS decoding successful. (method: openssl cms)"
+          elif security cms -D -i "$PP_PATH" > "$PAYLOAD" 2>/dev/null; then
+            echo "✅ Security CMS decoding successful. (method: security cms)"
+          elif openssl smime -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
+            echo "✅ OpenSSL SMIME decoding successful. (method: openssl smime)"
           else
-            echo "⚠️ All decoding methods failed, attempting strings extraction..."
-            strings "$PP_PATH" > "$RUNNER_TEMP/payload.xml"
-            PAYLOAD="$RUNNER_TEMP/payload.xml"
+            echo "⚠️ All decoding methods failed, attempting strings extraction... (method: strings)"
+            strings "$PP_PATH" > "$PAYLOAD"
           fi
           
           # Debug: show what we found
           echo "📝 Payload Preview:"
           head -n 20 "$PAYLOAD"
           
-          # Extract UUID and Name from the decoded payload using robust regex
-          UUID=$(grep -ioE "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" "$PAYLOAD" | head -n1)
-          PROFILE_NAME=$(grep -aA1 "Name" "$PAYLOAD" | grep -oa "<string>.*</string>" | head -n1 | sed 's|<string>||;s|</string>||')
-          
+          # Extract UUID from decoded payload or binary profile bytes
+          UUID=$(python3 - <<'PY'
+import re
+import sys
+paths = sys.argv[1:]
+for path in paths:
+    data = open(path, 'rb').read()
+    m = re.search(br'<key>UUID</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
+    if m:
+        print(m.group(1).decode('utf-8', 'ignore').strip())
+        break
+    m = re.search(rb'([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', data)
+    if m:
+        print(m.group(1).decode('utf-8', 'ignore').strip())
+        break
+PY
+"$PAYLOAD" "$PP_PATH")
+          PROFILE_NAME=$(python3 - <<'PY'
+import re
+import sys
+paths = sys.argv[1:]
+for path in paths:
+    data = open(path, 'rb').read()
+    m = re.search(br'<key>Name</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
+    if m:
+        print(m.group(1).decode('utf-8', 'ignore').strip())
+        break
+PY
+"$PAYLOAD" "$PP_PATH")
+
           if [ -z "$UUID" ]; then 
             echo "❌ Could not find UUID in payload! Here is more content for debugging:"
-            cat "$PAYLOAD" | head -n 100
+            grep -nE "UUID|<key>Name</key>|<string>.*</string>" "$PAYLOAD" | head -n 60 || true
             exit 1
           fi
-          
+
+          if [ -z "$PROFILE_NAME" ]; then
+            PROFILE_NAME="UnknownProvisioningProfile"
+          fi
+
           echo "🆔 Found UUID: $UUID"
           echo "📛 Found Profile Name: $PROFILE_NAME"
           
