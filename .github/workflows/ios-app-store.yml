@@ -21,20 +21,27 @@ permissions:
 jobs:
   build:
     name: Build & Export iOS IPA
-    runs-on: macos-15
+    runs-on: macos-latest
     timeout-minutes: 60
 
     env:
       BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       FLUTTER_VERSION: '3.24.5'
+      XCODE_SELECT_VERSION: '/Applications/Xcode.app/Contents/Developer'
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Xcode version
-        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer || sudo xcode-select --switch /Library/Developer/Xcode/Contents/Developer
+
+      - name: Verify Xcode and SDK versions
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos | tail -n 1
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -208,7 +215,10 @@ jobs:
             --build-number "$BUILD_NUMBER" \
             --export-options-plist=ios/Runner/ExportOptions.plist \
             --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
-            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
+            --verbose
+        env:
+          IPHONEOS_DEPLOYMENT_TARGET: '17.0'
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
