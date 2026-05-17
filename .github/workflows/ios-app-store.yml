@@ -97,7 +97,7 @@ jobs:
             cp "$PP_PATH" "$PAYLOAD"
           fi
           
-          # Debug: show what we found
+                    # Debug: show what we found
           echo "📝 Payload Preview:"
           head -n 20 "$PAYLOAD"
           
@@ -131,7 +131,6 @@ jobs:
                   break
           PY
           "$PP_PATH" "$PAYLOAD")
-
           if [ -z "$UUID" ]; then 
             echo "❌ Could not find UUID in payload! Here is more content for debugging:"
             grep -nE "UUID|<key>Name</key>|<string>.*</string>" "$PAYLOAD" | head -n 60 || true
