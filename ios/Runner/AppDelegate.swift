@@ -1,6 +1,5 @@
 import Flutter
 import UIKit
-import FirebaseCore
 import GoogleSignIn
 
 @main
@@ -11,11 +10,7 @@ import GoogleSignIn
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
 
-    // 🔥 CRITICAL ORDER: Firebase MUST be configured before ANYTHING else
-    // This ensures GoogleSignIn can read CLIENT_ID from GoogleService-Info.plist
-    FirebaseApp.configure()
-
-    // Register Flutter plugins AFTER Firebase is ready
+    // Register Flutter plugins
     GeneratedPluginRegistrant.register(with: self)
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
