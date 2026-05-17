@@ -95,7 +95,8 @@ jobs:
           echo "📝 Payload Preview:"
           head -n 20 "$PAYLOAD"
           
-          # Extract UUID from decoded payload or binary profile bytes
+          # Extract UUID from raw provisioning profile bytes first,
+          # then from decoded payload if available.
           UUID=$(python3 - <<'PY'
 import re
 import sys
@@ -111,7 +112,7 @@ for path in paths:
         print(m.group(1).decode('utf-8', 'ignore').strip())
         break
 PY
-"$PAYLOAD" "$PP_PATH")
+"$PP_PATH" "$PAYLOAD")
           PROFILE_NAME=$(python3 - <<'PY'
 import re
 import sys
@@ -123,7 +124,7 @@ for path in paths:
         print(m.group(1).decode('utf-8', 'ignore').strip())
         break
 PY
-"$PAYLOAD" "$PP_PATH")
+"$PP_PATH" "$PAYLOAD")
 
           if [ -z "$UUID" ]; then 
             echo "❌ Could not find UUID in payload! Here is more content for debugging:"
