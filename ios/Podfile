@@ -41,6 +41,15 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['SWIFT_VERSION'] = '5.9'
     end
+  end
+
+  # Fix invalid generated FirebaseSharedSwift source for current Swift compiler.
+  firebase_encoder = File.join(installer.sandbox.root, 'FirebaseSharedSwift', 'FirebaseSharedSwift', 'Sources', 'third_party', 'FirebaseDataEncoder', 'FirebaseDataEncoder.swift')
+  if File.exist?(firebase_encoder)
+    text = File.read(firebase_encoder)
+    fixed = text.gsub('throws -> sending Any', 'throws -> Any')
+    File.write(firebase_encoder, fixed) if text != fixed
   end
 end
