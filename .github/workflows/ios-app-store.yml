@@ -100,7 +100,7 @@ jobs:
           echo "Payload Preview:"
           head -n 20 "$PAYLOAD"
 
-          UUID=$(python3 - <<'PY'
+          UUID=$(python3 - "$PP_PATH" "$PAYLOAD" <<'PY'
           import re
           import sys
           for path in sys.argv[1:]:
@@ -110,9 +110,9 @@ jobs:
                   print(m.group(1).decode('utf-8', 'ignore').strip())
                   break
           PY
-          "$PP_PATH" "$PAYLOAD")
+          )
 
-          PROFILE_NAME=$(python3 - <<'PY'
+          PROFILE_NAME=$(python3 - "$PP_PATH" "$PAYLOAD" <<'PY'
           import re
           import sys
           for path in sys.argv[1:]:
@@ -122,7 +122,7 @@ jobs:
                   print(m.group(1).decode('utf-8', 'ignore').strip())
                   break
           PY
-          "$PP_PATH" "$PAYLOAD")
+          )
 
           if [ -z "$UUID" ]; then
             echo "ERROR: Could not find UUID in payload!"
