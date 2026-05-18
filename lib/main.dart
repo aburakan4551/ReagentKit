@@ -15,25 +15,121 @@ import 'core/globals.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  Object? startupError;
+  StackTrace? startupStackTrace;
+  var firebaseReady = false;
+
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     }
-  } catch (e) {
-    Logger.info('Firebase initialization error: $e');
+    firebaseReady = true;
+  } catch (e, st) {
+    startupError = e;
+    startupStackTrace = st;
+    Logger.error(
+      'Firebase initialization failed',
+      error: e,
+      stackTrace: st,
+    );
+  }
+
+  if (firebaseReady) {
+    try {
+      final remoteConfigService = RemoteConfigService();
+      await remoteConfigService.initialize();
+      Logger.info('Remote Config initialized successfully in main()');
+    } catch (e, st) {
+      Logger.error(
+        'Remote Config initialization failed in main()',
+        error: e,
+        stackTrace: st,
+      );
+    }
+  }
+
+  if (!firebaseReady) {
+    runApp(
+      StartupErrorApp(
+        error: startupError,
+        stackTrace: startupStackTrace,
+      ),
+    );
+    return;
   }
 
   try {
-    final remoteConfigService = RemoteConfigService();
-    await remoteConfigService.initialize();
-    Logger.info('✅ Remote Config initialized successfully in main()');
-  } catch (e) {
-    Logger.info('⚠️ Remote Config initialization failed in main(): $e');
+    await configureDependencies();
+  } catch (e, st) {
+    Logger.error(
+      'Dependency initialization failed',
+      error: e,
+      stackTrace: st,
+    );
+    runApp(
+      StartupErrorApp(
+        error: e,
+        stackTrace: st,
+      ),
+    );
+    return;
   }
 
-  await configureDependencies();
-
   runApp(const ProviderScope(child: ReagentTestingApp()));
+}
+
+class StartupErrorApp extends StatelessWidget {
+  const StartupErrorApp({
+    super.key,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final Object? error;
+  final StackTrace? stackTrace;
+
+  @override
+  Widget build(BuildContext context) {
+    final message = error?.toString() ?? 'Unknown startup error';
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(Icons.error_outline, size: 56),
+                const SizedBox(height: 20),
+                const Text(
+                  'ReagentKit could not start',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                if (stackTrace != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    stackTrace.toString().split('\n').take(3).join('\n'),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class ReagentTestingApp extends ConsumerWidget {
