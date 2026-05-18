@@ -263,6 +263,34 @@ def main():
         except Exception as e:
             print(f"⚠️ Failed to write to GITHUB_ENV: {e}")
             
+    # ----------------------------------------------------
+    # 9. Decode and Write GoogleService-Info.plist if available
+    # ----------------------------------------------------
+    google_service_plist = os.environ.get('GOOGLE_SERVICE_INFO_PLIST')
+    if google_service_plist:
+        plist_path = 'ios/Runner/GoogleService-Info.plist'
+        print(f"📄 Writing GoogleService-Info.plist to {plist_path}...")
+        try:
+            plist_content = google_service_plist.strip()
+            # Try to decode if base64 encoded
+            if not plist_content.startswith('<?xml') and not plist_content.startswith('<plist'):
+                try:
+                    decoded_bytes = base64.b64decode(plist_content)
+                    plist_content = decoded_bytes.decode('utf-8')
+                except Exception:
+                    pass
+            
+            # Ensure the directory exists
+            os.makedirs(os.path.dirname(plist_path), exist_ok=True)
+            with open(plist_path, 'w', encoding='utf-8') as f:
+                f.write(plist_content)
+            print("✅ GoogleService-Info.plist successfully written.")
+        except Exception as e:
+            print(f"❌ ERROR: Failed to write GoogleService-Info.plist: {e}")
+            sys.exit(1)
+    else:
+        print("⚠️ WARNING: GOOGLE_SERVICE_INFO_PLIST environment variable is missing. Build may fail if file is missing.")
+            
     print("="*60)
     print("🎉 ALL iOS SIGNING PREPARATIONS ARE 100% SUCCESSFUL AND VALIDATED!")
     print("="*60)

@@ -42,6 +42,9 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['SWIFT_VERSION'] = '5.0'
+      # Silence all warnings (including Swift 6 conformance warnings) inside Pods
+      config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+      config.build_settings['RUN_CLANG_STATIC_ANALYZER'] = 'NO'
     end
   end
 end
