@@ -41,12 +41,31 @@ class UserModel {
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    
+    DateTime parsedRegisteredAt = DateTime.now();
+    if (data['registeredAt'] != null) {
+      if (data['registeredAt'] is Timestamp) {
+        parsedRegisteredAt = (data['registeredAt'] as Timestamp).toDate();
+      } else if (data['registeredAt'] is String) {
+        parsedRegisteredAt = DateTime.tryParse(data['registeredAt']) ?? DateTime.now();
+      }
+    }
+
+    DateTime? parsedLastSignInAt;
+    if (data['lastSignInAt'] != null) {
+      if (data['lastSignInAt'] is Timestamp) {
+        parsedLastSignInAt = (data['lastSignInAt'] as Timestamp).toDate();
+      } else if (data['lastSignInAt'] is String) {
+        parsedLastSignInAt = DateTime.tryParse(data['lastSignInAt']);
+      }
+    }
+
     return UserModel(
       uid: data['uid'] ?? '',
       email: data['email'] ?? '',
       username: data['username'] ?? '',
-      registeredAt: (data['registeredAt'] as Timestamp).toDate(),
+      registeredAt: parsedRegisteredAt,
       photoUrl: data['photoUrl'],
       displayName: data['displayName'],
       isEmailVerified: data['isEmailVerified'] ?? false,
@@ -54,7 +73,7 @@ class UserModel {
       signInMethods: List<String>.from(data['signInMethods'] ?? []),
       preferredLanguage: data['preferredLanguage'],
       provider: data['provider'],
-      lastSignInAt: data['lastSignInAt'] != null ? (data['lastSignInAt'] as Timestamp).toDate() : null,
+      lastSignInAt: parsedLastSignInAt,
       customClaims: data['customClaims'],
       isActive: data['isActive'] ?? true,
       timezone: data['timezone'],
