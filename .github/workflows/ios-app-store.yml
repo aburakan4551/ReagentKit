@@ -49,134 +49,37 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Installing certificate...
+      - name: Prepare iOS Code Signing and Hardening Xcode project
         env:
-          B64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 || secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD || secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD || secrets.KEYCHAIN_PASSWORD }}
+          IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 || secrets.BUILD_CERTIFICATE_BASE64 }}
+          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD || secrets.P12_PASSWORD }}
+          IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD || secrets.KEYCHAIN_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 || secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          CERT_PATH=$RUNNER_TEMP/build_certificate.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-          
-          # Use Python for 100% reliable decoding of large strings
-          python3 -c "import base64, os; data = os.environ['B64'].replace('\n', '').replace(' ', ''); open('$CERT_PATH', 'wb').write(base64.b64decode(data))"
-          
-          if [ ! -s "$CERT_PATH" ]; then echo "❌ Certificate file is empty!"; exit 1; fi
-          
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERT_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          echo "✅ Certificate imported."
+          python3 ios_signer_helper.py
 
-      - name: Installing provisioning profile...
-        env:
-          B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+      - name: Verify Signing Configuration
         run: |
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-
-          if [ -z "$B64" ]; then
-            echo "ERROR: Provisioning Profile Secret is MISSING!"
-            exit 1
-          fi
-
-          python3 -c "import base64, os; data = os.environ['B64'].strip().replace('\\n', '').replace(' ', ''); open('$PP_PATH', 'wb').write(base64.b64decode(data))"
-
-          echo "Diagnostic Info:"
-          ls -lh "$PP_PATH"
-          xxd -l 32 "$PP_PATH"
-
-          if [ ! -s "$PP_PATH" ]; then
-            echo "ERROR: Provisioning profile file is empty!"
-            exit 1
-          fi
-
-          FILE_MAGIC=$(xxd -p -l 2 "$PP_PATH" | tr -d '[:space:]')
-          echo "File magic: $FILE_MAGIC"
-          if [ "$FILE_MAGIC" != "3082" ]; then
-            echo "WARNING: Unexpected provisioning profile header. The decoded secret may be invalid or double-encoded."
-          fi
-
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          PAYLOAD="$RUNNER_TEMP/payload.xml"
-
-          if security cms -D -i "$PP_PATH" > "$PAYLOAD" 2>/dev/null; then
-            echo "Security CMS decoding successful."
-          elif openssl cms -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
-            echo "OpenSSL CMS decoding successful."
-          elif openssl smime -verify -inform DER -in "$PP_PATH" -noverify -out "$PAYLOAD" 2>/dev/null; then
-            echo "OpenSSL SMIME decoding successful."
+          echo "🔍 Verifying signing config in macOS runner environment..."
+          echo "👉 Team ID: $APPLE_TEAM_ID"
+          echo "👉 Profile Name: $PROFILE_NAME"
+          echo "👉 UUID: $UUID"
+          
+          # Check profile file existence
+          PROFILE_PATH="$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+          if [ -f "$PROFILE_PATH" ]; then
+            echo "✅ Provisioning profile exists at: $PROFILE_PATH"
+            ls -lh "$PROFILE_PATH"
           else
-            echo "WARNING: All decoding methods failed. Using raw profile bytes for extraction."
-            cp "$PP_PATH" "$PAYLOAD"
-          fi
-
-          echo "Payload Preview:"
-          head -n 20 "$PAYLOAD"
-
-          UUID=$(python3 - "$PP_PATH" "$PAYLOAD" <<'PY'
-          import re
-          import sys
-          for path in sys.argv[1:]:
-              data = open(path, 'rb').read()
-              m = re.search(br'<key>UUID</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
-              if m:
-                  print(m.group(1).decode('utf-8', 'ignore').strip())
-                  break
-          PY
-          )
-
-          PROFILE_NAME=$(python3 - "$PP_PATH" "$PAYLOAD" <<'PY'
-          import re
-          import sys
-          for path in sys.argv[1:]:
-              data = open(path, 'rb').read()
-              m = re.search(br'<key>Name</key>\s*<string>([^<]+)</string>', data, re.I | re.S)
-              if m:
-                  print(m.group(1).decode('utf-8', 'ignore').strip())
-                  break
-          PY
-          )
-
-          if [ -z "$UUID" ]; then
-            echo "ERROR: Could not find UUID in payload!"
-            grep -nE 'UUID|<key>Name</key>|<string>.*</string>' "$PAYLOAD" | head -n 60 || true
+            echo "❌ ERROR: Provisioning profile is MISSING at expected path: $PROFILE_PATH"
             exit 1
           fi
-
-          if [ -z "$PROFILE_NAME" ]; then
-            PROFILE_NAME="UnknownProvisioningProfile"
-          fi
-
-          echo "Found UUID: $UUID"
-          echo "Found Profile Name: $PROFILE_NAME"
-
-          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
-          echo "UUID=$UUID" >> $GITHUB_ENV
-          echo "PROFILE_NAME=$PROFILE_NAME" >> $GITHUB_ENV
-          echo "Profile installed successfully."
-
-      - name: Hardening Xcode Project Signing
-        run: |
-          PROJECT_FILE="ios/Runner.xcodeproj/project.pbxproj"
           
-          # Force Manual Signing across ALL configurations
-          sed -i '' 's/ProvisioningStyle = [^;]*;/ProvisioningStyle = Manual;/g' "$PROJECT_FILE"
-          sed -i '' 's/CODE_SIGN_STYLE = [^;]*;/CODE_SIGN_STYLE = Manual;/g' "$PROJECT_FILE"
-          
-          # Force Team ID
-          sed -i '' "s/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = ${{ env.APPLE_TEAM_ID }};/g" "$PROJECT_FILE"
-          
-          # Force Provisioning Profile Specifier
-          sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = [^;]*;/PROVISIONING_PROFILE_SPECIFIER = \"${{ env.PROFILE_NAME }}\";/g" "$PROJECT_FILE"
-          
-          # Set Code Sign Identity to Distribution
-          sed -i '' 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PROJECT_FILE"
-          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = [^;]*;/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Distribution";/g' "$PROJECT_FILE"
-          
-          echo "✅ Xcode project signing forced to Manual Distribution."
+          # Check keychain certificates matching Distribution
+          echo "🔐 Checking imported signing identities..."
+          security find-identity -p codesigning -v
 
       - name: Flutter Pub Get & CocoaPods
         run: |
