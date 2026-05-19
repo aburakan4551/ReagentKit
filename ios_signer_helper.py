@@ -76,8 +76,19 @@ def main():
             '-k', keychain_path
         ]
         subprocess.run(import_cmd, check=True)
-        subprocess.run(['security', 'list-keychains', '-d', 'user', '-s', keychain_path], check=True)
-        subprocess.run(['security', 'set-key-partition-list', '-S', 'apple-tool:,apple:,codesign:', '-s', '-k', keychain_password, keychain_path], check=True)
+        # Include login.keychain-db in search list so Xcode codesign can locate the
+        # private key at archive time. Without this, signing succeeds in keychain but
+        # xcodebuild cannot find the identity.
+        subprocess.run([
+            'security', 'list-keychains', '-d', 'user', '-s',
+            keychain_path,
+            os.path.expanduser('~/Library/Keychains/login.keychain-db')
+        ], check=True)
+        subprocess.run([
+            'security', 'set-key-partition-list',
+            '-S', 'apple-tool:,apple:,codesign:',
+            '-s', '-k', keychain_password, keychain_path
+        ], check=True)
         print("✅ Certificate successfully imported into custom keychain.")
     except Exception as e:
         print(f"❌ ERROR: Failed to configure keychain or import certificate: {e}")

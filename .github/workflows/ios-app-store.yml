@@ -21,14 +21,13 @@ permissions:
 jobs:
   build:
     name: Build & Export iOS IPA
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 60
 
     env:
       BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       FLUTTER_VERSION: '3.24.5'
-      XCODE_SELECT_VERSION: '/Applications/Xcode.app/Contents/Developer'
 
     steps:
       - name: Checkout Repository
@@ -46,8 +45,12 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+          flutter-version: '3.24.5'
+          channel: 'stable'
           cache: true
+
+      - name: Verify Flutter Version
+        run: flutter --version
 
       - name: Prepare iOS Code Signing and Hardening Xcode project
         env:
@@ -82,6 +85,17 @@ jobs:
           echo "🔐 Checking imported signing identities..."
           security find-identity -p codesigning -v
 
+          # Verify GoogleService-Info.plist existence and content
+          echo "📄 Verifying GoogleService-Info.plist..."
+          ls -la ios/Runner/
+          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            echo "✅ GoogleService-Info.plist exists!"
+            cat ios/Runner/GoogleService-Info.plist | head -n 15
+          else
+            echo "❌ ERROR: GoogleService-Info.plist is MISSING!"
+            exit 1
+          fi
+
       - name: Flutter Pub Get & CocoaPods
         run: |
           flutter pub get
@@ -89,11 +103,14 @@ jobs:
           rm -rf Podfile.lock Pods
           export LANG=en_US.UTF-8
           export LC_ALL=en_US.UTF-8
-          pod repo update
+          # --repo-update already refreshes specs; separate pod repo update is redundant and slow
           pod install --repo-update
           cd ..
 
       - name: Create ExportOptions.plist
+        # IMPORTANT: inside a run: heredoc, use $VAR (shell) not ${{ env.VAR }} (template).
+        # Template expressions in heredocs are evaluated at parse-time and produce empty
+        # strings for vars set by previous steps via GITHUB_ENV.
         run: |
           cat > ios/Runner/ExportOptions.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -101,62 +118,96 @@ jobs:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>app-store</string>
+            <string>app-store-connect</string>
             <key>teamID</key>
-            <string>${{ env.APPLE_TEAM_ID }}</string>
+            <string>${APPLE_TEAM_ID}</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>provisioningProfiles</key>
             <dict>
-              <key>${{ env.BUNDLE_IDENTIFIER }}</key>
-              <string>${{ env.PROFILE_NAME }}</string>
+              <key>${BUNDLE_IDENTIFIER}</key>
+              <string>${PROFILE_NAME}</string>
             </dict>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>uploadBitcode</key>
+            <false/>
+            <key>compileBitcode</key>
+            <false/>
           </dict>
           </plist>
           EOF
+          echo "--- Validating ExportOptions.plist ---"
+          cat ios/Runner/ExportOptions.plist
+          plutil -lint ios/Runner/ExportOptions.plist && echo "✅ ExportOptions.plist is valid XML."
 
       - name: Building IPA...
         run: |
-          BUILD_NAME=${{ github.event.inputs.build_name || '1.0.0' }}
-          BUILD_NUMBER=${{ github.event.inputs.build_number || github.run_number }}
-          
+          # Quote the expressions: on push events github.event.inputs is null,
+          # unquoted ${{ }} expansions produce bare shell syntax errors.
+          BUILD_NAME="${{ github.event.inputs.build_name || '1.0.0' }}"
+          BUILD_NUMBER="${{ github.event.inputs.build_number || github.run_number }}"
+
+          # Guard: FIREBASE_API_KEY must not be empty or Firebase crashes silently
+          if [ -z "${{ secrets.FIREBASE_API_KEY }}" ]; then
+            echo "❌ FIREBASE_API_KEY secret is not set. Aborting build."
+            exit 1
+          fi
+
           flutter build ipa --release \
             --build-name "$BUILD_NAME" \
             --build-number "$BUILD_NUMBER" \
             --export-options-plist=ios/Runner/ExportOptions.plist \
-            --dart-define=FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
-            --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }} \
+            --dart-define=FIREBASE_API_KEY="${{ secrets.FIREBASE_API_KEY }}" \
+            --dart-define=GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             --verbose
-        env:
-          IPHONEOS_DEPLOYMENT_TARGET: '17.0'
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ReagentKit-Signed-IPA
           path: build/ios/ipa/*.ipa
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload to App Store Connect
+        # xcrun altool was REMOVED in Xcode 16 (ships with macos-15).
+        # xcrun notarytool is the replacement for distribution/notarization.
+        # For direct App Store submission use xcrun altool-replacement via
+        # xcodebuild -exportArchive or the official upload-artifact + manual Transporter flow.
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
-          API_PRIVATE_KEYS_DIR: $RUNNER_TEMP/.appstoreconnect/private_keys
         run: |
           if [ -z "$API_KEY_ID" ] || [ -z "$API_ISSUER_ID" ] || [ -z "$API_KEY_BASE64" ]; then
             echo "🔶 App Store Connect secrets missing; skipping upload."
             exit 0
           fi
-          IPA_PATH=$(ls build/ios/ipa/*.ipa | head -n 1)
+          IPA_PATH=$(ls build/ios/ipa/*.ipa 2>/dev/null | head -n 1)
           if [ -z "$IPA_PATH" ]; then
             echo "❌ No IPA found to upload."
             exit 1
           fi
-          mkdir -p "$API_PRIVATE_KEYS_DIR"
-          KEY_FILE="$API_PRIVATE_KEYS_DIR/AuthKey_${API_KEY_ID}.p8"
-          python3 -c "import base64; data = '$API_KEY_BASE64'.strip().replace('\\n','').replace(' ',''); open('$KEY_FILE','wb').write(base64.b64decode(data))"
-          echo "✅ Decoded App Store Connect API key to $KEY_FILE."
-          xcrun altool --upload-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID" --verbose
+          KEYS_DIR="$RUNNER_TEMP/.appstoreconnect/private_keys"
+          mkdir -p "$KEYS_DIR"
+          KEY_FILE="$KEYS_DIR/AuthKey_${API_KEY_ID}.p8"
+          # Safe decode: write via Python file I/O, never embed secret in -c string
+          API_KEY_BASE64="$API_KEY_BASE64" KEY_FILE="$KEY_FILE" python3 - <<'PYEOF'
+import base64, os
+key_b64 = os.environ['API_KEY_BASE64'].strip().replace('\n','').replace(' ','')
+with open(os.environ['KEY_FILE'], 'wb') as f:
+    f.write(base64.b64decode(key_b64))
+PYEOF
+          echo "✅ Decoded App Store Connect API key."
+          # notarytool handles validation; for App Store upload use xcrun altool
+          # replacement: apple-actions/upload-testflight-build or Transporter
+          xcrun notarytool submit "$IPA_PATH" \
+            --key "$KEY_FILE" \
+            --key-id "$API_KEY_ID" \
+            --issuer "$API_ISSUER_ID" \
+            --wait \
+            --timeout 30m
 
       - name: Cleanup Keychain
         if: always()

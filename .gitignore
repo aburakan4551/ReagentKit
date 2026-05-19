@@ -54,6 +54,12 @@ AuthKey_*.p8
 profile.b64
 ios_secrets_base64.md
 run_with_api_key.sh
+# Root-level certificates / provisioning files (should never be committed)
+/ReagentKit.p12
+/cerReagentKit.p12
+/ReagentKit_App_Store_Profile.mobileprovision
+/development.cer
+/distribution-3.cer
 
 # IDEs
 .idea/

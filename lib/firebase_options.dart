@@ -40,8 +40,11 @@ class DefaultFirebaseOptions {
     }
   }
 
+  // apiKey is injected at compile-time via --dart-define=FIREBASE_API_KEY.
+  // If the key is empty at runtime, Firebase will throw a PlatformException immediately
+  // on initialization — add an assertion in main() to catch this early in debug builds.
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_WEB', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
+    apiKey: String.fromEnvironment('FIREBASE_API_KEY', defaultValue: ''),
     appId: '1:76342007759:web:ec5cd1f83580a0fb3164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -51,7 +54,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_ANDROID', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
+    apiKey: String.fromEnvironment('FIREBASE_API_KEY', defaultValue: ''),
     appId: '1:76342007759:android:1d8bec4e1e5955d43164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -59,7 +62,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_IOS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
+    apiKey: String.fromEnvironment('FIREBASE_API_KEY', defaultValue: ''),
     appId: '1:76342007759:ios:2842920a81dc24613164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -69,7 +72,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_MACOS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
+    apiKey: String.fromEnvironment('FIREBASE_API_KEY', defaultValue: ''),
     appId: '1:76342007759:ios:2842920a81dc24613164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
@@ -79,7 +82,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: const String.fromEnvironment('FIREBASE_API_KEY_WINDOWS', defaultValue: String.fromEnvironment('FIREBASE_API_KEY')),
+    apiKey: String.fromEnvironment('FIREBASE_API_KEY', defaultValue: ''),
     appId: '1:76342007759:web:0318c3f7a6adef6e3164ba',
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
