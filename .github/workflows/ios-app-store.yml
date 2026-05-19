@@ -192,13 +192,8 @@ jobs:
           KEYS_DIR="$RUNNER_TEMP/.appstoreconnect/private_keys"
           mkdir -p "$KEYS_DIR"
           KEY_FILE="$KEYS_DIR/AuthKey_${API_KEY_ID}.p8"
-          # Safe decode: write via Python file I/O, never embed secret in -c string
-          API_KEY_BASE64="$API_KEY_BASE64" KEY_FILE="$KEY_FILE" python3 - <<'PYEOF'
-import base64, os
-key_b64 = os.environ['API_KEY_BASE64'].strip().replace('\n','').replace(' ','')
-with open(os.environ['KEY_FILE'], 'wb') as f:
-    f.write(base64.b64decode(key_b64))
-PYEOF
+          # Decode API key safely via python3 (single line — no YAML indentation issues)
+          python3 -c "import base64,os,sys; k=os.environ.get('API_KEY_BASE64','').strip().replace('\n','').replace(' ',''); sys.exit('API_KEY_BASE64 empty') if not k else open(os.environ['KEY_FILE'],'wb').write(base64.b64decode(k))"
           echo "✅ Decoded App Store Connect API key."
           # notarytool handles validation; for App Store upload use xcrun altool
           # replacement: apple-actions/upload-testflight-build or Transporter
