@@ -9,6 +9,7 @@ import 'package:reagentkit/features/reagent_testing/data/models/gemini_analysis_
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
 import 'package:reagentkit/core/utils/logger.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
+import '../../../premium/presentation/screens/paywall_screen.dart';
 
 class AIImageAnalysisSection extends ConsumerStatefulWidget {
   final ReagentEntity reagent;
@@ -202,19 +203,37 @@ class _AIImageAnalysisSectionState
                           );
 
                           return geminiServiceAsync.when(
-                            data: (service) => ElevatedButton.icon(
-                              onPressed: _analyzeImage,
-                              icon: Icon(HeroIcons.sparkles),
-                              label: Text(l10n.analyzeWithAI),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDarkMode
-                                    ? Colors.green.shade600
-                                    : Colors.green.shade500,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            data: (service) => Column(
+                              children: [
+                                ElevatedButton.icon(
+                                  onPressed: _analyzeImage,
+                                  icon: Icon(HeroIcons.sparkles),
+                                  label: Text(l10n.analyzeWithAI),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isDarkMode
+                                        ? Colors.green.shade600
+                                        : Colors.green.shade500,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Consumer(builder: (context, ref, child) {
+                                  final premium = ref.watch(premiumServiceProvider);
+                                  if (premium.isPremium) return const SizedBox.shrink();
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      '${premium.freeScansLeft} free scans remaining',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDarkMode ? Colors.white54 : Colors.black54,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
                             ),
                             loading: () => ElevatedButton.icon(
                               onPressed: null,
@@ -455,55 +474,61 @@ class _AIImageAnalysisSectionState
 
   Future<void> _analyzeImage() async {
     if (_capturedImage == null) return;
+    
+    final premiumService = ref.read(premiumServiceProvider);
+    if (!premiumService.canAnalyze) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const PaywallScreen()),
+      );
+      return;
+    }
+
     setState(() {
       _isAnalyzing = true;
       _error = null;
     });
 
     try {
-      // Get the AsyncValue from the FutureProvider
       final geminiServiceAsync = ref.read(geminiAnalysisServiceProvider);
 
-      // Handle the async value
       await geminiServiceAsync.when(
         data: (geminiService) async {
-          final drugResults = widget.reagent.drugResults
-              .map(
-                (result) => {
-                  'drugName': result.drugName,
-                  'color': result.color,
-                },
-              )
-              .toList();
-
-          final resultString = await geminiService.analyzeReagentTestImage(
-            imageFile: _capturedImage!,
-            reagentName: widget.reagent.reagentName,
-            drugResults: drugResults,
-            testContext: {'type': 'reagent_test'},
-          );
-
+          final resultString = await geminiService.analyzeImage(_capturedImage!);
           final resultJson = jsonDecode(resultString);
           final aiResult = GeminiReagentTestResult.fromJson(resultJson);
 
           ref
               .read(testExecutionControllerProvider.notifier)
               .updateAIAnalysisResult(aiResult);
+              
+          // Consume free scan upon success
+          await premiumService.consumeFreeScan();
         },
         loading: () {
-          // Service is still loading, keep showing progress
           Logger.info('Gemini service is still initializing...');
         },
         error: (error, stack) {
-          throw Exception('Gemini service initialization failed: $error');
+          throw Exception('AI service temporarily unavailable. ($error)');
         },
       );
     } catch (e) {
       Logger.error('AI Analysis failed: $e');
       if (mounted) {
         setState(() {
-          // Provide a clear user-friendly message with the exact error attached
-          _error = 'Unable to analyze image. Please try again.\n\nDetails: ${e.toString().replaceAll('Exception: ', '')}';
+          String errorMessage = 'Unable to analyze image.';
+          final eStr = e.toString();
+          
+          if (eStr.contains('NETWORK_TIMEOUT') || eStr.contains('SocketException')) {
+            errorMessage = 'Network connection lost. Please check your internet.';
+          } else if (eStr.contains('QUOTA_EXCEEDED')) {
+            errorMessage = 'AI service temporarily unavailable (Quota Exceeded).';
+          } else if (eStr.contains('PERMISSION_DENIED') || eStr.contains('API_KEY_INVALID')) {
+            errorMessage = 'AI service configuration error. Please contact support.';
+          } else if (eStr.contains('FREE_SCANS_LIMIT_REACHED')) {
+            errorMessage = 'Free scans limit reached. Purchase required to continue.';
+          }
+          
+          _error = errorMessage;
         });
       }
     } finally {

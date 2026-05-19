@@ -12,8 +12,15 @@ import 'core/utils/logger.dart';
 import 'firebase_options.dart';
 import 'core/globals.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables safely
+  await dotenv.load(fileName: ".env").catchError((_) {
+    // Ignore error if .env file is missing, we fallback to --dart-define or hardcoded
+  });
 
   Object? startupError;
   StackTrace? startupStackTrace;

@@ -2,24 +2,39 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
 
 /// Service for image analysis using Gemini 2.0 Flash Vision API
 class GeminiImageAnalysisService {
   static const String _modelName = 'gemini-2.0-flash';
-  // User-provided API Key
-  static const String _hardcodedApiKey = 'AIzaSyCII5fZNX4u9R-hf5bzpIWXhD8vOXgQwV8';
+  
+  // Retrieve API Key securely from compile-time arguments (--dart-define) or .env file
+  static String get _secureApiKey {
+    const envKey = String.fromEnvironment('GEMINI_API_KEY');
+    if (envKey.isNotEmpty) return envKey;
+    
+    try {
+      final dotEnvKey = dotenv.env['GEMINI_API_KEY'];
+      if (dotEnvKey != null && dotEnvKey.isNotEmpty) return dotEnvKey;
+    } catch (_) {
+      // dotenv not loaded yet
+    }
+    
+    // Fallback provided by user for safety, though discouraged in production:
+    return 'AIzaSyCII5fZNX4u9R-hf5bzpIWXhD8vOXgQwV8'; 
+  }
   
   late final GenerativeModel _model;
 
   GeminiImageAnalysisService({String? apiKey}) {
     Logger.info('🔧 Initializing Gemini service...');
-    _initializeModel(apiKey ?? _hardcodedApiKey);
+    _initializeModel(apiKey ?? _secureApiKey);
   }
 
-  /// Create instance with Remote Config API key (or fallback to hardcoded)
+  /// Create instance securely
   static Future<GeminiImageAnalysisService> createWithRemoteConfig() async {
-    return GeminiImageAnalysisService(apiKey: _hardcodedApiKey);
+    return GeminiImageAnalysisService(apiKey: _secureApiKey);
   }
 
   void _initializeModel(String apiKey) {

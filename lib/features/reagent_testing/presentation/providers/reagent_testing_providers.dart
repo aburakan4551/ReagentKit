@@ -15,8 +15,14 @@ import '../states/test_execution_state.dart';
 import '../states/test_result_state.dart';
 import '../states/test_result_history_state.dart';
 import 'package:reagentkit/core/services/gemini_image_analysis_service.dart';
+import 'package:reagentkit/core/services/premium_service.dart';
 
 import 'package:reagentkit/core/config/get_it_config.dart';
+
+// Premium Service Provider
+final premiumServiceProvider = ChangeNotifierProvider<PremiumService>((ref) {
+  return PremiumService();
+});
 
 // Remote Config Service Provider
 final remoteConfigServiceProvider = Provider<RemoteConfigService>((ref) {
