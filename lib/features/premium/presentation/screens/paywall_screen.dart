@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../reagent_testing/presentation/providers/reagent_testing_providers.dart';
+import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
 
 class PaywallScreen extends ConsumerWidget {
   const PaywallScreen({super.key});

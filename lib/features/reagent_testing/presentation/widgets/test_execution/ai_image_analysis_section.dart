@@ -9,7 +9,7 @@ import 'package:reagentkit/features/reagent_testing/data/models/gemini_analysis_
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
 import 'package:reagentkit/core/utils/logger.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
-import '../../../premium/presentation/screens/paywall_screen.dart';
+import '../../../../premium/presentation/screens/paywall_screen.dart';
 
 class AIImageAnalysisSection extends ConsumerStatefulWidget {
   final ReagentEntity reagent;
