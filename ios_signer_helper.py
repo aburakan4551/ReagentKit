@@ -235,14 +235,14 @@ def main():
                 block = re.sub(r'DEVELOPMENT_TEAM\s*=\s*[^;]+;', f'DEVELOPMENT_TEAM = {team_id};', block)
                 block = re.sub(r'"DEVELOPMENT_TEAM\[sdk=iphoneos\*\]"\s*=\s*[^;]+;', f'"DEVELOPMENT_TEAM[sdk=iphoneos*]" = {team_id};', block)
                 
-                # Replace or Inject PROVISIONING_PROFILE and PROVISIONING_PROFILE_SPECIFIER
-                if 'PROVISIONING_PROFILE_SPECIFIER' in block:
-                    block = re.sub(r'PROVISIONING_PROFILE_SPECIFIER\s*=\s*[^;]+;', f'PROVISIONING_PROFILE_SPECIFIER = "{profile_name}";\n\t\t\t\tPROVISIONING_PROFILE = "{profile_uuid}";', block)
-                else:
-                    # Inject them at the beginning of buildSettings
-                    block = block.replace('buildSettings = {', f'buildSettings = {{\n\t\t\t\tPROVISIONING_PROFILE = "{profile_uuid}";\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = "{profile_name}";')
+                # First, remove any existing PROVISIONING_PROFILE or PROVISIONING_PROFILE_SPECIFIER keys/lines to avoid duplicates
+                block = re.sub(r'PROVISIONING_PROFILE\s*=\s*[^;]+;\n?', '', block)
+                block = re.sub(r'PROVISIONING_PROFILE_SPECIFIER\s*=\s*[^;]+;\n?', '', block)
+                block = re.sub(r'"PROVISIONING_PROFILE_SPECIFIER\[sdk=iphoneos\*\]"\s*=\s*[^;]+;\n?', '', block)
+                block = re.sub(r'"PROVISIONING_PROFILE\[sdk=iphoneos\*\]"\s*=\s*[^;]+;\n?', '', block)
                 
-                block = re.sub(r'"PROVISIONING_PROFILE_SPECIFIER\[sdk=iphoneos\*\]"\s*=\s*[^;]+;', f'"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "{profile_name}";', block)
+                # Now, inject clean, updated values at the start of buildSettings
+                block = block.replace('buildSettings = {', f'buildSettings = {{\n\t\t\t\tPROVISIONING_PROFILE = "{profile_uuid}";\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = "{profile_name}";\n\t\t\t\t"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "{profile_name}";\n\t\t\t\t"PROVISIONING_PROFILE[sdk=iphoneos*]" = "{profile_uuid}";')
                 
                 # Force Apple Distribution certificate
                 block = re.sub(r'CODE_SIGN_IDENTITY\s*=\s*[^;]+;', 'CODE_SIGN_IDENTITY = "Apple Distribution";', block)
@@ -275,21 +275,60 @@ def main():
             print(f"⚠️ Failed to write to GITHUB_ENV: {e}")
             
     # ----------------------------------------------------
-    # 9. Decode and Write GoogleService-Info.plist if available
+    # 9. Generate ExportOptions.plist
+    # ----------------------------------------------------
+    export_options_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>compileBitcode</key>
+	<false/>
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>{bundle_id}</key>
+		<string>{profile_name}</string>
+	</dict>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>stripSwiftSymbols</key>
+	<true/>
+	<key>teamID</key>
+	<string>{team_id}</string>
+	<key>uploadBitcode</key>
+	<false/>
+</dict>
+</plist>
+"""
+    export_options_path = 'ios/Runner/ExportOptions.plist'
+    print(f"📄 Writing ExportOptions.plist to {export_options_path}...")
+    try:
+        os.makedirs(os.path.dirname(export_options_path), exist_ok=True)
+        with open(export_options_path, 'w', encoding='utf-8') as f:
+            f.write(export_options_xml)
+        print("✅ ExportOptions.plist successfully written.")
+    except Exception as e:
+        print(f"❌ ERROR: Failed to write ExportOptions.plist: {e}")
+        sys.exit(1)
+
+    # ----------------------------------------------------
+    # 10. Decode and Write GoogleService-Info.plist if available
     # ----------------------------------------------------
     google_service_plist = os.environ.get('GOOGLE_SERVICE_INFO_PLIST')
+    plist_path = 'ios/Runner/GoogleService-Info.plist'
     if google_service_plist:
-        plist_path = 'ios/Runner/GoogleService-Info.plist'
         print(f"📄 Writing GoogleService-Info.plist to {plist_path}...")
         try:
             plist_content = google_service_plist.strip()
             # Try to decode if base64 encoded
             if not plist_content.startswith('<?xml') and not plist_content.startswith('<plist'):
                 try:
-                    decoded_bytes = base64.b64decode(plist_content)
+                    normalized_b64 = plist_content.replace('\n', '').replace(' ', '')
+                    decoded_bytes = base64.b64decode(normalized_b64)
                     plist_content = decoded_bytes.decode('utf-8')
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"⚠️ Base64 decode failed for GoogleService-Info.plist, treating as raw content: {e}")
             
             # Ensure the directory exists
             os.makedirs(os.path.dirname(plist_path), exist_ok=True)
@@ -299,8 +338,18 @@ def main():
         except Exception as e:
             print(f"❌ ERROR: Failed to write GoogleService-Info.plist: {e}")
             sys.exit(1)
+    elif os.path.exists('GoogleService-Info.plist'):
+        print(f"📄 Found GoogleService-Info.plist in root directory. Copying to {plist_path} as fallback...")
+        try:
+            os.makedirs(os.path.dirname(plist_path), exist_ok=True)
+            import shutil
+            shutil.copy('GoogleService-Info.plist', plist_path)
+            print("✅ GoogleService-Info.plist copied successfully.")
+        except Exception as e:
+            print(f"❌ ERROR: Failed to copy GoogleService-Info.plist: {e}")
+            sys.exit(1)
     else:
-        print("⚠️ WARNING: GOOGLE_SERVICE_INFO_PLIST environment variable is missing. Build may fail if file is missing.")
+        print("⚠️ WARNING: GOOGLE_SERVICE_INFO_PLIST environment variable is missing and no root GoogleService-Info.plist found. Build may fail if file is missing.")
             
     print("="*60)
     print("🎉 ALL iOS SIGNING PREPARATIONS ARE 100% SUCCESSFUL AND VALIDATED!")
