@@ -439,7 +439,7 @@ class _AIImageAnalysisSectionState
   Future<void> _pickImage(ImageSource source) async {
     final image = await _picker.pickImage(
       source: source,
-      imageQuality: 80,
+      imageQuality: 60,
       maxWidth: 1024,
     );
     if (image != null) {
@@ -501,10 +501,9 @@ class _AIImageAnalysisSectionState
     } catch (e) {
       Logger.error('AI Analysis failed: $e');
       if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
         setState(() {
-          // Append the actual error message for debugging in production
-          _error = '${l10n.aiAnalysisError}\n\nDetails: ${e.toString().replaceAll('Exception: ', '')}';
+          // Provide a clear user-friendly message with the exact error attached
+          _error = 'Unable to analyze image. Please try again.\n\nDetails: ${e.toString().replaceAll('Exception: ', '')}';
         });
       }
     } finally {
