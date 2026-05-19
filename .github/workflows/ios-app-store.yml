@@ -54,10 +54,10 @@ jobs:
 
       - name: Prepare iOS Code Signing and Hardening Xcode project
         env:
-          IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 || secrets.BUILD_CERTIFICATE_BASE64 }}
-          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD || secrets.P12_PASSWORD }}
-          IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD || secrets.KEYCHAIN_PASSWORD }}
-          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 || secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ coalesce(secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64, secrets.BUILD_CERTIFICATE_BASE64) }}
+          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ coalesce(secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD, secrets.P12_PASSWORD) }}
+          IOS_KEYCHAIN_PASSWORD: ${{ coalesce(secrets.IOS_KEYCHAIN_PASSWORD, secrets.KEYCHAIN_PASSWORD) }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ coalesce(secrets.IOS_PROVISIONING_PROFILE_BASE64, secrets.BUILD_PROVISION_PROFILE_BASE64) }}
           BUNDLE_IDENTIFIER: ${{ secrets.BUNDLE_IDENTIFIER }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
@@ -143,10 +143,11 @@ jobs:
 
       - name: Building IPA...
         run: |
-          # Quote the expressions: on push events github.event.inputs is null,
-          # unquoted ${{ }} expansions produce bare shell syntax errors.
-          BUILD_NAME="${{ github.event.inputs.build_name || '1.0.0' }}"
-          BUILD_NUMBER="${{ github.event.inputs.build_number || github.run_number }}"
+          # Safe fallback using standard shell parameter expansion to avoid GHA expression parser errors.
+          BUILD_NAME="${{ github.event.inputs.build_name }}"
+          BUILD_NAME="${BUILD_NAME:-1.0.0}"
+          BUILD_NUMBER="${{ github.event.inputs.build_number }}"
+          BUILD_NUMBER="${BUILD_NUMBER:-$GITHUB_RUN_NUMBER}"
 
           # Guard: FIREBASE_API_KEY must not be empty or Firebase crashes silently
           if [ -z "${{ secrets.FIREBASE_API_KEY }}" ]; then
