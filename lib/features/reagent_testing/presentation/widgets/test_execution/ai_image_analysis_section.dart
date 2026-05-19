@@ -503,7 +503,8 @@ class _AIImageAnalysisSectionState
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
         setState(() {
-          _error = l10n.aiAnalysisError;
+          // Append the actual error message for debugging in production
+          _error = '${l10n.aiAnalysisError}\n\nDetails: ${e.toString().replaceAll('Exception: ', '')}';
         });
       }
     } finally {

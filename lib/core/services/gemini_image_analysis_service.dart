@@ -62,9 +62,15 @@ class GeminiImageAnalysisService {
         temperature: 0.0, // Lowest temperature for most consistent JSON output
         topK: 1,
         topP: 0.1,
-        maxOutputTokens: 200, // Increased for proper JSON responses
+        maxOutputTokens: 2000, // Increased to prevent truncated JSON responses
         responseMimeType: 'application/json', // Force JSON response
       ),
+      safetySettings: [
+        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none),
+      ],
     );
 
     Logger.info('🔧 Gemini service initialized with model: $_modelName');
