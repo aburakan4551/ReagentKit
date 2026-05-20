@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:google_generative_ai/google_generative_ai.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import '../utils/logger.dart';
 
 /// Service for image analysis using Gemini 2.0 Flash Vision API

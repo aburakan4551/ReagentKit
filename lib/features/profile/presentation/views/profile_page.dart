@@ -328,30 +328,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF3B82F6), // Blue
-              Color(0xFF8B5CF6), // Purple
-            ],
-          ),
-        ),
+        color: Colors.transparent, // Replaced gradient with clean background
       ),
       title: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: theme.colorScheme.primary.withOpacity(0.2),
                 width: 1,
               ),
             ),
-            child: const Icon(HeroIcons.beaker, color: Colors.white, size: 24),
+            child: Icon(HeroIcons.beaker, color: theme.colorScheme.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Text(
@@ -441,23 +432,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF3B82F6), // Blue
-            Color(0xFF8B5CF6), // Purple
-            Color(0xFF06B6D4), // Cyan
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3B82F6).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
       ),
       child: Row(
         children: [
@@ -465,11 +442,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 2,
+                color: theme.colorScheme.outlineVariant,
+                width: 1,
               ),
             ),
             child: user.photoUrl != null
@@ -482,10 +459,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       user.username.isNotEmpty
                           ? user.username[0].toUpperCase()
                           : 'L',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                   ),
@@ -497,10 +474,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               children: [
                 Text(
                   user.username,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -510,14 +485,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: theme.colorScheme.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '$totalTests ${l10n.totalTests}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
+                      color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -548,15 +523,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
           ),
           child: results.isEmpty
               ? Padding(
@@ -574,7 +543,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       result.reagentName,
                       result.possibleSubstances.join(', '),
                       _formatTimeAgo(result.testCompletedAt),
-                      _getConfidenceColor(result.confidencePercentage),
+                      _getConfidenceColor(result.confidencePercentage, theme),
                       theme,
                     );
                   }).toList(),
@@ -592,10 +561,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return 'Just now';
   }
 
-  Color _getConfidenceColor(int confidence) {
-    if (confidence >= 80) return const Color(0xFF10B981); // Green
-    if (confidence >= 60) return const Color(0xFF3B82F6); // Blue
-    return const Color(0xFFEF4444); // Red
+  Color _getConfidenceColor(int confidence, ThemeData theme) {
+    if (confidence >= 80) return theme.colorScheme.primary; 
+    if (confidence >= 60) return theme.colorScheme.secondary; 
+    return theme.colorScheme.error; 
   }
 
   Widget _buildActivityItem(
@@ -653,17 +622,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFFFECEC), // Light red
-            Color(0xFFFFF3E0), // Light orange
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
+        color: theme.colorScheme.errorContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: const Color(0xFFFF6B6B).withOpacity(0.3),
+          color: theme.colorScheme.error.withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -674,12 +636,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF6B6B),
-                  borderRadius: BorderRadius.circular(8),
+                  color: theme.colorScheme.error.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   HeroIcons.exclamation_triangle,
-                  color: Colors.white,
+                  color: theme.colorScheme.error,
                   size: 20,
                 ),
               ),

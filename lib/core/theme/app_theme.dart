@@ -1,169 +1,143 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'app_colors.dart';
+import 'app_text_styles.dart';
+import 'extensions/status_badge_theme.dart';
+import 'extensions/reagent_rarity_theme.dart';
+import 'extensions/premium_card_theme.dart';
 
 class AppTheme {
-  static ColorScheme _lightScheme() {
-    final ColorScheme base = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      tertiary: AppColors.accent,
-      error: AppColors.error,
-    );
-    return base.copyWith(
-      surface: AppColors.lightSurface,
-      onSurface: AppColors.lightText,
-      onSurfaceVariant: AppColors.lightTextSecondary,
-      surfaceContainerLowest: AppColors.lightBackground,
-      surfaceContainerLow: const Color(0xFFF1F5F9),
-      surfaceContainer: const Color(0xFFE2E8F0),
-      surfaceContainerHigh: const Color(0xFFFFFFFF),
-      surfaceContainerHighest: const Color(0xFFFFFFFF),
-      outline: AppColors.lightBorder,
-      outlineVariant: const Color(0xFFCBD5E1),
-      surfaceTint: Colors.transparent,
-      shadow: const Color(0x66000000),
-      scrim: Color(0x99000000),
-    );
-  }
+  // Private constructor to prevent instantiation
+  AppTheme._();
 
-  static ColorScheme _darkScheme() {
-    final ColorScheme base = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
+  static ThemeData get darkTheme {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.primaryAccent,
       brightness: Brightness.dark,
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      tertiary: AppColors.accent,
-      error: AppColors.error,
+      surface: AppColors.surfaceBase,
+      surfaceContainerHighest: AppColors.surfaceElevated,
+      primary: AppColors.primaryAccent,
+      secondary: AppColors.secondaryAccent,
+      tertiary: AppColors.tertiaryAccent,
+      error: AppColors.statusError,
+      onSurface: AppColors.textPrimary,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onError: Colors.white,
     );
-    return base.copyWith(
-      surface: AppColors.darkSurface,
-      onSurface: AppColors.darkText,
-      onSurfaceVariant: AppColors.darkTextSecondary,
-      surfaceContainerLowest: AppColors.darkBackground,
-      surfaceContainerLow: AppColors.darkSurface,
-      surfaceContainer: AppColors.darkSurfaceContainer,
-      surfaceContainerHigh: AppColors.darkSurfaceContainerHigh,
-      surfaceContainerHighest: AppColors.darkSurfaceContainerHighest,
-      primaryContainer: const Color(0xFF312E81),
-      onPrimaryContainer: const Color(0xFFE0E7FF),
-      secondaryContainer: const Color(0xFF831843),
-      onSecondaryContainer: const Color(0xFFFCE7F3),
-      tertiaryContainer: const Color(0xFF0F766E),
-      onTertiaryContainer: const Color(0xFFCCFBF1),
-      outline: AppColors.darkBorder,
-      outlineVariant: const Color(0xFF475569),
-      surfaceTint: Colors.transparent,
-      shadow: const Color(0xE6000000),
-      scrim: Color(0xCC000000),
-    );
-  }
 
-  static ThemeData _baseTheme({
-    required ColorScheme colorScheme,
-    required Brightness brightness,
-    required Color scaffoldBackground,
-  }) {
-    final bool isDark = brightness == Brightness.dark;
-    final TextTheme textTheme = TextTheme(
-      displayLarge: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold),
-      displayMedium: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold),
-      displaySmall: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.bold),
-      headlineMedium: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w700),
-      headlineLarge: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w700),
-      titleLarge: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600),
-      bodyLarge: TextStyle(color: colorScheme.onSurface),
-      bodyMedium: TextStyle(color: colorScheme.onSurfaceVariant),
-      labelLarge: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
-      labelMedium: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
-    );
     return ThemeData(
       useMaterial3: true,
-      brightness: brightness,
+      brightness: Brightness.dark,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: scaffoldBackground,
-      shadowColor: colorScheme.shadow,
-      dividerTheme: DividerThemeData(color: colorScheme.outlineVariant, thickness: 1),
-      iconTheme: IconThemeData(color: colorScheme.onSurface, size: 24),
-      appBarTheme: AppBarTheme(
+      scaffoldBackgroundColor: AppColors.backgroundBase,
+      textTheme: AppTextStyles.getTextTheme(),
+      extensions: [
+        StatusBadgeTheme.dark,
+        ReagentRarityTheme.dark,
+        PremiumCardTheme.dark,
+      ],
+      // Page Transitions - iOS Smooth Feel
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        },
+      ),
+
+      // App Bar Theme
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        scrolledUnderElevation: 0,
         centerTitle: true,
-        foregroundColor: colorScheme.onSurface,
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
-        titleTextStyle: TextStyle(
-          color: colorScheme.onSurface,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        systemOverlayStyle: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        scrolledUnderElevation: 0,
       ),
+
+      // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          disabledBackgroundColor: colorScheme.onSurface.withOpacity(0.12),
-          disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          backgroundColor: AppColors.primaryAccent,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
       ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.onSurface,
-          disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
-          side: BorderSide(color: colorScheme.outline),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+
+      // Card Theme
+      cardTheme: CardTheme(
+        color: AppColors.surfaceBase,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
+        margin: EdgeInsets.zero,
       ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
-      ),
+
+      // InputDecoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
+        fillColor: AppColors.surfaceElevated,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primaryAccent, width: 2),
         ),
-        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.statusError, width: 1),
+        ),
+        hintStyle: const TextStyle(color: AppColors.textMuted),
       ),
-      textTheme: textTheme,
+      
+      // Dialog Theme
+      dialogTheme: DialogTheme(
+        backgroundColor: AppColors.surfaceElevated,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.borderHighlight, width: 1),
+        ),
+      ),
+      
+      // Divider Theme
+      dividerTheme: const DividerThemeData(
+        color: AppColors.borderSubtle,
+        thickness: 1,
+        space: 1,
+      ),
+      
+      // Bottom Sheet Theme
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.surfaceElevated,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+      ),
     );
   }
 
+  // Fallback Light Theme (Not prioritized, but valid M3)
   static ThemeData get lightTheme {
-    final ColorScheme scheme = _lightScheme();
-    return _baseTheme(
-      colorScheme: scheme,
-      brightness: Brightness.light,
-      scaffoldBackground: AppColors.lightBackground,
-    );
-  }
-
-  static ThemeData get darkTheme {
-    final ColorScheme scheme = _darkScheme();
-    return _baseTheme(
-      colorScheme: scheme,
-      brightness: Brightness.dark,
-      scaffoldBackground: AppColors.darkBackground,
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryAccent),
+      extensions: [
+        StatusBadgeTheme.light,
+        ReagentRarityTheme.light,
+        PremiumCardTheme.light,
+      ],
     );
   }
 }

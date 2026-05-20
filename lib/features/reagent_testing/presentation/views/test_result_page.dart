@@ -334,10 +334,10 @@ class _ModernResultView extends StatelessWidget {
   Color _getConfidenceColor(BuildContext context, int confidence) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     if (confidence >= 80) {
-      return AppColors.success;
+      return AppColors.statusSuccess;
     }
     if (confidence >= 50) {
-      return AppColors.warning;
+      return AppColors.statusWarning;
     }
     return scheme.error;
   }

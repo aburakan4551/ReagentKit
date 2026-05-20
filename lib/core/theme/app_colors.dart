@@ -1,30 +1,45 @@
 import 'package:flutter/material.dart';
 
-/// Brand and neutral tokens. Prefer [ColorScheme] in widgets; these back [AppTheme] only.
+/// A premium dark theme color palette optimized for iOS OLED displays and WCAG contrast.
 class AppColors {
-  static const Color primary = Color(0xFF6366F1);
-  static const Color secondary = Color(0xFFEC4899);
-  static const Color accent = Color(0xFF14B8A6);
+  // Backgrounds
+  static const Color backgroundBase = Color(0xFF0B1020);
+  static const Color backgroundElevated = Color(0xFF111827);
+  static const Color backgroundHighest = Color(0xFF151B2E);
 
-  static const Color lightBackground = Color(0xFFF8FAFC);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightText = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF64748B);
-  static const Color lightBorder = Color(0xFFE2E8F0);
+  // Surfaces (Cards, BottomNav, Dialogs)
+  static const Color surfaceBase = Color(0xFF1A2238);
+  static const Color surfaceElevated = Color(0xFF202A44);
+  static const Color surfaceHighlight = Color(0xFF2A3655);
 
-  /// Dark scaffold — slightly darker than cards for clear depth (iOS-like layering).
-  static const Color darkBackground = Color(0xFF0B0F17);
-  static const Color darkSurface = Color(0xFF121826);
-  static const Color darkSurfaceContainer = Color(0xFF1A2230);
-  static const Color darkSurfaceContainerHigh = Color(0xFF232C3D);
-  static const Color darkSurfaceContainerHighest = Color(0xFF2D3748);
-  static const Color darkText = Color(0xFFF1F5F9);
-  /// WCAG-friendly on darkSurface (~7:1 vs surface).
-  static const Color darkTextSecondary = Color(0xFFCBD5E1);
-  static const Color darkBorder = Color(0xFF3D4A5C);
+  // Accents
+  static const Color primaryAccent = Color(0xFF7C5CFF);
+  static const Color secondaryAccent = Color(0xFF5B8CFF);
+  static const Color tertiaryAccent = Color(0xFFE879F9); // Optional soft pink/purple for premium
 
-  static const Color success = Color(0xFF34D399);
-  static const Color error = Color(0xFFF87171);
-  static const Color warning = Color(0xFFFBBF24);
-  static const Color info = Color(0xFF60A5FA);
+  // Typography
+  static const Color textPrimary = Color(0xFFF3F4F6);
+  static const Color textSecondary = Color(0xFFAEB6C7);
+  static const Color textMuted = Color(0xFF7B8499);
+
+  // Status & Semantic (Desaturated for premium feel)
+  static const Color statusSuccess = Color(0xFF34D399); // Soft emerald
+  static const Color statusWarning = Color(0xFFFBBF24); // Soft amber
+  static const Color statusError = Color(0xFFF87171); // Soft red
+  static const Color statusInfo = Color(0xFF60A5FA); // Soft blue
+  
+  // Rarities
+  static const Color rarityCommon = textSecondary;
+  static const Color rarityUncommon = statusSuccess;
+  static const Color rarityRare = secondaryAccent;
+  static const Color rarityEpic = primaryAccent;
+  static const Color rarityLegendary = Color(0xFFF59E0B); // Gold
+
+  // Borders & Dividers
+  static const Color borderSubtle = Color(0xFF2A3655); // Slightly lighter than surfaceElevated
+  static const Color borderHighlight = Color(0xFF3B4868);
+
+  // Overlay / Blur Backgrounds
+  static const Color overlayDark = Color(0x990B1020); // 60% opacity background
+  static const Color overlayLight = Color(0x1AFFFFFF); // 10% white
 }

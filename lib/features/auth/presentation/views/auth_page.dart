@@ -458,7 +458,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   Widget _buildSuccessMessage(String message) {
     final theme = Theme.of(context);
-    final Color successColor = theme.brightness == Brightness.dark ? AppColors.success : const Color(0xFF059669);
+    final Color successColor = theme.brightness == Brightness.dark ? AppColors.statusSuccess : const Color(0xFF059669);
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
