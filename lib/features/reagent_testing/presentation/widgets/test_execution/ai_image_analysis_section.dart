@@ -10,6 +10,7 @@ import 'package:reagentkit/features/reagent_testing/presentation/providers/reage
 import 'package:reagentkit/core/utils/logger.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
 import '../../../../premium/presentation/screens/paywall_screen.dart';
+import 'package:reagentkit/core/config/feature_flags.dart';
 
 class AIImageAnalysisSection extends ConsumerStatefulWidget {
   final ReagentEntity reagent;
@@ -203,38 +204,55 @@ class _AIImageAnalysisSectionState
                           );
 
                           return geminiServiceAsync.when(
-                            data: (service) => Column(
-                              children: [
-                                ElevatedButton.icon(
-                                  onPressed: _analyzeImage,
-                                  icon: Icon(HeroIcons.sparkles),
-                                  label: Text(l10n.analyzeWithAI),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: isDarkMode
-                                        ? Colors.green.shade600
-                                        : Colors.green.shade500,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                                Consumer(builder: (context, ref, child) {
-                                  final premium = ref.watch(premiumServiceProvider);
-                                  if (premium.isPremium) return const SizedBox.shrink();
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      '${premium.freeScansLeft} free scans remaining',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isDarkMode ? Colors.white54 : Colors.black54,
+                            data: (service) => !FeatureFlags.kEnableAIAnalysis
+                                ? ElevatedButton.icon(
+                                    onPressed: null,
+                                    icon: Icon(HeroIcons.clock),
+                                    label: const Text('AI Analysis will be available soon'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isDarkMode
+                                          ? theme.colorScheme.surfaceContainerHigh
+                                          : Colors.grey.shade400,
+                                      foregroundColor: isDarkMode
+                                          ? theme.colorScheme.onSurfaceVariant
+                                          : Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
-                                  );
-                                }),
-                              ],
-                            ),
+                                  )
+                                : Column(
+                                    children: [
+                                      ElevatedButton.icon(
+                                        onPressed: _analyzeImage,
+                                        icon: Icon(HeroIcons.sparkles),
+                                        label: Text(l10n.analyzeWithAI),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: isDarkMode
+                                              ? Colors.green.shade600
+                                              : Colors.green.shade500,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      ),
+                                      Consumer(builder: (context, ref, child) {
+                                        final premium = ref.watch(premiumServiceProvider);
+                                        if (premium.isPremium) return const SizedBox.shrink();
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8.0),
+                                          child: Text(
+                                            '${premium.freeScansLeft} free scans remaining',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: isDarkMode ? Colors.white54 : Colors.black54,
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ],
+                                  ),
                             loading: () => ElevatedButton.icon(
                               onPressed: null,
                               icon: SizedBox(
@@ -473,6 +491,7 @@ class _AIImageAnalysisSectionState
   }
 
   Future<void> _analyzeImage() async {
+    if (!FeatureFlags.kEnableAIAnalysis) return;
     if (_capturedImage == null) return;
     
     final premiumService = ref.read(premiumServiceProvider);
