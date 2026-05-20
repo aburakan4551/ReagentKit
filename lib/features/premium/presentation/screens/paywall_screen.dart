@@ -122,7 +122,7 @@ class PaywallScreen extends ConsumerWidget {
                         elevation: 4,
                       ),
                       child: const Text(
-                        'Unlock Now - \\$4.99 One-Time',
+                        'Unlock Now - \$4.99 One-Time',
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
