@@ -19,8 +19,8 @@ class AppColors {
 
   // Typography
   static const Color textPrimary = Color(0xFFF3F4F6);
-  static const Color textSecondary = Color(0xFFAEB6C7);
-  static const Color textMuted = Color(0xFF7B8499);
+  static const Color textSecondary = Color(0xFFC7CEDB);
+  static const Color textMuted = Color(0xFF94A3B8);
 
   // Status & Semantic (Desaturated for premium feel)
   static const Color statusSuccess = Color(0xFF34D399); // Soft emerald

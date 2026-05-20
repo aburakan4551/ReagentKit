@@ -62,19 +62,24 @@ class ReagentCard extends StatelessWidget {
   Widget _buildIcon(BuildContext context) {
     final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? StatusBadgeTheme.dark;
     Color iconBackgroundColor;
+    Color iconColor;
     
     switch (reagent.safetyLevel.toUpperCase()) {
       case 'EXTREME':
         iconBackgroundColor = statusTheme.errorBg;
+        iconColor = statusTheme.errorText;
         break;
       case 'HIGH':
         iconBackgroundColor = statusTheme.warningBg;
+        iconColor = statusTheme.warningText;
         break;
       case 'MEDIUM':
         iconBackgroundColor = statusTheme.infoBg;
+        iconColor = statusTheme.infoText;
         break;
       default:
         iconBackgroundColor = statusTheme.successBg;
+        iconColor = statusTheme.successText;
     }
 
     return Container(
@@ -85,7 +90,7 @@ class ReagentCard extends StatelessWidget {
       ),
       child: Icon(
         HeroIcons.beaker, // Chemistry beaker icon for reagent cards
-        color: Theme.of(context).colorScheme.primary,
+        color: iconColor,
         size: 28,
       ),
     );

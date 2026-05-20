@@ -34,21 +34,12 @@ class SafetyInformationSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.red.shade600, Colors.red.shade400],
-            ),
+            color: theme.colorScheme.error.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.red.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: const Icon(
+          child: Icon(
             HeroIcons.exclamation_triangle, // Safety warning icon
-            color: Colors.white,
+            color: theme.colorScheme.error,
             size: 24,
           ),
         ),
@@ -226,22 +217,10 @@ class _SafetySection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.primary.withOpacity(0.8),
-                  ],
-                ),
+                color: theme.colorScheme.primary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
-              child: _getIconWidget(iconType),
+              child: _getIconWidget(context, iconType),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -261,29 +240,25 @@ class _SafetySection extends StatelessWidget {
     );
   }
 
-  Widget _getIconWidget(SafetyIconType iconType) {
-    // Use Icons Plus for better compatibility and professional look
+  Widget _getIconWidget(BuildContext context, SafetyIconType iconType) {
+    final color = Theme.of(context).colorScheme.primary;
     switch (iconType) {
       case SafetyIconType.equipment:
-        // Using HeroIcons shield check for equipment
-        return Icon(HeroIcons.shield_check, size: 24, color: Colors.white);
+        return Icon(HeroIcons.shield_check, size: 24, color: color);
       case SafetyIconType.procedures:
-        // Using HeroIcons wrench screwdriver for procedures
         return Icon(
           HeroIcons.wrench_screwdriver,
           size: 24,
-          color: Colors.white,
+          color: color,
         );
       case SafetyIconType.hazards:
-        // Using HeroIcons exclamation triangle for hazards
         return Icon(
           HeroIcons.exclamation_triangle,
           size: 24,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.error,
         );
       case SafetyIconType.storage:
-        // Using HeroIcons archive box for storage
-        return Icon(HeroIcons.archive_box, size: 24, color: Colors.white);
+        return Icon(HeroIcons.archive_box, size: 24, color: color);
     }
   }
 }

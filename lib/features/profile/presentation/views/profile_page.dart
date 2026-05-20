@@ -112,14 +112,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
           title: Row(
             children: [
-              const Icon(Icons.lock_reset, color: Color(0xFF3B82F6), size: 24),
+              Icon(Icons.lock_reset, color: Theme.of(context).colorScheme.primary, size: 24),
               const SizedBox(width: 12),
               Text(
                 l10n.resetPasswordTitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -134,7 +134,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   l10n.resetPasswordDescription,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.4,
                   ),
                 ),
@@ -143,18 +143,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F9FF),
+                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: const Color(0xFF3B82F6).withOpacity(0.2),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
                     ),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.security,
                         size: 16,
-                        color: Color(0xFF3B82F6),
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -162,7 +162,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           'Reset links expire in 1 hour and can only be used once for security.',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blue[700],
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
                         ),
                       ),
@@ -184,12 +184,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
+                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF3B82F6),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                     ),
@@ -215,7 +215,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               child: Text(
                 l10n.backToLogin,
                 style: TextStyle(
-                  color: isLoading ? Colors.grey : const Color(0xFF6B7280),
+                  color: isLoading
+                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.3)
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -516,7 +518,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         Text(
           l10n.recentActivity,
           style: theme.textTheme.titleLarge?.copyWith(
-            color: const Color(0xFF1F2937),
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -533,7 +535,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: Center(
                     child: Text(
                       l10n.noRecentActivity,
-                      style: TextStyle(color: Colors.grey[500]),
+                      style: TextStyle(color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6)),
                     ),
                   ),
                 )
@@ -595,13 +597,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   reagent,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1F2937),
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 Text(
                   sample,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF6B7280),
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -610,7 +612,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Text(
             time,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF6B7280),
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -622,10 +624,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withOpacity(0.3),
+        color: theme.colorScheme.errorContainer.withOpacity(0.08),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.3),
+          color: theme.colorScheme.error.withOpacity(0.25),
         ),
       ),
       child: Column(
@@ -636,7 +638,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.error.withOpacity(0.15),
+                  color: theme.colorScheme.error.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -649,7 +651,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 l10n.safetyReminder,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFF1F2937),
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -659,7 +661,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Text(
             l10n.safetyReminderText,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF4B5563),
+              color: theme.colorScheme.onSurfaceVariant,
               height: 1.5,
             ),
           ),
@@ -675,7 +677,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         Text(
           l10n.accountInformation,
           style: theme.textTheme.titleLarge?.copyWith(
-            color: const Color(0xFF1F2937),
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -683,15 +685,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant,
+              width: 1,
+            ),
           ),
           child: Column(
             children: [
@@ -728,12 +727,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-            ),
+            color: theme.colorScheme.primary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: theme.colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -743,7 +740,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: const Color(0xFF6B7280),
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -751,7 +748,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 value,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: const Color(0xFF1F2937),
+                  color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),

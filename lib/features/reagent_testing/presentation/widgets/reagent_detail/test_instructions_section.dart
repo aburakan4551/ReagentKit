@@ -31,24 +31,12 @@ class TestInstructionsSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                theme.colorScheme.tertiary,
-                theme.colorScheme.tertiary.withOpacity(0.8),
-              ],
-            ),
+            color: theme.colorScheme.tertiary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.tertiary.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: const Icon(
+          child: Icon(
             HeroIcons.clipboard_document_list, // Test instructions icon
-            color: Colors.white,
+            color: theme.colorScheme.tertiary,
             size: 24,
           ),
         ),
@@ -80,7 +68,7 @@ class _InstructionsCard extends ConsumerWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor.withOpacity(0.2)),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),

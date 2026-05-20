@@ -5,7 +5,8 @@ import 'app_colors.dart';
 class AppTextStyles {
   // Utilizing GoogleFonts (e.g., Inter or standard San Francisco style)
   static TextTheme getTextTheme() {
-    return GoogleFonts.interTextTheme().copyWith(
+    final baseTextTheme = ThemeData(brightness: Brightness.dark).textTheme;
+    return GoogleFonts.interTextTheme(baseTextTheme).copyWith(
       displayLarge: const TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.w700,
@@ -27,11 +28,23 @@ class AppTextStyles {
         letterSpacing: -0.5,
         color: AppColors.textPrimary,
       ),
+      headlineLarge: const TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        height: 1.3,
+        color: AppColors.textPrimary,
+      ),
       headlineMedium: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         height: 1.35,
         letterSpacing: -0.3,
+        color: AppColors.textPrimary,
+      ),
+      headlineSmall: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        height: 1.35,
         color: AppColors.textPrimary,
       ),
       titleLarge: const TextStyle(
@@ -43,6 +56,12 @@ class AppTextStyles {
       ),
       titleMedium: const TextStyle(
         fontSize: 16,
+        fontWeight: FontWeight.w600,
+        height: 1.4,
+        color: AppColors.textPrimary,
+      ),
+      titleSmall: const TextStyle(
+        fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.4,
         color: AppColors.textPrimary,
@@ -74,6 +93,13 @@ class AppTextStyles {
       ),
       labelMedium: const TextStyle(
         fontSize: 12,
+        fontWeight: FontWeight.w500,
+        height: 1.2,
+        letterSpacing: 0.5,
+        color: AppColors.textMuted,
+      ),
+      labelSmall: const TextStyle(
+        fontSize: 10,
         fontWeight: FontWeight.w500,
         height: 1.2,
         letterSpacing: 0.5,

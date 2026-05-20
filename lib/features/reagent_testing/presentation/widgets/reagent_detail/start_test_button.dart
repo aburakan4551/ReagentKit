@@ -17,17 +17,18 @@ class StartTestButton extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final isAcknowledged = ref.watch(reagentDetailControllerProvider);
 
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
+        color: theme.colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outlineVariant,
+            width: 1,
           ),
-        ],
+        ),
       ),
       child: SafeArea(
         child: SizedBox(
@@ -37,14 +38,12 @@ class StartTestButton extends ConsumerWidget {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: isAcknowledged
-                  ? const Color(0xFF10B981) // Vibrant green for enabled state
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.12), // Disabled color
+                  ? theme.colorScheme.primary // Primary action color
+                  : theme.colorScheme.onSurface.withOpacity(0.12), // Disabled color
               foregroundColor: isAcknowledged
-                  ? Colors.white
-                  : Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.38),
-              elevation: isAcknowledged ? 2 : 0,
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurface.withOpacity(0.38),
+              elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

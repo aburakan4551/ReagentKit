@@ -372,7 +372,6 @@ class _SubstanceItem extends StatelessWidget {
               ),
             ),
           ),
-          Icon(HeroIcons.chevron_right, size: 16, color: theme.colorScheme.outline),
         ],
       ),
     );

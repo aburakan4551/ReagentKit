@@ -29,24 +29,12 @@ class ChemicalComponentsSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                theme.colorScheme.secondary,
-                theme.colorScheme.secondary.withOpacity(0.8),
-              ],
-            ),
+            color: theme.colorScheme.secondary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.secondary.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: const Icon(
+          child: Icon(
             HeroIcons.beaker, // Chemistry beaker icon for chemical components
-            color: Colors.white,
+            color: theme.colorScheme.secondary,
             size: 24,
           ),
         ),

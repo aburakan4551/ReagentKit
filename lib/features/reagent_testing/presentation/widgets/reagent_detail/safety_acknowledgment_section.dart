@@ -21,7 +21,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -48,21 +48,12 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.shade600, Colors.green.shade400],
-            ),
+            color: theme.colorScheme.primary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.green.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: const Icon(
+          child: Icon(
             HeroIcons.shield_check, // Safety acknowledgment icon
-            color: Colors.white,
+            color: theme.colorScheme.primary,
             size: 24,
           ),
         ),
