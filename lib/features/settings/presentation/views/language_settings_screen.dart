@@ -60,7 +60,6 @@ class _LanguageSettingsScreenState
   Widget build(BuildContext context) {
     final settingsState = ref.watch(settingsControllerProvider);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     String currentLanguage = 'en';
     if (settingsState is SettingsLoaded) {
@@ -68,14 +67,13 @@ class _LanguageSettingsScreenState
     }
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0F0F1A) : const Color(0xFFF5F5FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: isDark ? Colors.white : const Color(0xFF1A1A2E)),
+              color: theme.colorScheme.onSurface),
           onPressed: () {
             HapticFeedback.lightImpact();
             Navigator.pop(context);
@@ -86,7 +84,7 @@ class _LanguageSettingsScreenState
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 20,
-            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),
@@ -95,40 +93,43 @@ class _LanguageSettingsScreenState
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           children: [
-            _buildHeader(isDark),
+            _buildHeader(theme),
             const SizedBox(height: 24),
             ..._languages.map(
               (lang) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _buildLanguageOption(
                   context: context,
-                  isDark: isDark,
+                  theme: theme,
                   lang: lang,
                   currentLanguage: currentLanguage,
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            _buildDirectionNote(isDark),
+            _buildDirectionNote(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF48CAE4), Color(0xFF0077B6)],
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.secondary,
+            theme.colorScheme.tertiary,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0077B6).withOpacity(0.3),
+            color: theme.colorScheme.secondary.withOpacity(0.24),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -141,19 +142,20 @@ class _LanguageSettingsScreenState
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'Choose Your Language',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'The app will update immediately',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -165,14 +167,13 @@ class _LanguageSettingsScreenState
 
   Widget _buildLanguageOption({
     required BuildContext context,
-    required bool isDark,
+    required ThemeData theme,
     required Map<String, String> lang,
     required String currentLanguage,
   }) {
     final isSelected = currentLanguage == lang['code'];
-    final cardColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
-    final borderColor =
-        isSelected ? const Color(0xFF48CAE4) : Colors.transparent;
+    final cardColor = theme.colorScheme.surfaceContainerHighest;
+    final borderColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -184,8 +185,8 @@ class _LanguageSettingsScreenState
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? const Color(0xFF48CAE4).withOpacity(0.15)
-                : Colors.black.withOpacity(0.04),
+                ? theme.colorScheme.primary.withOpacity(0.12)
+                : Colors.black.withOpacity(0.02),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -211,9 +212,7 @@ class _LanguageSettingsScreenState
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.grey.withOpacity(0.08),
+                    color: theme.colorScheme.onSurface.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
@@ -230,11 +229,9 @@ class _LanguageSettingsScreenState
                     children: [
                       Text(
                         lang['native']!,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color:
-                              isDark ? Colors.white : const Color(0xFF1A1A2E),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -242,11 +239,8 @@ class _LanguageSettingsScreenState
                         children: [
                           Text(
                             lang['name']!,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600],
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -254,15 +248,15 @@ class _LanguageSettingsScreenState
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF48CAE4).withOpacity(0.15),
+                              color: theme.colorScheme.primary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               lang['direction']!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF0077B6),
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                           ),
@@ -277,8 +271,8 @@ class _LanguageSettingsScreenState
                       ? Container(
                           key: const ValueKey('selected'),
                           padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF48CAE4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.check_rounded,
@@ -291,9 +285,7 @@ class _LanguageSettingsScreenState
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark
-                                  ? Colors.grey[600]!
-                                  : Colors.grey[300]!,
+                              color: theme.colorScheme.outline,
                               width: 2,
                             ),
                           ),
@@ -307,7 +299,9 @@ class _LanguageSettingsScreenState
     );
   }
 
-  Widget _buildDirectionNote(bool isDark) {
+  Widget _buildDirectionNote(ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

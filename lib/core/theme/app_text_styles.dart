@@ -4,106 +4,111 @@ import 'app_colors.dart';
 
 class AppTextStyles {
   // Utilizing GoogleFonts (e.g., Inter or standard San Francisco style)
-  static TextTheme getTextTheme() {
-    final baseTextTheme = ThemeData(brightness: Brightness.dark).textTheme;
+  static TextTheme getTextTheme([Brightness brightness = Brightness.dark]) {
+    final isDark = brightness == Brightness.dark;
+    final primaryColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+    final secondaryColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final mutedColor = isDark ? AppColors.textMuted : AppColors.lightTextMuted;
+
+    final baseTextTheme = ThemeData(brightness: brightness).textTheme;
     return GoogleFonts.interTextTheme(baseTextTheme).copyWith(
-      displayLarge: const TextStyle(
+      displayLarge: TextStyle(
         fontSize: 32,
         fontWeight: FontWeight.w700,
         height: 1.2,
         letterSpacing: -0.5,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      displayMedium: const TextStyle(
+      displayMedium: TextStyle(
         fontSize: 28,
         fontWeight: FontWeight.w700,
         height: 1.25,
         letterSpacing: -0.5,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      displaySmall: const TextStyle(
+      displaySmall: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,
         height: 1.3,
         letterSpacing: -0.5,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      headlineLarge: const TextStyle(
+      headlineLarge: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w600,
         height: 1.3,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      headlineMedium: const TextStyle(
+      headlineMedium: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         height: 1.35,
         letterSpacing: -0.3,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      headlineSmall: const TextStyle(
+      headlineSmall: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         height: 1.35,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      titleLarge: const TextStyle(
+      titleLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         height: 1.4,
         letterSpacing: -0.2,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      titleMedium: const TextStyle(
+      titleMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         height: 1.4,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      titleSmall: const TextStyle(
+      titleSmall: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.4,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      bodyLarge: const TextStyle(
+      bodyLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 1.5,
-        color: AppColors.textSecondary,
+        color: secondaryColor,
       ),
-      bodyMedium: const TextStyle(
+      bodyMedium: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         height: 1.5,
-        color: AppColors.textSecondary,
+        color: secondaryColor,
       ),
-      bodySmall: const TextStyle(
+      bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         height: 1.4,
-        color: AppColors.textMuted,
+        color: mutedColor,
       ),
-      labelLarge: const TextStyle(
+      labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         height: 1.0,
         letterSpacing: 0.2,
-        color: AppColors.textPrimary,
+        color: primaryColor,
       ),
-      labelMedium: const TextStyle(
+      labelMedium: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         height: 1.2,
         letterSpacing: 0.5,
-        color: AppColors.textMuted,
+        color: mutedColor,
       ),
-      labelSmall: const TextStyle(
+      labelSmall: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.w500,
         height: 1.2,
         letterSpacing: 0.5,
-        color: AppColors.textMuted,
+        color: mutedColor,
       ),
     );
   }

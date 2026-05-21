@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
+import 'package:reagentkit/core/utils/layout_helper.dart';
 import '../states/settings_state.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
@@ -378,7 +379,7 @@ class SettingsPage extends ConsumerWidget {
         ),
 
         // Additional spacing at bottom
-        const SizedBox(height: 80),
+        SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
       ],
     );
   }

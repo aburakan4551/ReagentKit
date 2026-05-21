@@ -42,7 +42,6 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
   Widget build(BuildContext context) {
     final settingsState = ref.watch(settingsControllerProvider);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     ThemeMode currentMode = ThemeMode.system;
     if (settingsState is SettingsLoaded) {
@@ -50,13 +49,13 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
     }
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F0F1A) : const Color(0xFFF5F5FA),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: isDark ? Colors.white : const Color(0xFF1A1A2E)),
+              color: theme.colorScheme.onSurface),
           onPressed: () {
             HapticFeedback.lightImpact();
             Navigator.pop(context);
@@ -67,7 +66,7 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 20,
-            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),
@@ -76,11 +75,11 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           children: [
-            _buildHeader(isDark),
+            _buildHeader(theme),
             const SizedBox(height: 24),
             _buildThemeOption(
               context: context,
-              isDark: isDark,
+              theme: theme,
               mode: ThemeMode.light,
               currentMode: currentMode,
               icon: Icons.wb_sunny_rounded,
@@ -93,27 +92,27 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
             const SizedBox(height: 12),
             _buildThemeOption(
               context: context,
-              isDark: isDark,
+              theme: theme,
               mode: ThemeMode.dark,
               currentMode: currentMode,
               icon: Icons.nightlight_round,
               label: 'Dark',
               subtitle: 'Easy on the eyes at night',
               gradient: const LinearGradient(
-                colors: [Color(0xFF1A1A2E), Color(0xFF4A0080)],
+                colors: [Color(0xFF1A2238), Color(0xFF7C5CFF)],
               ),
             ),
             const SizedBox(height: 12),
             _buildThemeOption(
               context: context,
-              isDark: isDark,
+              theme: theme,
               mode: ThemeMode.system,
               currentMode: currentMode,
               icon: Icons.settings_suggest_rounded,
               label: 'System Default',
               subtitle: 'Follow your device settings',
               gradient: const LinearGradient(
-                colors: [Color(0xFF6C63FF), Color(0xFF48CAE4)],
+                colors: [Color(0xFF6366F1), Color(0xFF3B82F6)],
               ),
             ),
           ],
@@ -122,19 +121,22 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primary,
+            theme.colorScheme.secondary,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C63FF).withOpacity(0.3),
+            color: theme.colorScheme.primary.withOpacity(0.24),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -147,19 +149,20 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'Choose Your Theme',
-                  style: TextStyle(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   'Personalize the app appearance',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -171,7 +174,7 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
 
   Widget _buildThemeOption({
     required BuildContext context,
-    required bool isDark,
+    required ThemeData theme,
     required ThemeMode mode,
     required ThemeMode currentMode,
     required IconData icon,
@@ -180,8 +183,8 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
     required LinearGradient gradient,
   }) {
     final isSelected = currentMode == mode;
-    final cardColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
-    final borderColor = isSelected ? const Color(0xFF6C63FF) : Colors.transparent;
+    final cardColor = theme.colorScheme.surfaceContainerHighest;
+    final borderColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -193,8 +196,8 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? const Color(0xFF6C63FF).withOpacity(0.15)
-                : Colors.black.withOpacity(0.04),
+                ? theme.colorScheme.primary.withOpacity(0.12)
+                : Colors.black.withOpacity(0.02),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -231,18 +234,16 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
                     children: [
                       Text(
                         label,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -254,8 +255,8 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
                       ? Container(
                           key: const ValueKey('selected'),
                           padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF6C63FF),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.check_rounded,
@@ -268,7 +269,7 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark ? Colors.grey[600]! : Colors.grey[300]!,
+                              color: theme.colorScheme.outline,
                               width: 2,
                             ),
                           ),

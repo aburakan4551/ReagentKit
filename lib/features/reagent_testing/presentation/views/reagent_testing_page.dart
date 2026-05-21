@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../domain/entities/reagent_entity.dart';
+import '../../../../core/utils/layout_helper.dart';
 
 import '../providers/reagent_testing_providers.dart';
 import '../states/reagent_testing_state.dart';
@@ -136,15 +137,23 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
   }
 
   Widget _buildInitialState() {
-    return const Center(
+    final theme = Theme.of(context);
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(HeroIcons.beaker, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
+          Icon(
+            HeroIcons.beaker,
+            size: 64,
+            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+          ),
+          const SizedBox(height: 16),
           Text(
             'Initializing reagent data...',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 16,
+              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+            ),
           ),
         ],
       ),
@@ -158,7 +167,10 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: 16),
-          Text(l10n.loadingReagents, style: const TextStyle(fontSize: 16)),
+          Text(
+            l10n.loadingReagents,
+            style: const TextStyle(fontSize: 16),
+          ),
         ],
       ),
     );
@@ -169,7 +181,12 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
       onRefresh: () =>
           ref.read(reagentTestingControllerProvider.notifier).refresh(),
       child: GridView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 16,
+          bottom: LayoutHelper.getBottomNavPadding(context),
+        ),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 16,
@@ -243,27 +260,32 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
     controller,
     AppLocalizations l10n,
   ) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(HeroIcons.beaker, size: 64, color: Colors.grey.shade400),
+            Icon(
+              HeroIcons.beaker,
+              size: 64,
+              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+            ),
             const SizedBox(height: 16),
             Text(
               l10n.noReagentsAvailable,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(color: Colors.grey.shade600),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               l10n.unableToLoadReagentData,
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(

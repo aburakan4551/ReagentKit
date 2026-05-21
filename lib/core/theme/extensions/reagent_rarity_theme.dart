@@ -54,10 +54,10 @@ class ReagentRarityTheme extends ThemeExtension<ReagentRarityTheme> {
   );
   
   static ReagentRarityTheme get light => const ReagentRarityTheme(
-    commonColor: AppColors.rarityCommon,
-    uncommonColor: AppColors.rarityUncommon,
-    rareColor: AppColors.rarityRare,
-    epicColor: AppColors.rarityEpic,
-    legendaryColor: AppColors.rarityLegendary,
+    commonColor: AppColors.lightRarityCommon,
+    uncommonColor: AppColors.lightRarityUncommon,
+    rareColor: AppColors.lightRarityRare,
+    epicColor: AppColors.lightRarityEpic,
+    legendaryColor: AppColors.lightRarityLegendary,
   );
 }

@@ -6,6 +6,7 @@ import '../../domain/entities/test_result_entity.dart';
 import '../providers/reagent_testing_providers.dart';
 import '../states/test_result_history_state.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/utils/layout_helper.dart';
 
 class TestResultHistoryPage extends ConsumerStatefulWidget {
   const TestResultHistoryPage({super.key});
@@ -173,7 +174,12 @@ class _TestResultHistoryPageState extends ConsumerState<TestResultHistoryPage>
         _buildSearchAndFilter(theme, l10n),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: LayoutHelper.getBottomNavPadding(context),
+            ),
             itemCount: filteredResults.length,
             itemBuilder: (context, index) {
               final result = filteredResults[index];
@@ -290,7 +296,7 @@ class _TestResultHistoryPageState extends ConsumerState<TestResultHistoryPage>
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -448,7 +454,12 @@ class _TestResultHistoryPageState extends ConsumerState<TestResultHistoryPage>
     final stats = controller.getStatistics();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: LayoutHelper.getBottomNavPadding(context),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -496,7 +507,7 @@ class _TestResultHistoryPageState extends ConsumerState<TestResultHistoryPage>
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

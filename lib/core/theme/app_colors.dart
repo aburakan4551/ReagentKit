@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// A premium dark theme color palette optimized for iOS OLED displays and WCAG contrast.
+/// A premium dark/light theme color palette optimized for iOS OLED displays and WCAG contrast.
 class AppColors {
-  // Backgrounds
+  // Backgrounds (Dark Theme / Legacy defaults)
   static const Color backgroundBase = Color(0xFF0B1020);
   static const Color backgroundElevated = Color(0xFF111827);
   static const Color backgroundHighest = Color(0xFF151B2E);
@@ -42,4 +42,49 @@ class AppColors {
   // Overlay / Blur Backgrounds
   static const Color overlayDark = Color(0x990B1020); // 60% opacity background
   static const Color overlayLight = Color(0x1AFFFFFF); // 10% white
+
+  // ==========================================
+  // Light Theme Color Palette
+  // ==========================================
+  
+  // Backgrounds
+  static const Color lightBackgroundBase = Color(0xFFF9FAFB); // Premium cool grey-white
+  static const Color lightBackgroundElevated = Color(0xFFFFFFFF); // Pure white
+  static const Color lightBackgroundHighest = Color(0xFFF3F4F6); // Soft grey
+
+  // Surfaces (Cards, BottomNav, Dialogs)
+  static const Color lightSurfaceBase = Color(0xFFFFFFFF);
+  static const Color lightSurfaceElevated = Color(0xFFF3F4F6);
+  static const Color lightSurfaceHighlight = Color(0xFFE5E7EB);
+
+  // Accents (Enhanced contrast/vibrancy for light background)
+  static const Color lightPrimaryAccent = Color(0xFF6366F1); // Deep violet-indigo
+  static const Color lightSecondaryAccent = Color(0xFF3B82F6); // Vibrant Blue
+  static const Color lightTertiaryAccent = Color(0xFFD946EF); // Magenta
+
+  // Typography
+  static const Color lightTextPrimary = Color(0xFF111827); // Deep charcoal
+  static const Color lightTextSecondary = Color(0xFF4B5563); // Cool grey
+  static const Color lightTextMuted = Color(0xFF6B7280); // Muted grey
+
+  // Status & Semantic
+  static const Color lightStatusSuccess = Color(0xFF10B981); // Emerald
+  static const Color lightStatusWarning = Color(0xFFD97706); // Deep amber
+  static const Color lightStatusError = Color(0xFFEF4444); // Red
+  static const Color lightStatusInfo = Color(0xFF2563EB); // Blue
+  
+  // Rarities
+  static const Color lightRarityCommon = lightTextSecondary;
+  static const Color lightRarityUncommon = lightStatusSuccess;
+  static const Color lightRarityRare = lightSecondaryAccent;
+  static const Color lightRarityEpic = lightPrimaryAccent;
+  static const Color lightRarityLegendary = Color(0xFFD97706); // Dark gold
+
+  // Borders & Dividers
+  static const Color lightBorderSubtle = Color(0xFFE5E7EB);
+  static const Color lightBorderHighlight = Color(0xFFD1D5DB);
+
+  // Overlay / Blur Backgrounds
+  static const Color lightOverlayDark = Color(0x1A000000); // 10% black
+  static const Color lightOverlayLight = Color(0x0D000000); // 5% black
 }

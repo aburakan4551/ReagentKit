@@ -11,12 +11,23 @@ service cloud.firestore {
       allow update: if request.auth != null && 
                     resource != null &&
                     resource.data.uid == request.auth.uid &&
-                    request.resource.data.uid == request.auth.uid;
+                    request.resource.data.uid == request.auth.uid &&
+                    (
+                      // Ensure scansLeft cannot be modified to be larger than before (prevent bypass)
+                      (!('scansLeft' in request.resource.data)) || 
+                      (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
+                      (request.resource.data.scansLeft <= resource.data.scansLeft)
+                    );
       
       // Allow creating user documents during registration (requires authentication)
       // Must match authenticated user's UID
       allow create: if request.auth != null && 
-                    request.resource.data.uid == request.auth.uid;
+                    request.resource.data.uid == request.auth.uid &&
+                    (
+                      // Ensure new accounts cannot set scansLeft > 3
+                      (!('scansLeft' in request.resource.data)) ||
+                      (request.resource.data.scansLeft <= 3)
+                    );
       
       // Allow deleting user's own document only (requires authentication)
       allow delete: if request.auth != null && 
@@ -25,6 +36,20 @@ service cloud.firestore {
       
       // Allow listing for username availability checks (even without auth)
       allow list: if true;
+    }
+
+    // Anonymous devices collection rules - secure tracking of guest device limits
+    match /anonymous_devices/{deviceId} {
+      // Access requires knowing the specific generated deviceId
+      allow read: if true;
+      allow create: if request.resource.data.scansLeft <= 3;
+      allow update: if (
+                      // Only allow decreasing or keeping the scansLeft count (prevent bypass)
+                      (!('scansLeft' in request.resource.data)) ||
+                      (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
+                      (request.resource.data.scansLeft <= resource.data.scansLeft)
+                    );
+      allow delete: if false; // Guests cannot delete tracking records
     }
 
     // Result History collection rules - using email as document ID for test data

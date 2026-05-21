@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:reagentkit/core/theme/app_colors.dart';
+import 'package:reagentkit/core/utils/layout_helper.dart';
+import 'package:reagentkit/core/widgets/adaptive_section_title.dart';
+import 'package:reagentkit/core/widgets/adaptive_text_field.dart';
+import 'package:reagentkit/core/widgets/gradient_action_button.dart';
+import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
+import 'package:reagentkit/core/services/premium_service.dart';
+
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../auth/presentation/states/auth_state.dart';
 import '../../../../core/services/notification_service.dart';
@@ -106,193 +114,180 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.lock_reset, color: Theme.of(context).colorScheme.primary, size: 24),
-              const SizedBox(width: 12),
-              Text(
-                l10n.resetPasswordTitle,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-          content: SizedBox(
-            width: 300,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+        builder: (context, setState) {
+          final theme = Theme.of(context);
+          final isDarkMode = theme.brightness == Brightness.dark;
+          
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: isDarkMode ? AppColors.surfaceBase : AppColors.lightSurfaceBase,
+            title: Row(
               children: [
+                Icon(Icons.lock_reset, color: theme.colorScheme.primary, size: 24),
+                const SizedBox(width: 12),
                 Text(
-                  l10n.resetPasswordDescription,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    height: 1.4,
+                  l10n.resetPasswordTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 20),
-                // Security Notice
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.security,
-                        size: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Reset links expire in 1 hour and can only be used once for security.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: resetEmailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  enabled: !isLoading,
-                  decoration: InputDecoration(
-                    labelText: l10n.email,
-                    hintText: l10n.enterEmailToReset,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return l10n.pleaseEnterEmail;
-                    }
-                    if (!RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value)) {
-                      return l10n.pleaseEnterValidEmail;
-                    }
-                    return null;
-                  },
                 ),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isLoading ? null : () => Navigator.of(context).pop(),
-              child: Text(
-                l10n.backToLogin,
-                style: TextStyle(
-                  color: isLoading
-                      ? Theme.of(context).colorScheme.onSurface.withOpacity(0.3)
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: isLoading
-                  ? null
-                  : () async {
-                      final email = resetEmailController.text.trim();
-                      if (email.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.pleaseEnterEmail),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
-                      setState(() {
-                        isLoading = true;
-                      });
-
-                      try {
-                        await ref
-                            .read(authControllerProvider.notifier)
-                            .sendPasswordResetEmail(email);
-
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.passwordResetEmailSent),
-                              backgroundColor: Colors.green,
-                              duration: const Duration(seconds: 4),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: ${e.toString()}'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3B82F6),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            content: SizedBox(
+              width: 320,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.resetPasswordDescription,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Security Notice
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withOpacity(0.2),
                       ),
-                    )
-                  : Text(l10n.sendResetEmail),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.security,
+                          size: 16,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Reset links expire in 1 hour and can only be used once for security.',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  AdaptiveTextField(
+                    controller: resetEmailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    labelText: l10n.email,
+                    hintText: l10n.enterEmailToReset,
+                    prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withOpacity(0.7)),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.pleaseEnterEmail;
+                      }
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
+                        return l10n.pleaseEnterValidEmail;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.of(context).pop(),
+                child: Text(
+                  l10n.backToLogin,
+                  style: TextStyle(
+                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        final email = resetEmailController.text.trim();
+                        if (email.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.pleaseEnterEmail),
+                              backgroundColor: AppColors.statusError,
+                            ),
+                          );
+                          return;
+                        }
+
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await ref
+                              .read(authControllerProvider.notifier)
+                              .sendPasswordResetEmail(email);
+
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.passwordResetEmailSent),
+                                backgroundColor: AppColors.statusSuccess,
+                                duration: const Duration(seconds: 4),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: ${e.toString()}'),
+                                backgroundColor: AppColors.statusError,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(l10n.sendResetEmail),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -301,37 +296,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final historyState = ref.watch(testResultHistoryControllerProvider);
+    final premiumService = ref.watch(premiumServiceProvider);
     final theme = Theme.of(context);
 
-    // Set context for the auth controller
+    // Show notifications for errors and success messages
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Show top notification for errors and success messages
       if (authState is AuthError) {
-        NotificationService.showError(
-          message: authState.message,
-        );
+        NotificationService.showError(message: authState.message);
       } else if (authState is AuthSuccess) {
-        NotificationService.showSuccess(
-          message: authState.message,
-        );
+        NotificationService.showSuccess(message: authState.message);
       }
     });
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _buildModernAppBar(authState, theme),
-      body: _buildBody(authState, historyState, theme),
+      body: _buildBody(authState, historyState, premiumService, theme),
     );
   }
 
   PreferredSizeWidget _buildModernAppBar(AuthState authState, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
-      flexibleSpace: Container(
-        color: Colors.transparent, // Replaced gradient with clean background
-      ),
       title: Row(
         children: [
           Container(
@@ -344,14 +333,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 width: 1,
               ),
             ),
-            child: Icon(HeroIcons.beaker, color: theme.colorScheme.primary, size: 24),
+            child: Icon(HeroIcons.user, color: theme.colorScheme.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Text(
             _getAppBarTitle(authState),
             style: theme.textTheme.titleLarge?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+              color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -371,15 +360,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget _buildBody(
     AuthState authState,
     TestResultHistoryState historyState,
+    PremiumService premiumService,
     ThemeData theme,
   ) {
     final l10n = AppLocalizations.of(context)!;
     if (authState is AuthAuthenticated) {
-      return _buildModernProfileView(authState.user, historyState, theme);
+      return _buildModernProfileView(authState.user, historyState, premiumService, theme);
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -390,6 +381,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildModernGoogleSignInButton(authState, l10n, theme),
           const SizedBox(height: 20),
           _buildToggleAuthModeButton(l10n, theme),
+          SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
         ],
       ),
     );
@@ -398,6 +390,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget _buildModernProfileView(
     user,
     TestResultHistoryState historyState,
+    PremiumService premiumService,
     ThemeData theme,
   ) {
     final l10n = AppLocalizations.of(context)!;
@@ -407,419 +400,51 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildProfileHeader(user, results.length, l10n, theme),
+          ProfileHeaderCard(
+            user: user,
+            totalTests: results.length,
+            isPremium: premiumService.isPremium,
+            freeScansLeft: premiumService.freeScansLeft,
+            onUpgradePressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PaywallScreen()),
+              );
+            },
+          ),
           const SizedBox(height: 24),
-          _buildRecentActivity(results, l10n, theme),
+          ActivityCard(results: results),
           const SizedBox(height: 24),
-          _buildSafetySection(l10n, theme),
+          const SafetyReminderCard(),
           const SizedBox(height: 24),
-          _buildAccountSection(user, l10n, theme),
-          const SizedBox(height: 24),
+          AccountInfoCard(user: user),
+          const SizedBox(height: 32),
           _buildSignOutButton(l10n, theme),
+          SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
         ],
       ),
     );
-  }
-
-  Widget _buildProfileHeader(
-    user,
-    int totalTests,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
-                width: 1,
-              ),
-            ),
-            child: user.photoUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: Image.network(user.photoUrl!, fit: BoxFit.cover),
-                  )
-                : Center(
-                    child: Text(
-                      user.username.isNotEmpty
-                          ? user.username[0].toUpperCase()
-                          : 'L',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.username,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '$totalTests ${l10n.totalTests}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentActivity(
-    List<TestResultEntity> results,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.recentActivity,
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: theme.colorScheme.outlineVariant, width: 1),
-          ),
-          child: results.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Center(
-                    child: Text(
-                      l10n.noRecentActivity,
-                      style: TextStyle(color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6)),
-                    ),
-                  ),
-                )
-              : Column(
-                  children: results.take(3).map((result) {
-                    return _buildActivityItem(
-                      result.reagentName,
-                      result.possibleSubstances.join(', '),
-                      _formatTimeAgo(result.testCompletedAt),
-                      _getConfidenceColor(result.confidencePercentage, theme),
-                      theme,
-                    );
-                  }).toList(),
-                ),
-        ),
-      ],
-    );
-  }
-
-  String _formatTimeAgo(DateTime dateTime) {
-    final diff = DateTime.now().difference(dateTime);
-    if (diff.inDays > 0) return '${diff.inDays}d ago';
-    if (diff.inHours > 0) return '${diff.inHours}h ago';
-    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
-    return 'Just now';
-  }
-
-  Color _getConfidenceColor(int confidence, ThemeData theme) {
-    if (confidence >= 80) return theme.colorScheme.primary; 
-    if (confidence >= 60) return theme.colorScheme.secondary; 
-    return theme.colorScheme.error; 
-  }
-
-  Widget _buildActivityItem(
-    String reagent,
-    String sample,
-    String time,
-    Color color,
-    ThemeData theme,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  reagent,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                Text(
-                  sample,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            time,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSafetySection(AppLocalizations l10n, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.25),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.error.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  HeroIcons.exclamation_triangle,
-                  color: theme.colorScheme.error,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                l10n.safetyReminder,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            l10n.safetyReminderText,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAccountSection(user, AppLocalizations l10n, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.accountInformation,
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant,
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              _buildInfoRow(
-                HeroIcons.user,
-                l10n.username,
-                user.username,
-                theme,
-              ),
-              const Divider(height: 32),
-              _buildInfoRow(HeroIcons.envelope, l10n.email, user.email, theme),
-              const Divider(height: 32),
-              _buildInfoRow(
-                HeroIcons.calendar,
-                l10n.memberSince,
-                _formatDate(user.registeredAt),
-                theme,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(
-    IconData icon,
-    String label,
-    String value,
-    ThemeData theme,
-  ) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: theme.colorScheme.primary, size: 20),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSignOutButton(AppLocalizations l10n, ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFFF6B6B).withOpacity(0.3),
-        ),
-      ),
-      child: TextButton.icon(
-        onPressed: _signOut,
-        icon: const Icon(
-          HeroIcons.arrow_right_on_rectangle,
-          color: Color(0xFFFF6B6B),
-        ),
-        label: Text(
-          l10n.signOut,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: const Color(0xFFFF6B6B),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   Widget _buildModernWelcomeSection(AppLocalizations l10n, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+        ),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -828,20 +453,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16),
+              color: theme.colorScheme.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
             child: Icon(
               _isLoginMode ? HeroIcons.beaker : HeroIcons.user_plus,
-              size: 48,
-              color: theme.colorScheme.onPrimaryContainer,
+              size: 40,
+              color: theme.colorScheme.primary,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             _isLoginMode ? l10n.welcomeBack : l10n.joinOurLab,
             style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.onSurface,
+              color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -849,7 +474,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Text(
             _isLoginMode ? l10n.accessYourLab : l10n.startYourJourney,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -865,17 +490,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ThemeData theme,
   ) {
     final isLoading = authState is AuthLoading;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+        ),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -885,11 +514,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!_isLoginMode) ...[
-              _buildModernTextField(
+              AdaptiveTextField(
                 controller: _usernameController,
-                label: l10n.username,
-                icon: HeroIcons.user,
-                enabled: !isLoading,
+                labelText: l10n.username,
+                prefixIcon: Icon(HeroIcons.user, color: theme.colorScheme.primary.withOpacity(0.7)),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return l10n.pleaseEnterUsername;
@@ -905,12 +533,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
               const SizedBox(height: 20),
             ],
-            _buildModernTextField(
+            AdaptiveTextField(
               controller: _emailController,
-              label: l10n.emailAddress,
-              icon: HeroIcons.envelope,
+              labelText: l10n.emailAddress,
+              prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withOpacity(0.7)),
               keyboardType: TextInputType.emailAddress,
-              enabled: !isLoading,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return l10n.pleaseEnterEmail;
@@ -924,16 +551,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               },
             ),
             const SizedBox(height: 20),
-            _buildModernTextField(
+            AdaptiveTextField(
               controller: _passwordController,
-              label: l10n.password,
-              icon: HeroIcons.lock_closed,
+              labelText: l10n.password,
+              prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withOpacity(0.7)),
               obscureText: !_isPasswordVisible,
-              enabled: !isLoading,
               suffixIcon: IconButton(
                 icon: Icon(
                   _isPasswordVisible ? HeroIcons.eye_slash : HeroIcons.eye,
-                  color: const Color(0xFF64748B),
+                  color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                  size: 20,
                 ),
                 onPressed: () {
                   setState(() {
@@ -953,18 +580,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
             if (!_isLoginMode) ...[
               const SizedBox(height: 20),
-              _buildModernTextField(
+              AdaptiveTextField(
                 controller: _confirmPasswordController,
-                label: l10n.confirmPassword,
-                icon: HeroIcons.lock_closed,
+                labelText: l10n.confirmPassword,
+                prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withOpacity(0.7)),
                 obscureText: !_isConfirmPasswordVisible,
-                enabled: !isLoading,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isConfirmPasswordVisible
-                        ? HeroIcons.eye_slash
-                        : HeroIcons.eye,
-                    color: const Color(0xFF64748B),
+                    _isConfirmPasswordVisible ? HeroIcons.eye_slash : HeroIcons.eye,
+                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                    size: 20,
                   ),
                   onPressed: () {
                     setState(() {
@@ -984,7 +609,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ],
             if (_isLoginMode) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -992,131 +617,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   child: Text(
                     l10n.forgotPassword,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF3B82F6),
-                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
             ],
-            const SizedBox(height: 32),
-            Container(
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3B82F6).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: isLoading ? null : _submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: isLoading
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            _isLoginMode
-                                ? l10n.signingIn
-                                : l10n.creatingAccount,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Text(
-                        _isLoginMode
-                            ? l10n.accessLaboratory
-                            : l10n.joinLaboratory,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-              ),
+            const SizedBox(height: 24),
+            GradientActionButton(
+              onPressed: isLoading ? null : _submitForm,
+              text: _isLoginMode
+                  ? (isLoading ? l10n.signingIn : l10n.accessLaboratory)
+                  : (isLoading ? l10n.creatingAccount : l10n.joinLaboratory),
+              isLoading: isLoading,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildModernTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    bool enabled = true,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      enabled: enabled,
-      validator: validator,
-      style: const TextStyle(fontSize: 16, color: Color(0xFF1E293B)),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF64748B)),
-        suffixIcon: suffixIcon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEF4444)),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
-        ),
-        filled: true,
-        fillColor: const Color(0xFFF8FAFC),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
-        labelStyle: const TextStyle(color: Color(0xFF64748B)),
       ),
     );
   }
@@ -1127,17 +644,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     ThemeData theme,
   ) {
     final isLoading = authState is AuthLoading;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+        ),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -1146,20 +667,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Row(
             children: [
               Expanded(
-                child: Container(height: 1, color: theme.dividerColor.withOpacity(0.5)),
+                child: Container(
+                  height: 1,
+                  color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   l10n.orContinueWith,
                   style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    fontSize: 14,
+                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
               Expanded(
-                child: Container(height: 1, color: theme.dividerColor.withOpacity(0.5)),
+                child: Container(
+                  height: 1,
+                  color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+                ),
               ),
             ],
           ),
@@ -1168,19 +696,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             height: 56,
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: theme.dividerColor),
+              border: Border.all(
+                color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderHighlight,
+              ),
               borderRadius: BorderRadius.circular(16),
+              color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
             ),
             child: TextButton.icon(
               onPressed: isLoading ? null : _signInWithGoogle,
               icon: Image.asset(
                 'assets/images/google_logo.png',
-                height: 24,
-                width: 24,
+                height: 22,
+                width: 22,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
                     HeroIcons.globe_americas,
-                    size: 24,
+                    size: 22,
                     color: Color(0xFF4285F4),
                   );
                 },
@@ -1188,9 +719,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               label: Text(
                 _isLoginMode ? l10n.signInWithGoogle : l10n.signUpWithGoogle,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                 ),
               ),
               style: TextButton.styleFrom(
@@ -1210,7 +741,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       onPressed: _toggleAuthMode,
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+          style: TextStyle(
+            fontSize: 15,
+            color: theme.brightness == Brightness.dark ? AppColors.textMuted : AppColors.lightTextMuted,
+            fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+          ),
           children: [
             TextSpan(
               text: _isLoginMode
@@ -1219,13 +754,634 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
             TextSpan(
               text: _isLoginMode ? l10n.joinNow : l10n.signIn,
-              style: const TextStyle(
-                color: Color(0xFF3B82F6),
-                fontWeight: FontWeight.w600,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSignOutButton(AppLocalizations l10n, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFF6B6B).withOpacity(0.3),
+          width: 1.5,
+        ),
+        color: const Color(0xFFFF6B6B).withOpacity(isDarkMode ? 0.05 : 0.02),
+      ),
+      child: TextButton.icon(
+        onPressed: _signOut,
+        icon: const Icon(
+          HeroIcons.arrow_right_on_rectangle,
+          color: Color(0xFFFF6B6B),
+          size: 20,
+        ),
+        label: Text(
+          l10n.signOut,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: const Color(0xFFFF6B6B),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom component for the profile header (including subscriber/scans usage details)
+class ProfileHeaderCard extends StatelessWidget {
+  final dynamic user;
+  final int totalTests;
+  final bool isPremium;
+  final int freeScansLeft;
+  final VoidCallback onUpgradePressed;
+
+  const ProfileHeaderCard({
+    super.key,
+    required this.user,
+    required this.totalTests,
+    required this.isPremium,
+    required this.freeScansLeft,
+    required this.onUpgradePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
+                    width: 1,
+                  ),
+                ),
+                child: user.photoUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.network(user.photoUrl!, fit: BoxFit.cover),
+                      )
+                    : Center(
+                        child: Text(
+                          user.username.isNotEmpty
+                              ? user.username[0].toUpperCase()
+                              : 'L',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.username,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '$totalTests ${l10n.totalTests}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Divider(height: 1),
+          const SizedBox(height: 20),
+          
+          // Premium Entitlement Status Bar
+          if (isPremium)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryAccent.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              ),
+              child: Row(
+                children: [
+                  const Icon(HeroIcons.sparkles, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'PRO Laboratory Account',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          'Unlimited scans and advanced reports active.',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Free Scan Allowance',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                        ),
+                      ),
+                      Text(
+                        '$freeScansLeft / 3 left',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Progress bar showing consumed scans
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: freeScansLeft / 3.0,
+                      backgroundColor: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderHighlight,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        freeScansLeft > 0 ? theme.colorScheme.primary : AppColors.statusError,
+                      ),
+                      minHeight: 8,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Need unlimited analysis?',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: onUpgradePressed,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(HeroIcons.sparkles, color: Colors.white, size: 13),
+                              SizedBox(width: 6),
+                              Text(
+                                'Upgrade',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Custom component for the activity history list
+class ActivityCard extends StatelessWidget {
+  final List<TestResultEntity> results;
+
+  const ActivityCard({super.key, required this.results});
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final diff = DateTime.now().difference(dateTime);
+    if (diff.inDays > 0) return '${diff.inDays}d ago';
+    if (diff.inHours > 0) return '${diff.inHours}h ago';
+    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
+    return 'Just now';
+  }
+
+  Color _getConfidenceColor(int confidence, ThemeData theme) {
+    if (confidence >= 80) return theme.colorScheme.primary;
+    if (confidence >= 60) return theme.colorScheme.secondary;
+    return theme.colorScheme.error;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AdaptiveSectionTitle(
+          title: l10n.recentActivity,
+          showAccentBar: true,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: results.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(28.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          HeroIcons.beaker,
+                          size: 32,
+                          color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.noRecentActivity,
+                          style: TextStyle(
+                            color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: results.take(3).length,
+                  separatorBuilder: (_, __) => const Divider(height: 1, indent: 44, endIndent: 16),
+                  itemBuilder: (context, index) {
+                    final result = results[index];
+                    final color = _getConfidenceColor(result.confidencePercentage, theme);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: color.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  result.reagentName,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  result.possibleSubstances.join(', '),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            _formatTimeAgo(result.testCompletedAt),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Custom component for the safety instructions/reminders card
+class SafetyReminderCard extends StatelessWidget {
+  const SafetyReminderCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+
+    final warningColor = isDarkMode ? AppColors.statusWarning : AppColors.lightStatusWarning;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: warningColor.withOpacity(isDarkMode ? 0.06 : 0.03),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: warningColor.withOpacity(0.25),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: warningColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  HeroIcons.exclamation_triangle,
+                  color: warningColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                l10n.safetyReminder,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.safetyReminderText,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Custom component for Account metadata
+class AccountInfoCard extends StatelessWidget {
+  final dynamic user;
+
+  const AccountInfoCard({super.key, required this.user});
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AdaptiveSectionTitle(
+          title: l10n.accountInformation,
+          showAccentBar: true,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildInfoRow(
+                context,
+                HeroIcons.user,
+                l10n.username,
+                user.username,
+              ),
+              const Divider(height: 1),
+              _buildInfoRow(
+                context,
+                HeroIcons.envelope,
+                l10n.email,
+                user.email,
+              ),
+              const Divider(height: 1),
+              _buildInfoRow(
+                context,
+                HeroIcons.calendar,
+                l10n.memberSince,
+                _formatDate(user.registeredAt),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: theme.colorScheme.primary, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

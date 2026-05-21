@@ -62,12 +62,12 @@ class PremiumCardTheme extends ThemeExtension<PremiumCardTheme> {
   );
   
   static PremiumCardTheme get light => PremiumCardTheme(
-    background: Colors.white,
-    iconColor: AppColors.primaryAccent,
-    textColor: AppColors.textPrimary,
+    background: AppColors.lightSurfaceBase,
+    iconColor: AppColors.lightPrimaryAccent,
+    textColor: AppColors.lightTextPrimary,
     gradientColors: [
-      AppColors.primaryAccent.withOpacity(0.1),
-      AppColors.secondaryAccent.withOpacity(0.1),
+      AppColors.lightPrimaryAccent.withOpacity(0.08),
+      AppColors.lightSecondaryAccent.withOpacity(0.08),
     ],
   );
 }

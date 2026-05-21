@@ -160,6 +160,71 @@ class FirestoreService {
     _cacheTimestamps.clear();
   }
 
+  /// Get scans left for a user (default is 3)
+  Future<int> getUserScansLeft(String uid) async {
+    try {
+      final doc = await _usersCollection.doc(uid).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('scansLeft')) {
+          return data['scansLeft'] as int;
+        }
+      }
+      // If not set yet, initialize it
+      await updateUserScansLeft(uid, 3);
+      return 3;
+    } catch (e) {
+      Logger.error('Error getting user scans left: $e');
+      return 3; // Fallback
+    }
+  }
+
+  /// Update scans left for a user
+  Future<void> updateUserScansLeft(String uid, int scansLeft) async {
+    try {
+      await _usersCollection.doc(uid).set({
+        'scansLeft': scansLeft,
+      }, SetOptions(merge: true));
+      Logger.info('✅ FirestoreService: Updated scansLeft to $scansLeft for user $uid');
+    } catch (e) {
+      Logger.error('Error updating user scans left: $e');
+      throw Exception('Failed to update scans left: $e');
+    }
+  }
+
+  /// Get scans left for an anonymous device (default is 3)
+  Future<int> getDeviceScansLeft(String deviceId) async {
+    try {
+      final doc = await _firestore.collection('anonymous_devices').doc(deviceId).get();
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data.containsKey('scansLeft')) {
+          return data['scansLeft'] as int;
+        }
+      }
+      // If not set yet, initialize it
+      await updateDeviceScansLeft(deviceId, 3);
+      return 3;
+    } catch (e) {
+      Logger.error('Error getting device scans left: $e');
+      return 3; // Fallback
+    }
+  }
+
+  /// Update scans left for an anonymous device
+  Future<void> updateDeviceScansLeft(String deviceId, int scansLeft) async {
+    try {
+      await _firestore.collection('anonymous_devices').doc(deviceId).set({
+        'scansLeft': scansLeft,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      Logger.info('✅ FirestoreService: Updated scansLeft to $scansLeft for device $deviceId');
+    } catch (e) {
+      Logger.error('Error updating device scans left: $e');
+      throw Exception('Failed to update device scans left: $e');
+    }
+  }
+
   // Debug method to test Firestore connectivity
   Future<void> testFirestoreConnection() async {
     try {

@@ -1,30 +1,43 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'firestore_service.dart';
+import '../config/get_it_config.dart';
 import '../utils/logger.dart';
 
-/// PremiumService handles Freemium logic, Free Scans limits, and In-App Purchases
+/// PremiumService handles secure Freemium limits (Firestore/Keychain synced) and RevenueCat subscriptions.
 class PremiumService extends ChangeNotifier {
   static const String _freeScansKey = 'free_scans_left';
   static const String _premiumUserKey = 'is_premium_user';
-  static const String productId = 'ai_analysis_unlimited';
+  static const String _installationUuidKey = 'installation_uuid';
+  static const String entitlementId = 'premium';
   
-  final InAppPurchase _iap = InAppPurchase.instance;
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
+  final _secureStorage = const FlutterSecureStorage();
+  final _firestoreService = getIt<FirestoreService>();
+  StreamSubscription<User?>? _authSubscription;
   
-  bool _isAvailable = false;
   bool _isPremium = false;
   int _freeScansLeft = 3;
   bool _isPurchasePending = false;
   String? _errorMessage;
-
+  String? _deviceId;
+  String? _currentUid;
+  
   bool get isPremium => _isPremium;
   int get freeScansLeft => _freeScansLeft;
   bool get isPurchasePending => _isPurchasePending;
   String? get errorMessage => _errorMessage;
   bool get canAnalyze => _isPremium || _freeScansLeft > 0;
+
+  List<Package> _activeOfferings = [];
+  List<Package> get activeOfferings => _activeOfferings;
 
   PremiumService() {
     _init();
@@ -33,30 +46,128 @@ class PremiumService extends ChangeNotifier {
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
     
-    // Load local state
+    // 1. Load basic local cache for fast offline startup
     _isPremium = prefs.getBool(_premiumUserKey) ?? false;
-    if (prefs.containsKey(_freeScansKey)) {
-      _freeScansLeft = prefs.getInt(_freeScansKey)!;
-    } else {
-      _freeScansLeft = 3;
-      await prefs.setInt(_freeScansKey, _freeScansLeft);
-    }
-    
-    // Initialize IAP
-    _isAvailable = await _iap.isAvailable();
-    if (_isAvailable) {
-      _subscription = _iap.purchaseStream.listen(
-        _onPurchaseDetailsUpdate,
-        onDone: () => _subscription.cancel(),
-        onError: (error) {
-          Logger.error('IAP Error: $error');
-          _errorMessage = 'Purchase stream error: $error';
-          _isPurchasePending = false;
-          notifyListeners();
-        },
-      );
-    }
+    _freeScansLeft = prefs.getInt(_freeScansKey) ?? 3;
     notifyListeners();
+
+    // 2. Load/Generate persistent device footprint (Keychain survives reinstall)
+    try {
+      _deviceId = await _secureStorage.read(key: _installationUuidKey);
+      if (_deviceId == null) {
+        _deviceId = _generateUniqueId();
+        await _secureStorage.write(key: _installationUuidKey, value: _deviceId!);
+      }
+      Logger.info('🔑 Device Persistent ID: $_deviceId');
+    } catch (e) {
+      Logger.error('Failed to access secure storage: $e');
+      _deviceId = prefs.getString(_installationUuidKey);
+      if (_deviceId == null) {
+        _deviceId = _generateUniqueId();
+        await prefs.setString(_installationUuidKey, _deviceId!);
+      }
+    }
+
+    // 3. Initialize RevenueCat
+    await _initRevenueCat();
+
+    // 4. Setup Auth State listener to sync scan counts
+    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+    await _syncScansLimit();
+
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) async {
+      _currentUid = user?.uid;
+      await _syncScansLimit();
+    });
+  }
+
+  String _generateUniqueId() {
+    final random = Random();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randomVal = random.nextInt(1000000);
+    return 'device_${timestamp}_$randomVal';
+  }
+
+  Future<void> _initRevenueCat() async {
+    try {
+      // Load public API Keys from dotenv, or use mock keys
+      final apiKeyIOS = dotenv.env['REVENUECAT_API_KEY_IOS'] ?? 'api_key_placeholder';
+      final apiKeyAndroid = dotenv.env['REVENUECAT_API_KEY_ANDROID'] ?? 'api_key_placeholder';
+      
+      // Select appropriate key
+      String apiKey = apiKeyAndroid;
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        apiKey = apiKeyIOS;
+      }
+      
+      await Purchases.setLogLevel(LogLevel.info);
+      
+      // Configure purchases_flutter
+      final configuration = PurchasesConfiguration(apiKey)
+        ..appUserID = _currentUid ?? _deviceId;
+        
+      await Purchases.configure(configuration);
+
+      // Fetch customer info
+      final customerInfo = await Purchases.getCustomerInfo();
+      _updatePremiumStatus(customerInfo);
+
+      // Listen for updates in real-time
+      Purchases.addCustomerInfoUpdateListener((customerInfo) {
+        _updatePremiumStatus(customerInfo);
+      });
+
+      // Load active offerings
+      final offerings = await Purchases.getOfferings();
+      if (offerings.current != null) {
+        _activeOfferings = offerings.current!.availablePackages;
+        notifyListeners();
+      }
+      
+      Logger.info('✅ RevenueCat initialized successfully.');
+    } catch (e) {
+      Logger.error('⚠️ RevenueCat initialization failed: $e. Using local cached fallback.');
+      // Offline fallback: we keep whatever _isPremium was loaded from local preferences.
+    }
+  }
+
+  void _updatePremiumStatus(CustomerInfo customerInfo) async {
+    final entitlementActive = customerInfo.entitlements.all[entitlementId]?.isActive ?? false;
+    if (_isPremium != entitlementActive) {
+      _isPremium = entitlementActive;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_premiumUserKey, _isPremium);
+      notifyListeners();
+    }
+  }
+
+  Future<void> _syncScansLimit() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int serverCount = 3;
+
+      if (_currentUid != null) {
+        // Logged-in user: get count from Firestore
+        serverCount = await _firestoreService.getUserScansLeft(_currentUid!);
+        
+        // Anti-bypass check: If guest had fewer scans, sync guest's lower limit to the account
+        final guestCount = prefs.getInt(_freeScansKey) ?? 3;
+        if (guestCount < serverCount && guestCount >= 0) {
+          serverCount = guestCount;
+          await _firestoreService.updateUserScansLeft(_currentUid!, serverCount);
+        }
+      } else if (_deviceId != null) {
+        // Guest user: get count from device collection in Firestore
+        serverCount = await _firestoreService.getDeviceScansLeft(_deviceId!);
+      }
+
+      _freeScansLeft = serverCount;
+      await prefs.setInt(_freeScansKey, _freeScansLeft);
+      notifyListeners();
+      Logger.info('🔄 Scans limit synced: $_freeScansLeft remaining.');
+    } catch (e) {
+      Logger.error('Failed to sync scans limit: $e. Falling back to local cache.');
+    }
   }
 
   Future<void> consumeFreeScan() async {
@@ -66,45 +177,59 @@ class PremiumService extends ChangeNotifier {
       _freeScansLeft--;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_freeScansKey, _freeScansLeft);
-      
+      notifyListeners();
+
+      // Sync asynchronously to Firestore
       try {
+        if (_currentUid != null) {
+          await _firestoreService.updateUserScansLeft(_currentUid!, _freeScansLeft);
+        } else if (_deviceId != null) {
+          await _firestoreService.updateDeviceScansLeft(_deviceId!, _freeScansLeft);
+        }
+        
         await FirebaseAnalytics.instance.logEvent(
           name: 'free_scan_consumed',
-          parameters: {'scans_left': _freeScansLeft},
+          parameters: {
+            'scans_left': _freeScansLeft,
+            'user_type': _currentUid != null ? 'registered' : 'guest'
+          },
         );
-      } catch (_) {}
+      } catch (e) {
+        Logger.error('Firestore limit sync deferred (offline/error): $e');
+        // Firestore handles offline queuing internally, so the local decrement is safe.
+      }
       
-      notifyListeners();
       Logger.info('Free scan consumed. $_freeScansLeft remaining.');
     }
   }
 
-  Future<void> buyPremium() async {
-    if (!_isAvailable) {
-      _errorMessage = 'Store is not available. Please check your connection.';
-      notifyListeners();
-      return;
-    }
-
+  Future<void> buyPremium(Package package) async {
     _isPurchasePending = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final ProductDetailsResponse response = await _iap.queryProductDetails({productId});
-      if (response.notFoundIDs.isNotEmpty || response.productDetails.isEmpty) {
-        _errorMessage = 'Product not found on the store.';
-        _isPurchasePending = false;
-        notifyListeners();
-        return;
-      }
-
-      final ProductDetails productDetails = response.productDetails.first;
-      final PurchaseParam purchaseParam = PurchaseParam(productDetails: productDetails);
-      await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+      final customerInfo = await Purchases.purchasePackage(package);
+      _updatePremiumStatus(customerInfo);
       
+      try {
+        await FirebaseAnalytics.instance.logEvent(
+          name: 'premium_purchase_success',
+          parameters: {'package_id': package.identifier},
+        );
+      } catch (_) {}
+      
+    } on PlatformException catch (e) {
+      final errorCode = PurchasesErrorHelper.getErrorCode(e);
+      if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
+        _errorMessage = 'Purchase cancelled.';
+      } else {
+        _errorMessage = e.message ?? 'Purchase failed.';
+      }
+      Logger.error('Purchase failed: $errorCode - $e');
     } catch (e) {
-      _errorMessage = 'Failed to initiate purchase: $e';
+      _errorMessage = 'Purchase failed: $e';
+    } finally {
       _isPurchasePending = false;
       notifyListeners();
     }
@@ -115,58 +240,43 @@ class PremiumService extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      await _iap.restorePurchases();
+      final customerInfo = await Purchases.restorePurchases();
+      _updatePremiumStatus(customerInfo);
+      
+      if (_isPremium) {
+        Logger.info('✅ Entitlements restored successfully.');
+      } else {
+        _errorMessage = 'No active subscriptions found to restore.';
+      }
+    } on PlatformException catch (e) {
+      _errorMessage = e.message ?? 'Restore failed.';
+      Logger.error('Restore failed: $e');
     } catch (e) {
-      _errorMessage = 'Failed to restore purchases: $e';
+      _errorMessage = 'Restore failed: $e';
+    } finally {
       _isPurchasePending = false;
       notifyListeners();
     }
   }
 
-  Future<void> _onPurchaseDetailsUpdate(List<PurchaseDetails> purchaseDetailsList) async {
-    for (final PurchaseDetails purchaseDetails in purchaseDetailsList) {
-      if (purchaseDetails.status == PurchaseStatus.pending) {
-        _isPurchasePending = true;
-        notifyListeners();
-      } else {
-        if (purchaseDetails.status == PurchaseStatus.error) {
-          _errorMessage = purchaseDetails.error?.message ?? 'Unknown error';
-        } else if (purchaseDetails.status == PurchaseStatus.purchased || 
-                   purchaseDetails.status == PurchaseStatus.restored) {
-          
-          if (purchaseDetails.productID == productId) {
-            await _grantPremium();
-          }
-        }
-        
-        if (purchaseDetails.pendingCompletePurchase) {
-          await _iap.completePurchase(purchaseDetails);
-        }
-        
-        _isPurchasePending = false;
-        notifyListeners();
-      }
-    }
-  }
-
-  Future<void> _grantPremium() async {
+  /// For simulator/sandbox testing fallback
+  Future<void> simulatePremiumUnlock() async {
+    _isPurchasePending = true;
+    _errorMessage = null;
+    notifyListeners();
+    
+    await Future.delayed(const Duration(seconds: 1));
     _isPremium = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_premiumUserKey, true);
-    
-    try {
-      await FirebaseAnalytics.instance.logEvent(
-        name: 'premium_unlocked',
-        parameters: {'method': 'in_app_purchase'},
-      );
-    } catch (_) {}
-    
-    Logger.info('✅ Lifetime premium unlocked successfully.');
+    _isPurchasePending = false;
+    notifyListeners();
+    Logger.info('✅ Simulated Premium unlocked successfully.');
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _authSubscription?.cancel();
     super.dispose();
   }
 }
