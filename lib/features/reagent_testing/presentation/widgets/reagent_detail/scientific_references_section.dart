@@ -12,7 +12,8 @@ class ScientificReferencesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (reagent.references.isEmpty) {
+    final validReferences = reagent.references.where((r) => r.trim().isNotEmpty).toList();
+    if (validReferences.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -20,7 +21,7 @@ class ScientificReferencesSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    final parsedRefs = reagent.references.map((r) => ReferenceParser.parse(r)).toList();
+    final parsedRefs = validReferences.map((r) => ReferenceParser.parse(r)).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

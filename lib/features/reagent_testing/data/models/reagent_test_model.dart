@@ -1,3 +1,8 @@
+import 'dart:developer' as developer;
+import '../../../../scientific_engine/safe_parsers.dart';
+import '../../../../scientific_engine/validation_profile.dart';
+import '../../../../scientific_engine/dataset_parsing_exception.dart';
+import '../../../../core/services/crash_analytics.dart';
 import '../../domain/entities/reagent_entity.dart';
 import 'drug_result_model.dart';
 
@@ -14,9 +19,9 @@ class ReagentTestInstructionStep {
 
   factory ReagentTestInstructionStep.fromJson(Map<String, dynamic> json) {
     return ReagentTestInstructionStep(
-      step: json['step'] as int? ?? 0,
-      instruction: json['instruction'] as String? ?? '',
-      instructionAr: json['instruction_ar'] as String? ?? '',
+      step: SafeJsonParser.safeInt(json['step']),
+      instruction: SafeJsonParser.safeString(json['instruction'] ?? json['text'] ?? json['textEn']),
+      instructionAr: SafeJsonParser.safeString(json['instruction_ar'] ?? json['instructionAr'] ?? json['textAr']),
     );
   }
 
@@ -42,10 +47,10 @@ class ReagentTestSafetyInfo {
 
   factory ReagentTestSafetyInfo.fromJson(Map<String, dynamic> json) {
     return ReagentTestSafetyInfo(
-      requiredEquipment: List<String>.from(json['requiredEquipment'] as List? ?? []),
-      handlingProcedures: List<String>.from(json['handlingProcedures'] as List? ?? []),
-      specificHazards: List<String>.from(json['specificHazards'] as List? ?? []),
-      storageRequirements: List<String>.from(json['storageRequirements'] as List? ?? []),
+      requiredEquipment: SafeJsonParser.safeList<String>(json['requiredEquipment']),
+      handlingProcedures: SafeJsonParser.safeList<String>(json['handlingProcedures']),
+      specificHazards: SafeJsonParser.safeList<String>(json['specificHazards']),
+      storageRequirements: SafeJsonParser.safeList<String>(json['storageRequirements'] ?? json['storage']),
     );
   }
 
@@ -90,40 +95,160 @@ class ReagentTestModel {
     required this.safety,
   });
 
-  factory ReagentTestModel.fromJson(Map<String, dynamic> json) {
-    // Parsing Defense (Safe Offline Mode/Null-Safety)
-    final id = json['id'] as String? ?? '';
-    final name = json['reagentName'] as String? ?? '';
-    if (id.isEmpty || name.isEmpty) {
-      throw const FormatException('Invalid reagent JSON schema: missing id or name');
+  factory ReagentTestModel.fromJson(
+    Map<String, dynamic> json, {
+    ValidationProfile profile = ValidationProfile.balanced,
+  }) {
+    try {
+      // 1. Hard validation: id, reagentName, category
+      final rawId = json['id'];
+      if (rawId == null || rawId.toString().trim().isEmpty) {
+        throw DatasetParsingException(
+          reagentId: 'unknown',
+          field: 'id',
+          error: 'Missing or empty reagent ID',
+        );
+      }
+      final id = rawId.toString().trim();
+
+      final rawName = json['reagentName'] ?? json['name'];
+      if (rawName == null || rawName.toString().trim().isEmpty) {
+        throw DatasetParsingException(
+          reagentId: id,
+          field: 'reagentName',
+          error: 'Missing or empty reagent name',
+        );
+      }
+      final name = rawName.toString().trim();
+
+      final rawCategory = json['category'] ?? json['cat'];
+      if (rawCategory == null || rawCategory.toString().trim().isEmpty) {
+        throw DatasetParsingException(
+          reagentId: id,
+          field: 'category',
+          error: 'Missing or empty category',
+        );
+      }
+      final category = rawCategory.toString().trim();
+
+      // 2. Soft validation & parsing
+      final List<ReagentTestInstructionStep> instructions = [];
+      final rawInstructions = json['testInstructions'] ?? json['instructions'] ?? json['steps'];
+      if (rawInstructions is List) {
+        for (final step in rawInstructions) {
+          if (step is Map<String, dynamic>) {
+            try {
+              instructions.add(ReagentTestInstructionStep.fromJson(step));
+            } catch (e) {
+              developer.log('Error parsing instruction step: $e', name: 'ScientificParser');
+            }
+          }
+        }
+      }
+
+      if (instructions.isEmpty) {
+        if (profile == ValidationProfile.strict) {
+          throw DatasetParsingException(
+            reagentId: id,
+            field: 'testInstructions',
+            error: 'Empty test instructions list',
+          );
+        } else if (profile == ValidationProfile.balanced) {
+          developer.log(
+            'Soft validation warning: empty test instructions list for reagent $id',
+            name: 'ScientificParser',
+          );
+        }
+      }
+
+      final List<DrugResultModel> reactionResults = [];
+      final resultsList = json['reactionResults'] ?? json['drugResults'] ?? json['results'];
+      if (resultsList is List) {
+        for (final res in resultsList) {
+          if (res is Map<String, dynamic>) {
+            try {
+              reactionResults.add(DrugResultModel.fromJson(res));
+            } catch (e) {
+              developer.log('Error parsing reaction result: $e', name: 'ScientificParser');
+            }
+          }
+        }
+      }
+
+      if (reactionResults.isEmpty) {
+        if (profile == ValidationProfile.strict) {
+          throw DatasetParsingException(
+            reagentId: id,
+            field: 'reactionResults',
+            error: 'Empty reaction results list',
+          );
+        } else if (profile == ValidationProfile.balanced) {
+          developer.log(
+            'Soft validation warning: empty reaction results list for reagent $id',
+            name: 'ScientificParser',
+          );
+        }
+      }
+
+      // Safe scientific references parsing
+      final rawRefs = json['references'] ?? json['reference'] ?? json['refs'];
+      final List<String> referencesList = [];
+      if (rawRefs is List) {
+        for (final ref in rawRefs) {
+          if (ref != null) {
+            final refStr = ref.toString().trim();
+            if (refStr.isNotEmpty) {
+              referencesList.add(refStr);
+            }
+          }
+        }
+      }
+
+      if (referencesList.isEmpty) {
+        if (profile == ValidationProfile.strict) {
+          throw DatasetParsingException(
+            reagentId: id,
+            field: 'references',
+            error: 'Empty scientific references list',
+          );
+        } else if (profile == ValidationProfile.balanced) {
+          developer.log(
+            'Soft validation warning: empty scientific references list for reagent $id',
+            name: 'ScientificParser',
+          );
+        }
+      }
+
+      return ReagentTestModel(
+        id: id,
+        reagentName: name,
+        reagentNameAr: SafeJsonParser.safeString(json['reagentName_ar'] ?? json['reagentNameAr'] ?? json['name_ar'] ?? json['nameAr']),
+        description: SafeJsonParser.safeString(json['description'] ?? json['desc']),
+        descriptionAr: SafeJsonParser.safeString(json['description_ar'] ?? json['descriptionAr'] ?? json['desc_ar'] ?? json['descAr']),
+        safetyLevel: SafeJsonParser.safeString(json['safetyLevel'] ?? json['safety_level'] ?? 'MEDIUM'),
+        safetyLevelAr: SafeJsonParser.safeString(json['safetyLevel_ar'] ?? json['safetyLevelAr'] ?? json['safety_level_ar'] ?? json['safetyLevelAr']),
+        category: category,
+        testDuration: SafeJsonParser.safeInt(json['testDuration'] ?? json['duration'], 5),
+        chemicals: SafeJsonParser.safeList<String>(json['chemicals'] ?? json['chemicalList']),
+        testInstructions: instructions,
+        reactionResults: reactionResults,
+        references: referencesList,
+        safety: ReagentTestSafetyInfo.fromJson(SafeJsonParser.safeMap(json['safety'] ?? json['safetyInfo'])),
+      );
+    } catch (e, st) {
+      developer.log(
+        'Invalid reagent skipped',
+        error: e,
+        stackTrace: st,
+        name: 'ScientificParser',
+      );
+      CrashAnalytics.recordError(
+        e,
+        st,
+        reason: 'Invalid scientific reagent parsing error',
+      );
+      rethrow;
     }
-
-    final instructions = (json['testInstructions'] as List? ?? [])
-        .map((e) => ReagentTestInstructionStep.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    // Support both new `reactionResults` key and legacy `drugResults` key for compatibility
-    final resultsList = json['reactionResults'] as List? ?? json['drugResults'] as List? ?? [];
-    final reactionResults = resultsList
-        .map((e) => DrugResultModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    return ReagentTestModel(
-      id: id,
-      reagentName: name,
-      reagentNameAr: json['reagentName_ar'] as String? ?? json['reagentNameAr'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      descriptionAr: json['description_ar'] as String? ?? json['descriptionAr'] as String? ?? '',
-      safetyLevel: json['safetyLevel'] as String? ?? 'MEDIUM',
-      safetyLevelAr: json['safetyLevel_ar'] as String? ?? json['safetyLevelAr'] as String? ?? '',
-      category: json['category'] as String? ?? 'General',
-      testDuration: (json['testDuration'] as num?)?.toInt() ?? 5,
-      chemicals: List<String>.from(json['chemicals'] as List? ?? []),
-      testInstructions: instructions,
-      reactionResults: reactionResults,
-      references: List<String>.from(json['references'] as List? ?? json['reference'] as List? ?? []),
-      safety: ReagentTestSafetyInfo.fromJson(json['safety'] as Map<String, dynamic>? ?? {}),
-    );
   }
 
   Map<String, dynamic> toJson() {

@@ -1,4 +1,5 @@
 import '../../domain/entities/reagent_entity.dart';
+import '../../data/services/unified_data_service.dart';
 
 abstract class ReagentTestingState {
   const ReagentTestingState();
@@ -16,11 +17,17 @@ class ReagentTestingLoaded extends ReagentTestingState {
   final List<ReagentEntity> reagents;
   final String? searchQuery;
   final String? selectedSafetyLevel;
+  final String? warningMessage;
+  final WarningSeverity warningSeverity;
+  final DatasetLifecycleState lifecycleState;
 
   const ReagentTestingLoaded({
     required this.reagents,
     this.searchQuery,
     this.selectedSafetyLevel,
+    this.warningMessage,
+    this.warningSeverity = WarningSeverity.info,
+    this.lifecycleState = DatasetLifecycleState.healthy,
   });
 
   @override
@@ -29,14 +36,20 @@ class ReagentTestingLoaded extends ReagentTestingState {
     return other is ReagentTestingLoaded &&
         _listEquals(other.reagents, reagents) &&
         other.searchQuery == searchQuery &&
-        other.selectedSafetyLevel == selectedSafetyLevel;
+        other.selectedSafetyLevel == selectedSafetyLevel &&
+        other.warningMessage == warningMessage &&
+        other.warningSeverity == warningSeverity &&
+        other.lifecycleState == lifecycleState;
   }
 
   @override
   int get hashCode {
     return reagents.hashCode ^
         searchQuery.hashCode ^
-        selectedSafetyLevel.hashCode;
+        selectedSafetyLevel.hashCode ^
+        warningMessage.hashCode ^
+        warningSeverity.hashCode ^
+        lifecycleState.hashCode;
   }
 
   bool _listEquals<T>(List<T> a, List<T> b) {
@@ -77,3 +90,4 @@ class ReagentTestingEmpty extends ReagentTestingState {
   @override
   int get hashCode => message.hashCode;
 }
+

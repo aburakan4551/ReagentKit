@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
@@ -139,11 +141,24 @@ class StartupErrorApp extends StatelessWidget {
   }
 }
 
-class ReagentTestingApp extends ConsumerWidget {
+class ReagentTestingApp extends ConsumerStatefulWidget {
   const ReagentTestingApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReagentTestingApp> createState() => _ReagentTestingAppState();
+}
+
+class _ReagentTestingAppState extends ConsumerState<ReagentTestingApp> {
+  @override
+  void initState() {
+    super.initState();
+    scheduleMicrotask(() {
+      ref.read(unifiedDataServiceProvider).initialize();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
     final settingsState = ref.watch(settingsControllerProvider);
 

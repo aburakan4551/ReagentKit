@@ -49,76 +49,113 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
     final reagentsAsync = ref.watch(allReagentsProvider);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1115),
-      appBar: AppBar(
-        title: Text(
-          isAr ? 'المراجع العلمية' : 'Scientific References',
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+    return reagentsAsync.when(
+      loading: () => Scaffold(
         backgroundColor: const Color(0xFF0F1115),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _sortByAlphabet ? HeroIcons.bars_arrow_down : HeroIcons.bars_arrow_up,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              setState(() {
-                _sortByAlphabet = !_sortByAlphabet;
-              });
-              HapticFeedback.selectionClick();
-            },
-            tooltip: isAr ? 'ترتيب أبجدي' : 'Sort Alphabetically',
+        appBar: AppBar(
+          title: Text(
+            isAr ? 'المراجع العلمية' : 'Scientific References',
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
           ),
-        ],
-      ),
-      body: reagentsAsync.when(
-        loading: () => const Center(
+          backgroundColor: const Color(0xFF0F1115),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        body: const Center(
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C5CFF)),
           ),
         ),
-        error: (err, _) => Center(
+      ),
+      error: (err, _) => Scaffold(
+        backgroundColor: const Color(0xFF0F1115),
+        appBar: AppBar(
+          title: Text(
+            isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
+            style: const TextStyle(color: Color(0xFFF87171)),
+          ),
+          backgroundColor: const Color(0xFF0F1115),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        body: Center(
           child: Text(
             isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
             style: const TextStyle(color: Color(0xFFF87171)),
           ),
         ),
-        data: (reagents) {
-          // Filter reagents that have references
-          var filteredList = reagents.where((r) => r.references.isNotEmpty).toList();
+      ),
+      data: (reagents) {
+        // Filter reagents that have references
+        var filteredList = reagents.where((r) => r.references.any((ref) => ref.trim().isNotEmpty)).toList();
 
-          // Search filter
-          if (_searchQuery.isNotEmpty) {
-            final query = _searchQuery.toLowerCase();
-            filteredList = filteredList.where((r) {
-              final name = r.reagentName.toLowerCase();
-              final nameAr = r.reagentNameAr.toLowerCase();
-              final desc = r.description.toLowerCase();
-              return name.contains(query) || nameAr.contains(query) || desc.contains(query);
-            }).toList();
-          }
+        // Search filter
+        if (_searchQuery.isNotEmpty) {
+          final query = _searchQuery.toLowerCase();
+          filteredList = filteredList.where((r) {
+            final name = r.reagentName.toLowerCase();
+            final nameAr = r.reagentNameAr.toLowerCase();
+            final desc = r.description.toLowerCase();
+            return name.contains(query) || nameAr.contains(query) || desc.contains(query);
+          }).toList();
+        }
 
-          // Category filter
-          final categories = {'All', ...reagents.map((r) => r.category).where((c) => c.isNotEmpty)};
-          if (_selectedCategory != 'All') {
-            filteredList = filteredList.where((r) => r.category == _selectedCategory).toList();
-          }
+        // Category filter
+        final categories = {'All', ...reagents.map((r) => r.category).where((c) => c.isNotEmpty)};
+        if (_selectedCategory != 'All') {
+          filteredList = filteredList.where((r) => r.category == _selectedCategory).toList();
+        }
 
-          // Sort alphabetically
-          if (_sortByAlphabet) {
-            filteredList.sort((a, b) => a.reagentName.compareTo(b.reagentName));
-          } else {
-            filteredList.sort((a, b) => b.reagentName.compareTo(a.reagentName));
-          }
+        // Sort alphabetically
+        if (_sortByAlphabet) {
+          filteredList.sort((a, b) => a.reagentName.compareTo(b.reagentName));
+        } else {
+          filteredList.sort((a, b) => b.reagentName.compareTo(a.reagentName));
+        }
 
-          return Column(
+        final totalReferencesCount = filteredList.fold<int>(
+          0,
+          (sum, r) => sum + r.references.where((ref) => ref.trim().isNotEmpty).length,
+        );
+
+        return Scaffold(
+          backgroundColor: const Color(0xFF0F1115),
+          appBar: AppBar(
+            title: Text(
+              isAr
+                  ? 'المراجع العلمية ($totalReferencesCount)'
+                  : 'Scientific References ($totalReferencesCount)',
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFF0F1115),
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  _sortByAlphabet ? HeroIcons.bars_arrow_down : HeroIcons.bars_arrow_up,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _sortByAlphabet = !_sortByAlphabet;
+                  });
+                  HapticFeedback.selectionClick();
+                },
+                tooltip: isAr ? 'ترتيب أبجدي' : 'Sort Alphabetically',
+              ),
+            ],
+          ),
+          body: Column(
             children: [
               // Search and Filter Bar
               Padding(
@@ -215,9 +252,9 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                       ),
               ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -279,7 +316,10 @@ class _ReagentReferenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parsedRefs = reagent.references.map((r) => ReferenceParser.parse(r)).toList();
+    final parsedRefs = reagent.references
+        .where((r) => r.trim().isNotEmpty)
+        .map((r) => ReferenceParser.parse(r))
+        .toList();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

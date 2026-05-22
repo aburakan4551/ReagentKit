@@ -8,6 +8,7 @@ import '../providers/reagent_testing_providers.dart';
 import '../states/reagent_testing_state.dart';
 import '../widgets/reagent_card.dart';
 import 'reagent_detail_page.dart';
+import '../../data/services/unified_data_service.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ReagentTestingPage extends ConsumerStatefulWidget {
@@ -177,31 +178,38 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
   }
 
   Widget _buildLoadedState(ReagentTestingLoaded state) {
-    return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(reagentTestingControllerProvider.notifier).refresh(),
-      child: GridView.builder(
-        padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: LayoutHelper.getBottomNavPadding(context),
+    return Column(
+      children: [
+        if (state.warningMessage != null) _buildWarningBanner(state),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () =>
+                ref.read(reagentTestingControllerProvider.notifier).refresh(),
+            child: GridView.builder(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: state.warningMessage != null ? 8 : 16,
+                bottom: LayoutHelper.getBottomNavPadding(context),
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: state.reagents.length,
+              itemBuilder: (context, index) {
+                final reagent = state.reagents[index];
+                return ReagentCard(
+                  reagent: reagent,
+                  onTap: () => _navigateToDetail(context, reagent),
+                );
+              },
+            ),
+          ),
         ),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: state.reagents.length,
-        itemBuilder: (context, index) {
-          final reagent = state.reagents[index];
-          return ReagentCard(
-            reagent: reagent,
-            onTap: () => _navigateToDetail(context, reagent),
-          );
-        },
-      ),
+      ],
     );
   }
 
@@ -245,7 +253,7 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => controller.refresh(),
+              onPressed: () => controller.forceReload(clearCache: true),
               icon: Icon(HeroIcons.arrow_path),
               label: Text(l10n.tryAgain),
             ),
@@ -289,12 +297,56 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => controller.refresh(),
+              onPressed: () => controller.forceReload(clearCache: true),
               icon: Icon(HeroIcons.arrow_path),
               label: Text(l10n.retryLoading),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildWarningBanner(ReagentTestingLoaded state) {
+    Color color;
+    IconData icon;
+    
+    switch (state.warningSeverity) {
+      case WarningSeverity.critical:
+        color = Colors.red;
+        icon = HeroIcons.exclamation_circle;
+        break;
+      case WarningSeverity.warning:
+        color = Colors.amber;
+        icon = HeroIcons.exclamation_triangle;
+        break;
+      case WarningSeverity.info:
+      default:
+        color = Colors.blue;
+        icon = HeroIcons.information_circle;
+        break;
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              state.warningMessage!,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
       ),
     );
   }

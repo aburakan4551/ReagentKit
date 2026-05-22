@@ -1,3 +1,4 @@
+import '../../../../scientific_engine/safe_parsers.dart';
 import '../../domain/entities/drug_result_entity.dart';
 
 class DrugResultModel {
@@ -14,9 +15,9 @@ class DrugResultModel {
   // Convert from JSON to Model
   factory DrugResultModel.fromJson(Map<String, dynamic> json) {
     return DrugResultModel(
-      drugName: json['drugName'] as String,
-      color: json['color'] as String,
-      colorAr: json['color_ar'] as String,
+      drugName: SafeReactionParser.safeAnalyteName(json),
+      color: SafeJsonParser.safeString(json['color']),
+      colorAr: SafeJsonParser.safeString(json['color_ar'] ?? json['colorAr']),
     );
   }
 

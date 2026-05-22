@@ -1,11 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/reagent_entity.dart';
 import '../../domain/repositories/reagent_testing_repository.dart';
+import '../../data/services/unified_data_service.dart';
 import '../states/reagent_testing_state.dart';
 
 class ReagentTestingController extends StateNotifier<ReagentTestingState> {
   final ReagentTestingRepository _repository;
   List<ReagentEntity> _allReagents = [];
+  int _retryCount = 0;
+  static const int _maxRetries = 3;
 
   ReagentTestingController(this._repository)
     : super(const ReagentTestingInitial()) {
@@ -17,13 +20,51 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
     state = const ReagentTestingLoading();
     try {
       _allReagents = await _repository.getAllReagents();
+      final warning = _repository.warningMessage;
       if (_allReagents.isEmpty) {
         state = const ReagentTestingEmpty('No reagents found');
       } else {
-        state = ReagentTestingLoaded(reagents: _allReagents);
+        _retryCount = 0; // reset on success
+        state = ReagentTestingLoaded(
+          reagents: _allReagents,
+          warningMessage: warning,
+          warningSeverity: _repository.warningSeverity,
+          lifecycleState: _repository.lifecycleState,
+        );
       }
     } catch (e) {
       state = ReagentTestingError('Failed to load reagents: $e');
+    }
+  }
+
+  // Force reload reagents, clear cache, recalculate diagnostics
+  Future<void> forceReload({bool clearCache = false, bool forceAssetReload = true}) async {
+    if (_retryCount >= _maxRetries) {
+      state = const ReagentTestingError('Maximum retry limit reached. Please reset or contact support.');
+      return;
+    }
+    state = const ReagentTestingLoading();
+    try {
+      _retryCount++;
+      await _repository.forceReload(
+        clearCache: clearCache,
+        forceAssetReload: forceAssetReload,
+      );
+      _allReagents = await _repository.getAllReagents();
+      final warning = _repository.warningMessage;
+      if (_allReagents.isEmpty) {
+        state = const ReagentTestingEmpty('No reagents found');
+      } else {
+        _retryCount = 0; // Reset on successful load
+        state = ReagentTestingLoaded(
+          reagents: _allReagents,
+          warningMessage: warning,
+          warningSeverity: _repository.warningSeverity,
+          lifecycleState: _repository.lifecycleState,
+        );
+      }
+    } catch (e) {
+      state = ReagentTestingError('Failed to reload reagents (Attempt $_retryCount/$_maxRetries): $e');
     }
   }
 
@@ -31,7 +72,12 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
   Future<void> searchReagents(String query) async {
     if (query.trim().isEmpty) {
       // If search is empty, show all reagents
-      state = ReagentTestingLoaded(reagents: _allReagents);
+      state = ReagentTestingLoaded(
+        reagents: _allReagents,
+        warningMessage: _repository.warningMessage,
+        warningSeverity: _repository.warningSeverity,
+        lifecycleState: _repository.lifecycleState,
+      );
       return;
     }
 
@@ -44,6 +90,9 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
         state = ReagentTestingLoaded(
           reagents: searchResults,
           searchQuery: query,
+          warningMessage: _repository.warningMessage,
+          warningSeverity: _repository.warningSeverity,
+          lifecycleState: _repository.lifecycleState,
         );
       }
     } catch (e) {
@@ -55,7 +104,12 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
   Future<void> filterBySafetyLevel(String? safetyLevel) async {
     if (safetyLevel == null || safetyLevel.isEmpty) {
       // If no safety level selected, show all reagents
-      state = ReagentTestingLoaded(reagents: _allReagents);
+      state = ReagentTestingLoaded(
+        reagents: _allReagents,
+        warningMessage: _repository.warningMessage,
+        warningSeverity: _repository.warningSeverity,
+        lifecycleState: _repository.lifecycleState,
+      );
       return;
     }
 
@@ -72,6 +126,9 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
         state = ReagentTestingLoaded(
           reagents: filteredReagents,
           selectedSafetyLevel: safetyLevel,
+          warningMessage: _repository.warningMessage,
+          warningSeverity: _repository.warningSeverity,
+          lifecycleState: _repository.lifecycleState,
         );
       }
     } catch (e) {
@@ -91,12 +148,17 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
 
   // Clear search and filters
   void clearFilters() {
-    state = ReagentTestingLoaded(reagents: _allReagents);
+    state = ReagentTestingLoaded(
+      reagents: _allReagents,
+      warningMessage: _repository.warningMessage,
+      warningSeverity: _repository.warningSeverity,
+      lifecycleState: _repository.lifecycleState,
+    );
   }
 
   // Refresh data
   Future<void> refresh() async {
-    await loadAllReagents();
+    await forceReload(clearCache: false, forceAssetReload: true);
   }
 
   // Get current reagents list
@@ -126,5 +188,10 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
           currentState.selectedSafetyLevel!.isNotEmpty;
     }
     return false;
+  }
+
+  // Reset retry counter
+  void resetRetryCounter() {
+    _retryCount = 0;
   }
 }
