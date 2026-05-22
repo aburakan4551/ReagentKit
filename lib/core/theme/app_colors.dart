@@ -48,24 +48,24 @@ class AppColors {
   // ==========================================
   
   // Backgrounds
-  static const Color lightBackgroundBase = Color(0xFFF9FAFB); // Premium cool grey-white
-  static const Color lightBackgroundElevated = Color(0xFFFFFFFF); // Pure white
-  static const Color lightBackgroundHighest = Color(0xFFF3F4F6); // Soft grey
+  static const Color lightBackgroundBase = Color(0xFFF8F9FC); // Pure soft white/cool grey-white background
+  static const Color lightBackgroundElevated = Colors.white; // Pure white
+  static const Color lightBackgroundHighest = Color(0xFFF1F3F9); // Slight warm scientific gray surface
 
   // Surfaces (Cards, BottomNav, Dialogs)
-  static const Color lightSurfaceBase = Color(0xFFFFFFFF);
-  static const Color lightSurfaceElevated = Color(0xFFF3F4F6);
-  static const Color lightSurfaceHighlight = Color(0xFFE5E7EB);
+  static const Color lightSurfaceBase = Colors.white;
+  static const Color lightSurfaceElevated = Color(0xFFF8F9FC);
+  static const Color lightSurfaceHighlight = Color(0xFFE6E8F0);
 
   // Accents (Enhanced contrast/vibrancy for light background)
-  static const Color lightPrimaryAccent = Color(0xFF6366F1); // Deep violet-indigo
+  static const Color lightPrimaryAccent = Color(0xFF7C4DFF); // Indigo/violet accent
   static const Color lightSecondaryAccent = Color(0xFF3B82F6); // Vibrant Blue
   static const Color lightTertiaryAccent = Color(0xFFD946EF); // Magenta
 
   // Typography
-  static const Color lightTextPrimary = Color(0xFF111827); // Deep charcoal
-  static const Color lightTextSecondary = Color(0xFF4B5563); // Cool grey
-  static const Color lightTextMuted = Color(0xFF6B7280); // Muted grey
+  static const Color lightTextPrimary = Color(0xFF101828); // Accessible deep charcoal
+  static const Color lightTextSecondary = Color(0xFF667085); // Secondary grey
+  static const Color lightTextMuted = Color(0xFF94A3B8); // Muted grey
 
   // Status & Semantic
   static const Color lightStatusSuccess = Color(0xFF10B981); // Emerald
@@ -81,7 +81,7 @@ class AppColors {
   static const Color lightRarityLegendary = Color(0xFFD97706); // Dark gold
 
   // Borders & Dividers
-  static const Color lightBorderSubtle = Color(0xFFE5E7EB);
+  static const Color lightBorderSubtle = Color(0xFFE6E8F0); // Subtle border
   static const Color lightBorderHighlight = Color(0xFFD1D5DB);
 
   // Overlay / Blur Backgrounds

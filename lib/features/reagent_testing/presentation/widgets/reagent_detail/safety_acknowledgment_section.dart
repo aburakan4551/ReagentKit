@@ -4,6 +4,8 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../controllers/reagent_detail_controller.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class SafetyAcknowledgmentSection extends ConsumerWidget {
   final ReagentEntity reagent;
@@ -19,18 +21,26 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
 
     return Card(
       elevation: 0,
+      color: theme.brightness == Brightness.dark
+          ? const Color(0xFF161B22)
+          : Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: theme.brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.08)
+              : const Color(0xFFE6E8F0),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader(theme, l10n),
+            _buildSectionHeader(context, theme, l10n),
             const SizedBox(height: 16),
             _buildAcknowledgmentCheckbox(
+              context,
               theme,
               l10n,
               isAcknowledged,
@@ -42,26 +52,28 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
-            HeroIcons.shield_check, // Safety acknowledgment icon
+            HeroIcons.shield_check,
             color: theme.colorScheme.primary,
-            size: 24,
+            size: 22,
           ),
         ),
         const SizedBox(width: 12),
-        Text(
-          l10n.safetyAcknowledgment,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: Text(
+            l10n.safetyAcknowledgment,
+            style: AppTypography.getSectionTitle(context).copyWith(
+              fontSize: 18,
+            ),
           ),
         ),
       ],
@@ -69,27 +81,64 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
   }
 
   Widget _buildAcknowledgmentCheckbox(
+    BuildContext context,
     ThemeData theme,
     AppLocalizations l10n,
     bool isAcknowledged,
     ReagentDetailController controller,
   ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Checkbox(
-          value: isAcknowledged,
-          onChanged: (value) =>
-              controller.setSafetyAcknowledgment(value ?? false),
+    final textStyle = AppTypography.getMetadataValue(
+      context,
+      color: theme.brightness == Brightness.dark
+          ? AppColors.textSecondary
+          : AppColors.lightTextSecondary,
+    ).copyWith(
+      fontSize: 14,
+      height: 1.4,
+    );
+
+    return InkWell(
+      onTap: () => controller.setSafetyAcknowledgment(!isAcknowledged),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: Checkbox(
+                  value: isAcknowledged,
+                  onChanged: (value) =>
+                      controller.setSafetyAcknowledgment(value ?? false),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  activeColor: theme.colorScheme.primary,
+                  checkColor: Colors.white,
+                  side: BorderSide(
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white.withOpacity(0.3)
+                        : const Color(0xFFD1D5DB),
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l10n.safetyAcknowledgmentText,
+                style: textStyle,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            l10n.safetyAcknowledgmentText,
-            style: theme.textTheme.bodyMedium,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

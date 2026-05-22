@@ -12,6 +12,8 @@ import 'package:reagentkit/scientific_engine/reference_parser.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/utils/localization_helper.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/app_colors.dart';
 
 // Provider to fetch references dynamically for a given reagent name
 final reagentReferencesProvider = FutureProvider.family<List<String>, String>((ref, reagentName) async {
@@ -27,25 +29,28 @@ class TestResultPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(testResultControllerProvider);
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1115),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
           l10n.testResults,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: AppTypography.getCardTitle(context).copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: const Color(0xFF0F1115),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+          icon: Icon(LocalizationHelper.getBackChevronIcon(context)),
           onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
           tooltip: l10n.backToHome,
         ),
         actions: [
           if (state is TestResultLoaded)
             IconButton(
-              icon: const Icon(HeroIcons.share, color: Colors.white),
+              icon: const Icon(HeroIcons.share),
               onPressed: () {
                 final result = state.testResult;
                 final substances = result.possibleSubstances.isNotEmpty
@@ -72,11 +77,10 @@ class TestResultPage extends ConsumerWidget {
     TestResultState state,
     AppLocalizations l10n,
   ) {
+    final theme = Theme.of(context);
     if (state is TestResultLoading) {
       return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C5CFF)),
-        ),
+        child: CircularProgressIndicator(),
       );
     } else if (state is TestResultLoaded) {
       return _ModernResultView(testResult: state.testResult);
@@ -87,19 +91,19 @@ class TestResultPage extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(HeroIcons.exclamation_circle, size: 64, color: Color(0xFFF87171)),
+              Icon(HeroIcons.exclamation_circle, size: 64, color: theme.colorScheme.error),
               const SizedBox(height: 16),
               Text(
                 l10n.error(state.message),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16, color: Colors.white),
+                style: AppTypography.getMetadataValue(context).copyWith(
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7C5CFF),
-                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text(l10n.goBack),
@@ -112,7 +116,7 @@ class TestResultPage extends ConsumerWidget {
       return Center(
         child: Text(
           l10n.noTestResultsYet,
-          style: const TextStyle(color: Colors.white70),
+          style: AppTypography.getMetadataLabel(context),
         ),
       );
     }
@@ -133,13 +137,19 @@ class _ModernResultView extends ConsumerWidget {
 
     final stabilityVal = testResult.stabilityIndex ?? 1.0;
     String stabilityText = isAr ? 'مستقر' : 'Stable Result';
-    Color stabilityColor = const Color(0xFF34D399);
+    Color stabilityColor = theme.brightness == Brightness.dark 
+        ? AppColors.statusSuccess 
+        : AppColors.lightStatusSuccess;
     if (stabilityVal < 0.6) {
       stabilityText = isAr ? 'غير مستقر' : 'Unstable Interpretation';
-      stabilityColor = const Color(0xFFF87171);
+      stabilityColor = theme.brightness == Brightness.dark 
+          ? AppColors.statusError 
+          : AppColors.lightStatusError;
     } else if (stabilityVal < 0.85) {
       stabilityText = isAr ? 'مستقر جزئياً' : 'Moderately Stable';
-      stabilityColor = const Color(0xFFFBBF24);
+      stabilityColor = theme.brightness == Brightness.dark 
+          ? AppColors.statusWarning 
+          : AppColors.lightStatusWarning;
     }
 
     return SingleChildScrollView(
@@ -149,14 +159,19 @@ class _ModernResultView extends ConsumerWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF131722),
-                  Color(0xFF0F1115),
-                ],
+                colors: theme.brightness == Brightness.dark
+                    ? const [
+                        Color(0xFF131722),
+                        Color(0xFF0F1115),
+                      ]
+                    : [
+                        theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+                        theme.colorScheme.surface,
+                      ],
               ),
             ),
             child: Column(
@@ -168,23 +183,21 @@ class _ModernResultView extends ConsumerWidget {
                       context,
                       percentage: testResult.aiInterpretationConfidence ?? (testResult.confidencePercentage / 100.0),
                       label: isAr ? 'ثقة تفسير الذكاء الاصطناعي' : 'AI Interpretation',
-                      accentColor: const Color(0xFF7C5CFF),
+                      accentColor: theme.colorScheme.primary,
                     ),
                     _buildConfidenceIndicator(
                       context,
                       percentage: testResult.colorMatchConfidence ?? (testResult.confidencePercentage / 100.0),
                       label: isAr ? 'ثقة مطابقة اللون' : 'Color Match',
-                      accentColor: const Color(0xFF5B8CFF),
+                      accentColor: theme.colorScheme.secondary,
                     ),
                   ],
                 ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 24),
                 Text(
                   isAr ? (testResult.reagentName == 'Marquis Test' ? 'اختبار ماركيز' : testResult.reagentName) : testResult.reagentName,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.getSectionTitle(context).copyWith(
                     letterSpacing: 1.1,
-                    color: Colors.white,
                   ),
                 ).animate().fadeIn(delay: 200.ms).moveY(begin: 10, end: 0),
                 const SizedBox(height: 8),
@@ -202,9 +215,9 @@ class _ModernResultView extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Text(
                       '${isAr ? "مؤشر الاستقرار" : "Stability Index"}: $stabilityText (${(stabilityVal * 100).toInt()}%)',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
+                      style: AppTypography.getMetadataLabel(context,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        isBold: true,
                       ),
                     ),
                   ],
@@ -222,25 +235,41 @@ class _ModernResultView extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161B22),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF161B22)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE6E8F0),
+                    ),
+                    boxShadow: theme.brightness == Brightness.dark
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         isAr ? 'المركبات المحتملة المرصودة:' : 'Possible Substances Detected:',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
+                        style: AppTypography.getMetadataLabel(context,
+                          color: theme.brightness == Brightness.dark
+                              ? AppColors.textSecondary
+                              : AppColors.lightTextSecondary,
+                          isBold: true,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -248,23 +277,34 @@ class _ModernResultView extends ConsumerWidget {
                       if (testResult.possibleSubstances.isEmpty)
                         Text(
                           l10n.unknownSubstance,
-                          style: const TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: theme.brightness == Brightness.dark
+                                ? AppColors.statusError
+                                : AppColors.lightStatusError,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       if (testResult.notes != null && testResult.notes!.isNotEmpty) ...[
-                        const Divider(color: Colors.white10, height: 24),
+                        Divider(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.white10
+                              : const Color(0xFFE6E8F0),
+                          height: 24,
+                        ),
                         Text(
                           isAr ? 'التفاصيل والتحليل:' : 'Analysis Details:',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                          style: AppTypography.getMetadataLabel(context,
+                            color: theme.brightness == Brightness.dark
+                                ? AppColors.textSecondary
+                                : AppColors.lightTextSecondary,
+                            isBold: true,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           testResult.notes!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            height: 1.4,
-                            color: Colors.white,
+                          style: AppTypography.getMetadataValue(context).copyWith(
+                            height: 1.45,
                           ),
                         ),
                       ],
@@ -277,16 +317,30 @@ class _ModernResultView extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161B22),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF161B22)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE6E8F0),
+                    ),
+                    boxShadow: theme.brightness == Brightness.dark
+                        ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                   ),
                   child: Row(
                     children: [
@@ -296,10 +350,15 @@ class _ModernResultView extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: _parseHexColor(testResult.observedHex, testResult.observedColor),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white24, width: 2),
+                          border: Border.all(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white24
+                                : const Color(0xFFE6E8F0),
+                            width: 2,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.4),
+                              color: Colors.black.withOpacity(0.2),
                               blurRadius: 4,
                             ),
                           ],
@@ -312,17 +371,18 @@ class _ModernResultView extends ConsumerWidget {
                           children: [
                             Text(
                               isAr ? 'اللون المرصود بالتحليل' : 'Observed Color Reaction',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.bold,
+                              style: AppTypography.getMetadataLabel(context,
+                                color: theme.brightness == Brightness.dark
+                                    ? AppColors.textSecondary
+                                    : AppColors.lightTextSecondary,
+                                isBold: true,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               testResult.observedColor,
-                              style: theme.textTheme.titleMedium?.copyWith(
+                              style: AppTypography.getCardTitle(context).copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -338,16 +398,28 @@ class _ModernResultView extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF161B22),
+                      color: theme.brightness == Brightness.dark
+                          ? const Color(0xFF161B22)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF7C5CFF).withOpacity(0.3)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                      ),
+                      boxShadow: theme.brightness == Brightness.dark
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ]
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
                     ),
                     child: Table(
                       columnWidths: const {
@@ -355,11 +427,11 @@ class _ModernResultView extends ConsumerWidget {
                         1: FlexColumnWidth(1.8),
                       },
                       children: [
-                        _buildTableRow(isAr ? 'قيمة اللون HEX:' : 'HEX Color Value:', testResult.observedHex ?? 'N/A'),
-                        _buildTableRow(isAr ? 'قيمة اللون RGB:' : 'RGB Color Value:', testResult.observedRgb ?? 'N/A'),
-                        _buildTableRow(isAr ? 'معدل الاختلاف Delta E:' : 'Delta E Difference:', testResult.deltaE?.toStringAsFixed(2) ?? 'N/A'),
-                        _buildTableRow(isAr ? 'إصدار الخوارزمية:' : 'Algorithm Version:', testResult.algorithmVersion ?? '1.0.0'),
-                        _buildTableRow(isAr ? 'إصدار قاعدة البيانات:' : 'Dataset Version:', ref.watch(dataSourceInfoProvider)),
+                        _buildTableRow(context, isAr ? 'قيمة اللون HEX:' : 'HEX Color Value:', testResult.observedHex ?? 'N/A'),
+                        _buildTableRow(context, isAr ? 'قيمة اللون RGB:' : 'RGB Color Value:', testResult.observedRgb ?? 'N/A'),
+                        _buildTableRow(context, isAr ? 'معدل الاختلاف Delta E:' : 'Delta E Difference:', testResult.deltaE?.toStringAsFixed(2) ?? 'N/A'),
+                        _buildTableRow(context, isAr ? 'إصدار الخوارزمية:' : 'Algorithm Version:', testResult.algorithmVersion ?? '1.0.0'),
+                        _buildTableRow(context, isAr ? 'إصدار قاعدة البيانات:' : 'Dataset Version:', ref.watch(dataSourceInfoProvider)),
                       ],
                     ),
                   ).animate().fadeIn(delay: 500.ms),
@@ -373,20 +445,34 @@ class _ModernResultView extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1212),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF1C1212)
+                        : const Color(0xFFFDF2F2),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFF87171).withOpacity(0.2)),
+                    border: Border.all(
+                      color: theme.brightness == Brightness.dark
+                          ? const Color(0xFFF87171).withOpacity(0.2)
+                          : const Color(0xFFFCA5A5),
+                    ),
                   ),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          const Icon(HeroIcons.exclamation_triangle, color: Color(0xFFF87171), size: 20),
+                          Icon(
+                            HeroIcons.exclamation_triangle, 
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFFF87171)
+                                : const Color(0xFFDC2626), 
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             isAr ? 'إخلاء مسؤولية علمي هام' : 'Important Scientific Disclaimer',
-                            style: const TextStyle(
-                              color: Color(0xFFF87171),
+                            style: TextStyle(
+                              color: theme.brightness == Brightness.dark
+                                  ? const Color(0xFFF87171)
+                                  : const Color(0xFFDC2626),
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -394,14 +480,19 @@ class _ModernResultView extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Interpretations generated by this application are probabilistic analytical observations and not certified scientific conclusions. This application is intended solely for educational, analytical, and research-support workflows.',
-                        style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                        style: AppTypography.getCaption(context).copyWith(height: 1.4),
                       ),
-                      const Divider(color: Colors.white10, height: 16),
-                      const Text(
+                      Divider(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.white10
+                            : Colors.black10,
+                        height: 16,
+                      ),
+                      Text(
                         'التفسيرات الناتجة عن هذا التطبيق هي ملاحظات تحليلية احتمالية وليست استنتاجات علمية معتمدة. هذا التطبيق مخصص فقط لسير العمل التعليمي والتحليلي ودعم الأبحاث.',
-                        style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                        style: AppTypography.getCaption(context).copyWith(height: 1.4),
                         textAlign: TextAlign.right,
                       ),
                     ],
@@ -413,18 +504,12 @@ class _ModernResultView extends ConsumerWidget {
                     onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(240, 56),
-                      backgroundColor: const Color(0xFF7C5CFF),
-                      foregroundColor: Colors.white,
                       elevation: 2,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                     child: Text(
                       l10n.backToHome,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -454,9 +539,8 @@ class _ModernResultView extends ConsumerWidget {
           percent: percentVal,
           center: Text(
             "${(percentVal * 100).toInt()}%",
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: AppTypography.getCardTitle(context).copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.white,
             ),
           ),
           circularStrokeCap: CircularStrokeCap.round,
@@ -466,10 +550,8 @@ class _ModernResultView extends ConsumerWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+          style: AppTypography.getCaption(context).copyWith(
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -477,39 +559,47 @@ class _ModernResultView extends ConsumerWidget {
   }
 
   Widget _buildSectionLabel(BuildContext context, String label, IconData icon) {
-    const Color accent = Color(0xFF7C5CFF);
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 18, color: accent),
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
+          style: AppTypography.getCaption(context,
+            color: theme.colorScheme.primary,
+          ).copyWith(
             fontWeight: FontWeight.bold,
-            color: accent,
             letterSpacing: 1.2,
-            fontSize: 12,
           ),
         ),
       ],
     );
   }
 
-  TableRow _buildTableRow(String label, String value) {
+  TableRow _buildTableRow(BuildContext context, String label, String value) {
+    final theme = Theme.of(context);
     return TableRow(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
             label,
-            style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13),
+            style: AppTypography.getMetadataLabel(context,
+              color: theme.brightness == Brightness.dark
+                  ? AppColors.textSecondary
+                  : AppColors.lightTextSecondary,
+              isBold: true,
+            ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: SelectableText(
             value,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Courier'),
+            style: AppTypography.getMetadataValue(context).copyWith(
+              fontFamily: 'Courier',
+            ),
           ),
         ),
       ],
@@ -554,18 +644,17 @@ class _SubstanceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: const Color(0xFF7C5CFF).withOpacity(0.1),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(HeroIcons.beaker, size: 18, color: Color(0xFF7C5CFF)),
+            child: Icon(HeroIcons.beaker, size: 18, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               substance,
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: AppTypography.getMetadataValue(context).copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
               ),
             ),
           ),
@@ -586,6 +675,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     
@@ -596,13 +686,13 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
       children: [
         Row(
           children: [
-            const Icon(HeroIcons.book_open, size: 18, color: Color(0xFF7C5CFF)),
+            Icon(HeroIcons.book_open, size: 18, color: theme.colorScheme.primary),
             const SizedBox(width: 8),
             Text(
               l10n.references.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF7C5CFF),
+                color: theme.colorScheme.primary,
                 letterSpacing: 1.2,
                 fontSize: 12,
               ),
@@ -615,7 +705,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Text(
             isAr ? 'فشل تحميل المراجع' : 'Failed to load references',
-            style: const TextStyle(color: Color(0xFFF87171)),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
           data: (refs) {
             final parsedRefs = refs.map((r) => ReferenceParser.parse(r)).toList();
@@ -625,18 +715,33 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF161B22),
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF161B22)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  border: Border.all(
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white.withOpacity(0.08)
+                        : const Color(0xFFE6E8F0),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(HeroIcons.information_circle, color: Colors.white38),
+                    Icon(
+                      HeroIcons.information_circle, 
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white38
+                          : Colors.black38,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.noReferencesAvailable,
-                        style: const TextStyle(color: Colors.white38),
+                        style: TextStyle(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.white38
+                              : Colors.black38,
+                        ),
                       ),
                     ),
                   ],
@@ -657,10 +762,16 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                 return Card(
                   margin: EdgeInsets.zero,
                   elevation: 0,
-                  color: const Color(0xFF161B22),
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF161B22)
+                      : Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                    side: BorderSide(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.08)
+                          : const Color(0xFFE6E8F0),
+                    ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -673,43 +784,48 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7C5CFF).withOpacity(0.1),
+                                color: theme.colorScheme.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 citation,
-                                style: const TextStyle(
-                                  color: Color(0xFF7C5CFF),
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11,
                                 ),
                               ),
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(HeroIcons.clipboard, size: 18, color: Colors.white70),
-                                  onPressed: () {
-                                    Clipboard.setData(ClipboardData(text: apaString));
-                                    HapticFeedback.lightImpact();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(isAr ? 'تم نسخ المرجع بنجاح!' : 'Reference copied successfully!'),
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  tooltip: isAr ? 'نسخ المرجع' : 'Copy Reference',
-                                ),
-                              ],
+                            IconButton(
+                              icon: Icon(
+                                HeroIcons.clipboard, 
+                                size: 18, 
+                                color: theme.brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.black54,
+                              ),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: apaString));
+                                HapticFeedback.lightImpact();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isAr ? 'تم نسخ المرجع بنجاح!' : 'Reference copied successfully!'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              tooltip: isAr ? 'نسخ المرجع' : 'Copy Reference',
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
                           apaString,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: AppTypography.getMetadataValue(context,
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                          ).copyWith(
                             fontSize: 13,
                             height: 1.4,
                           ),

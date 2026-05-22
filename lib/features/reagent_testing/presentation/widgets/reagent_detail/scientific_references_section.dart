@@ -45,7 +45,7 @@ class ScientificReferencesSection extends StatelessWidget {
               l10n.references,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ],
@@ -64,10 +64,16 @@ class ScientificReferencesSection extends StatelessWidget {
             return Card(
               margin: EdgeInsets.zero,
               elevation: 0,
-              color: const Color(0xFF161B22),
+              color: theme.brightness == Brightness.dark
+                  ? const Color(0xFF161B22)
+                  : theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                side: BorderSide(
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.08)
+                      : theme.colorScheme.outlineVariant,
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -93,7 +99,11 @@ class ScientificReferencesSection extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(HeroIcons.clipboard, size: 18, color: Colors.white70),
+                          icon: Icon(
+                            HeroIcons.clipboard,
+                            size: 18,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () {
@@ -105,9 +115,11 @@ class ScientificReferencesSection extends StatelessWidget {
                                   isAr
                                       ? 'تم نسخ المرجع بنجاح!'
                                       : 'Reference copied successfully!',
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(color: theme.colorScheme.onSurface),
                                 ),
-                                backgroundColor: const Color(0xFF161B22),
+                                backgroundColor: theme.brightness == Brightness.dark
+                                    ? const Color(0xFF161B22)
+                                    : theme.colorScheme.surfaceContainer,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -122,8 +134,8 @@ class ScientificReferencesSection extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       apaString,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
                         fontSize: 13,
                         height: 1.4,
                       ),

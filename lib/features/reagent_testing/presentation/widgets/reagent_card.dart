@@ -3,6 +3,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../domain/entities/reagent_entity.dart';
 import '../../../../core/utils/localization_helper.dart';
 import '../../../../core/theme/extensions/status_badge_theme.dart';
+import '../../../../core/widgets/auto_size_text.dart';
 
 class ReagentCard extends StatelessWidget {
   final ReagentEntity reagent;
@@ -44,11 +45,14 @@ class ReagentCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              AutoSizeText(
                 LocalizationHelper.getLocalizedReagentName(context, reagent),
                 style: Theme.of(context).textTheme.titleMedium,
                 maxLines: 2,
+                minFontSize: 12,
+                stepGranularity: 0.5,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.start,
               ),
               const SizedBox(height: 6),
               _buildSafetyBadge(context),
