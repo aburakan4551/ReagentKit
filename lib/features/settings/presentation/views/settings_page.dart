@@ -7,6 +7,10 @@ import '../states/settings_state.dart';
 import '../widgets/settings_section.dart';
 import '../widgets/settings_tile.dart';
 import '../providers/settings_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
+import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
+import 'package:reagentkit/core/services/premium_service.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -16,6 +20,7 @@ class SettingsPage extends ConsumerWidget {
     final settingsState = ref.watch(settingsControllerProvider);
     final currentTheme = ref.watch(currentThemeModeProvider);
     final currentLanguage = ref.watch(currentLanguageProvider);
+    final premiumService = ref.watch(premiumServiceProvider);
 
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -82,6 +87,7 @@ class SettingsPage extends ConsumerWidget {
                 settingsState,
                 currentTheme,
                 currentLanguage,
+                premiumService,
               ),
             ),
           ],
@@ -97,6 +103,7 @@ class SettingsPage extends ConsumerWidget {
     SettingsState settingsState,
     String currentTheme,
     String currentLanguage,
+    PremiumService premiumService,
   ) {
     final theme = Theme.of(context);
 
@@ -328,6 +335,74 @@ class SettingsPage extends ConsumerWidget {
           ],
         ),
 
+        // Subscription & Trials Section
+        _buildEnhancedSection(
+          title: l10n.subscriptionAndTrials,
+          icon: HeroIcons.sparkles,
+          gradient: [
+            Colors.amber.withOpacity(0.1),
+            Colors.orange.withOpacity(0.1),
+          ],
+          children: [
+            SettingsTile(
+              title: l10n.subscriptionStatus,
+              subtitle: premiumService.isPremium
+                  ? l10n.premiumStatus
+                  : l10n.freeTrialStatus,
+              leadingIcon: HeroIcons.credit_card,
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: premiumService.isPremium
+                      ? Colors.green.withOpacity(0.12)
+                      : Colors.orange.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  premiumService.isPremium
+                      ? (l10n.localeName == 'ar' ? 'نشط' : 'Active')
+                      : (l10n.localeName == 'ar' ? 'تجريبي' : 'Trial'),
+                  style: TextStyle(
+                    color: premiumService.isPremium
+                        ? Colors.green.shade700
+                        : Colors.orange.shade700,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              isFirst: true,
+              isLast: premiumService.isPremium,
+            ),
+            if (!premiumService.isPremium) ...[
+              SettingsTile(
+                title: l10n.freeTestsRemaining(premiumService.freeScansLeft),
+                subtitle: l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
+                leadingIcon: HeroIcons.chart_bar,
+              ),
+              SettingsTile(
+                title: l10n.upgradeToPremium,
+                subtitle: l10n.unlimitedTests,
+                leadingIcon: HeroIcons.sparkles,
+                trailing: Icon(
+                  HeroIcons.chevron_right,
+                  size: 16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PaywallScreen(),
+                    ),
+                  );
+                },
+                isLast: true,
+              ),
+            ],
+          ],
+        ),
+
         // About Section
         _buildEnhancedSection(
           title: l10n.about,
@@ -348,6 +423,34 @@ class SettingsPage extends ConsumerWidget {
               ),
               onTap: () => _showDevelopersDialog(context, l10n),
               isFirst: true,
+            ),
+            SettingsTile(
+              title: l10n.privacyPolicy,
+              subtitle: l10n.viewPrivacyPolicy,
+              leadingIcon: HeroIcons.shield_check,
+              trailing: Icon(
+                HeroIcons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              onTap: () async {
+                final uri = Uri.parse('https://colorstest.com/en/privacy/');
+                try {
+                  final launched = await launchUrl(
+                    uri,
+                    mode: LaunchMode.inAppBrowserView,
+                  );
+                  if (!launched) {
+                    throw 'Could not launch privacy policy';
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                }
+              },
             ),
             SettingsTile(
               title: l10n.version,

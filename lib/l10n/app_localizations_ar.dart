@@ -93,7 +93,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get developersDialogTitle => 'المطورون';
 
   @override
-  String get reagentTestingApp => 'ReagentKit';
+  String get reagentTestingApp => 'Reagent ColorTest';
 
   @override
   String get theDevelopers => '👨‍💻 المطورين';
@@ -751,4 +751,41 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiResultsApplied => 'تم تطبيق اختيار لون الذكاء الاصطناعي بنجاح!';
+
+  @override
+  String get noReferencesAvailable => 'لا توجد مراجع علمية متاحة لهذه المادة.';
+
+  @override
+  String freeTestsRemaining(int remaining) {
+    return 'الاختبارات المجانية المتبقية: $remaining/3';
+  }
+
+  @override
+  String freeTestsUsed(int used) {
+    return 'الاختبارات المجانية المستخدمة: $used/3';
+  }
+
+  @override
+  String get upgradeToPremium => 'الترقية إلى النسخة المدفوعة';
+
+  @override
+  String get unlimitedTests => 'اختبارات غير محدودة';
+
+  @override
+  String get subscriptionStatus => 'حالة الاشتراك';
+
+  @override
+  String get premiumStatus => 'مدفوع (نشط)';
+
+  @override
+  String get freeTrialStatus => 'فترة تجريبية مجانية';
+
+  @override
+  String get subscriptionAndTrials => 'الاشتراك والتجربة';
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get viewPrivacyPolicy => 'عرض سياسة خصوصية التطبيق';
 }

@@ -266,7 +266,7 @@ abstract class AppLocalizations {
   /// No description provided for @reagentTestingApp.
   ///
   /// In en, this message translates to:
-  /// **'ReagentKit'**
+  /// **'Reagent ColorTest'**
   String get reagentTestingApp;
 
   /// No description provided for @theDevelopers.
@@ -1558,6 +1558,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI color selection applied successfully!'**
   String get aiResultsApplied;
+
+  /// No description provided for @noReferencesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No scientific references available for this substance.'**
+  String get noReferencesAvailable;
+
+  /// No description provided for @freeTestsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Tests Remaining: {remaining}/3'**
+  String freeTestsRemaining(int remaining);
+
+  /// No description provided for @freeTestsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Tests Used: {used}/3'**
+  String freeTestsUsed(int used);
+
+  /// No description provided for @upgradeToPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to Premium'**
+  String get upgradeToPremium;
+
+  /// No description provided for @unlimitedTests.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Tests'**
+  String get unlimitedTests;
+
+  /// No description provided for @subscriptionStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Status'**
+  String get subscriptionStatus;
+
+  /// No description provided for @premiumStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium (Active)'**
+  String get premiumStatus;
+
+  /// No description provided for @freeTrialStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Trial'**
+  String get freeTrialStatus;
+
+  /// No description provided for @subscriptionAndTrials.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription & Trials'**
+  String get subscriptionAndTrials;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @viewPrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'View app privacy policy'**
+  String get viewPrivacyPolicy;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

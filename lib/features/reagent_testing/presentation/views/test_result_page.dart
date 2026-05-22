@@ -10,6 +10,9 @@ import 'package:reagentkit/features/reagent_testing/presentation/states/test_res
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/utils/localization_helper.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../data/services/scientific_references_registry.dart';
+import '../../domain/entities/scientific_reference.dart';
 
 class TestResultPage extends ConsumerWidget {
   const TestResultPage({super.key});
@@ -240,8 +243,15 @@ class _ModernResultView extends StatelessWidget {
                 ],
 
                 // 4. Analysis Logic / AI Reasoning (if any)
-                if (testResult.notes?.contains('AI Analysis') ?? false)
+                if (testResult.notes?.contains('AI Analysis') ?? false) ...[
                   _buildAIReasoningSection(context, l10n),
+                  const SizedBox(height: 32),
+                ],
+
+                // 5. Scientific References
+                _ScientificReferencesSection(testResult: testResult)
+                    .animate()
+                    .fadeIn(delay: 750.ms),
 
                 const SizedBox(height: 48),
 
@@ -425,6 +435,165 @@ class _ResultDetailTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ScientificReferencesSection extends StatelessWidget {
+  final TestResultEntity testResult;
+
+  const _ScientificReferencesSection({required this.testResult});
+
+  Future<void> _launchURL(BuildContext context, String urlString) async {
+    final uri = Uri.parse(urlString);
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.inAppBrowserView,
+      );
+      if (!launched) {
+        throw 'Could not launch $urlString';
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error opening link: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+
+    final references = <ScientificReference>[];
+    final seenUrls = <String>{};
+    for (final substance in testResult.possibleSubstances) {
+      final refs = ScientificReferencesRegistry.getReferencesForSubstance(substance, languageCode);
+      for (final ref in refs) {
+        if (!seenUrls.contains(ref.url)) {
+          seenUrls.add(ref.url);
+          references.add(ref);
+        }
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(HeroIcons.book_open, size: 18, color: theme.colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              l10n.references.toUpperCase(),
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (references.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
+            child: Row(
+              children: [
+                Icon(HeroIcons.information_circle, color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.noReferencesAvailable,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: references.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final ref = references[index];
+              return Card(
+                margin: EdgeInsets.zero,
+                elevation: 0,
+                color: theme.colorScheme.surfaceContainerHigh,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => _launchURL(context, ref.url),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.secondary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                ref.sourceName,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              HeroIcons.arrow_top_right_on_square,
+                              size: 16,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          ref.title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          ref.description,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }

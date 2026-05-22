@@ -1,6 +1,6 @@
 {
-    "name": "ReagentKit",
-    "short_name": "ReagentKit",
+    "name": "Reagent ColorTest",
+    "short_name": "Reagent ColorTest",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

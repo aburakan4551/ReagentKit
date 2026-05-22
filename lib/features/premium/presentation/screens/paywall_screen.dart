@@ -340,7 +340,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Scientific Disclaimer: ReagentKit AI analysis is an educational aid. It does not replace certified laboratory testing or chemical safety protocols. Verify results manually.',
+                                'Scientific Disclaimer: Reagent ColorTest AI analysis is an educational aid. It does not replace certified laboratory testing or chemical safety protocols. Verify results manually.',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                                   height: 1.4,

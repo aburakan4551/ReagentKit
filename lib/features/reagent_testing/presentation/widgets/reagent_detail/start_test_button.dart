@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
+import '../../providers/reagent_testing_providers.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../controllers/reagent_detail_controller.dart';
@@ -16,6 +18,7 @@ class StartTestButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isAcknowledged = ref.watch(reagentDetailControllerProvider);
+    final premiumService = ref.watch(premiumServiceProvider);
 
     final theme = Theme.of(context);
 
@@ -34,7 +37,20 @@ class StartTestButton extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: isAcknowledged ? () => _navigateToTest(context) : null,
+            onPressed: isAcknowledged
+                ? () {
+                    if (premiumService.canAnalyze) {
+                      _navigateToTest(context);
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PaywallScreen(),
+                        ),
+                      );
+                    }
+                  }
+                : null,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: isAcknowledged

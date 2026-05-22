@@ -28,7 +28,7 @@
     "comingSoonContent": "{feature} functionality will be implemented soon!",
     "ok": "OK",
     "developersDialogTitle": "Developers",
-    "reagentTestingApp": "ReagentKit",
+    "reagentTestingApp": "Reagent ColorTest",
     "theDevelopers": "Developers",
     "developerOneName": "يوسف مسير العنزي",
     "developerTwoName": " محمد نفاع الرويلي",
@@ -261,5 +261,30 @@
     "resetEmailSending": "Sending reset email...",
     
     "useAiResults": "Use AI Results",
-    "aiResultsApplied": "AI color selection applied successfully!"
+    "aiResultsApplied": "AI color selection applied successfully!",
+    "noReferencesAvailable": "No scientific references available for this substance.",
+    "freeTestsRemaining": "Free Tests Remaining: {remaining}/3",
+    "@freeTestsRemaining": {
+      "placeholders": {
+        "remaining": {
+          "type": "int"
+        }
+      }
+    },
+    "freeTestsUsed": "Free Tests Used: {used}/3",
+    "@freeTestsUsed": {
+      "placeholders": {
+        "used": {
+          "type": "int"
+        }
+      }
+    },
+    "upgradeToPremium": "Upgrade to Premium",
+    "unlimitedTests": "Unlimited Tests",
+    "subscriptionStatus": "Subscription Status",
+    "premiumStatus": "Premium (Active)",
+    "freeTrialStatus": "Free Trial",
+    "subscriptionAndTrials": "Subscription & Trials",
+    "privacyPolicy": "Privacy Policy",
+    "viewPrivacyPolicy": "View app privacy policy"
 } 

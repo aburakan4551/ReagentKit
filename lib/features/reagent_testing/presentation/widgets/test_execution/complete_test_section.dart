@@ -110,6 +110,7 @@ class CompleteTestSection extends ConsumerWidget {
                 notes: finalNotes,
               );
         } else if (execution.selectedColor != null) {
+          ref.read(premiumServiceProvider).consumeFreeScan();
           ref
               .read(testResultControllerProvider.notifier)
               .analyzeTestResult(

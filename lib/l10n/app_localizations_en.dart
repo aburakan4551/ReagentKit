@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get developersDialogTitle => 'Developers';
 
   @override
-  String get reagentTestingApp => 'ReagentKit';
+  String get reagentTestingApp => 'Reagent ColorTest';
 
   @override
   String get theDevelopers => 'Developers';
@@ -751,4 +751,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiResultsApplied => 'AI color selection applied successfully!';
+
+  @override
+  String get noReferencesAvailable => 'No scientific references available for this substance.';
+
+  @override
+  String freeTestsRemaining(int remaining) {
+    return 'Free Tests Remaining: $remaining/3';
+  }
+
+  @override
+  String freeTestsUsed(int used) {
+    return 'Free Tests Used: $used/3';
+  }
+
+  @override
+  String get upgradeToPremium => 'Upgrade to Premium';
+
+  @override
+  String get unlimitedTests => 'Unlimited Tests';
+
+  @override
+  String get subscriptionStatus => 'Subscription Status';
+
+  @override
+  String get premiumStatus => 'Premium (Active)';
+
+  @override
+  String get freeTrialStatus => 'Free Trial';
+
+  @override
+  String get subscriptionAndTrials => 'Subscription & Trials';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get viewPrivacyPolicy => 'View app privacy policy';
 }

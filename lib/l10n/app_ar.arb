@@ -28,7 +28,7 @@
     "comingSoonContent": "سيتم تنفيذ وظيفة {feature} قريبًا!",
     "ok": "موافق",
     "developersDialogTitle": "المطورون",
-    "reagentTestingApp": "ReagentKit",
+    "reagentTestingApp": "Reagent ColorTest",
     "theDevelopers": "👨‍💻 المطورين",
     "developerOneName": "يوسف مسير العنزي",
     "developerTwoName": "محمد نفاع الرويلي",
@@ -258,5 +258,30 @@
     "resetEmailSending": "جاري إرسال بريد الإعادة...",
     
     "useAiResults": "استخدام نتائج الذكاء الاصطناعي",
-    "aiResultsApplied": "تم تطبيق اختيار لون الذكاء الاصطناعي بنجاح!"
+    "aiResultsApplied": "تم تطبيق اختيار لون الذكاء الاصطناعي بنجاح!",
+    "noReferencesAvailable": "لا توجد مراجع علمية متاحة لهذه المادة.",
+    "freeTestsRemaining": "الاختبارات المجانية المتبقية: {remaining}/3",
+    "@freeTestsRemaining": {
+      "placeholders": {
+        "remaining": {
+          "type": "int"
+        }
+      }
+    },
+    "freeTestsUsed": "الاختبارات المجانية المستخدمة: {used}/3",
+    "@freeTestsUsed": {
+      "placeholders": {
+        "used": {
+          "type": "int"
+        }
+      }
+    },
+    "upgradeToPremium": "الترقية إلى النسخة المدفوعة",
+    "unlimitedTests": "اختبارات غير محدودة",
+    "subscriptionStatus": "حالة الاشتراك",
+    "premiumStatus": "مدفوع (نشط)",
+    "freeTrialStatus": "فترة تجريبية مجانية",
+    "subscriptionAndTrials": "الاشتراك والتجربة",
+    "privacyPolicy": "سياسة الخصوصية",
+    "viewPrivacyPolicy": "عرض سياسة خصوصية التطبيق"
 } 

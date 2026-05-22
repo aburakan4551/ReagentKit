@@ -13,7 +13,7 @@
 	</array>
 
 	<key>CFBundleDisplayName</key>
-	<string>ReagentKit</string>
+	<string>Reagent ColorTest</string>
 
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -25,7 +25,7 @@
 	<string>6.0</string>
 
 	<key>CFBundleName</key>
-	<string>ReagentKit</string>
+	<string>Reagent ColorTest</string>
 
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
@@ -96,13 +96,13 @@
 
 	<!-- Privacy Descriptions -->
 	<key>NSCameraUsageDescription</key>
-	<string>ReagentKit needs camera access to analyze reagent test results using AI.</string>
+	<string>Reagent ColorTest needs camera access to analyze reagent test results using AI.</string>
 
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>ReagentKit needs photo library access to allow you to upload images of test results for analysis.</string>
+	<string>Reagent ColorTest needs photo library access to allow you to upload images of test results for analysis.</string>
 
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ReagentKit needs microphone access for video capture if needed during testing.</string>
+	<string>Reagent ColorTest needs microphone access for video capture if needed during testing.</string>
 
 	<!-- URL Schemes for LSApplicationQueriesSchemes -->
 	<key>LSApplicationQueriesSchemes</key>
