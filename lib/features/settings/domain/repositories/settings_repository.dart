@@ -8,6 +8,7 @@ abstract class SettingsRepository {
   Future<void> updateLanguage(String language);
   Future<void> updatePushNotifications(bool enabled);
   Future<void> updateVibration(bool enabled);
+  Future<void> updateResearchMode(bool enabled);
   Future<void> resetToDefaults();
   Future<void> saveLanguage(String language);
   Future<String> getLanguage();

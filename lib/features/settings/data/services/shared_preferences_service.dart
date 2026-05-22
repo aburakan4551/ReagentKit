@@ -81,4 +81,10 @@ class SharedPreferencesService {
     final updatedSettings = currentSettings.copyWith(vibrationEnabled: enabled);
     await saveSettings(updatedSettings);
   }
+
+  Future<void> updateResearchMode(bool enabled) async {
+    final currentSettings = await loadSettings();
+    final updatedSettings = currentSettings.copyWith(researchMode: enabled);
+    await saveSettings(updatedSettings);
+  }
 }

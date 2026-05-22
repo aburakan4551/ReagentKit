@@ -131,6 +131,31 @@ class SettingsController extends StateNotifier<SettingsState> {
     }
   }
 
+  Future<void> updateResearchMode(bool enabled) async {
+    final currentState = state;
+    if (currentState is! SettingsLoaded) return;
+
+    state = const SettingsLoading();
+    try {
+      await _settingsRepository.updateResearchMode(enabled);
+      final updatedSettings = currentState.settings.copyWith(
+        researchMode: enabled,
+      );
+      state = SettingsSuccess(
+        'Research mode updated successfully',
+        updatedSettings,
+      );
+      // After showing success, return to loaded state
+      await Future.delayed(const Duration(milliseconds: 500));
+      state = SettingsLoaded(updatedSettings);
+    } catch (e) {
+      state = SettingsError('Failed to update research mode: $e');
+      // Return to previous state after error
+      await Future.delayed(const Duration(seconds: 2));
+      state = currentState;
+    }
+  }
+
   Future<void> resetToDefaults() async {
     final currentState = state;
     if (currentState is! SettingsLoaded) return;

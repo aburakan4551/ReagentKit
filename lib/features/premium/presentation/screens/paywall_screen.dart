@@ -1,11 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
-import 'package:reagentkit/core/theme/app_colors.dart';
+
+class PaywallTier {
+  final String identifier;
+  final String title;
+  final String description;
+  final String priceString;
+  final String periodSuffix;
+  final String badge;
+  final Package? package;
+
+  const PaywallTier({
+    required this.identifier,
+    required this.title,
+    required this.description,
+    required this.priceString,
+    required this.periodSuffix,
+    required this.badge,
+    this.package,
+  });
+}
 
 class PaywallScreen extends ConsumerStatefulWidget {
   const PaywallScreen({super.key});
@@ -15,12 +35,22 @@ class PaywallScreen extends ConsumerStatefulWidget {
 }
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen> {
-  Package? _selectedPackage;
+  PaywallTier? _selectedTier;
 
   Future<void> _launchURL(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    } catch (_) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not open link: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -40,15 +70,66 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       });
     }
 
-    // Auto-select first package if none selected and offerings exist
-    if (_selectedPackage == null && offerings.isNotEmpty) {
-      _selectedPackage = offerings.first;
+    // Build tiers
+    final List<PaywallTier> tiers = [];
+    if (offerings.isNotEmpty) {
+      for (final package in offerings) {
+        final product = package.storeProduct;
+        final cleanTitle = product.title.split('(').first.trim();
+        final isLifetime = package.packageType == PackageType.lifetime || cleanTitle.toLowerCase().contains('lifetime');
+        final isAnnual = package.packageType == PackageType.annual || cleanTitle.toLowerCase().contains('annual');
+        tiers.add(PaywallTier(
+          identifier: package.identifier,
+          title: cleanTitle,
+          description: product.description,
+          priceString: product.priceString,
+          periodSuffix: isLifetime ? 'one-time' : (isAnnual ? '/year' : '/month'),
+          badge: isLifetime ? 'BEST VALUE' : (isAnnual ? 'SAVE 50%' : ''),
+          package: package,
+        ));
+      }
+    } else {
+      // Offline fallback / Mock tiers
+      tiers.addAll([
+        const PaywallTier(
+          identifier: 'monthly',
+          title: 'Monthly Subscription',
+          description: 'Unlock unlimited reagent scans on a monthly basis.',
+          priceString: '\$4.99',
+          periodSuffix: '/month',
+          badge: '',
+        ),
+        const PaywallTier(
+          identifier: 'annual',
+          title: 'Annual Subscription',
+          description: 'Get unlimited reagent scans for a full year. Includes 3-day free trial.',
+          priceString: '\$29.99',
+          periodSuffix: '/year',
+          badge: 'SAVE 50%',
+        ),
+        const PaywallTier(
+          identifier: 'lifetime',
+          title: 'Lifetime Access',
+          description: 'One-time payment for perpetual unlimited reagent scans.',
+          priceString: '\$59.99',
+          periodSuffix: 'one-time',
+          badge: 'BEST VALUE',
+        ),
+      ]);
+    }
+
+    // Auto-select preferred tier if none is selected
+    if (_selectedTier == null && tiers.isNotEmpty) {
+      _selectedTier = tiers.firstWhere(
+        (t) => t.identifier == 'annual' || t.title.toLowerCase().contains('annual'),
+        orElse: () => tiers.first,
+      );
     }
 
     // Background gradient depending on dark/light theme
     final backgroundGradient = isDarkMode
         ? const LinearGradient(
-            colors: [Color(0xFF0F172A), Color(0xFF020617)],
+            colors: [Color(0xFF0F1115), Color(0xFF161B22)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )
@@ -58,13 +139,16 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             end: Alignment.bottomCenter,
           );
 
+    final locale = Localizations.localeOf(context).languageCode;
+    final isAr = locale == 'ar';
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
-              // Custom Navigation/Header
+              // Custom Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
@@ -79,11 +163,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     ),
                     if (offerings.isEmpty || kDebugMode)
                       TextButton.icon(
-                        icon: const Icon(HeroIcons.cpu_chip, size: 16, color: AppColors.primaryAccent),
+                        icon: const Icon(HeroIcons.cpu_chip, size: 16, color: Color(0xFF7C5CFF)),
                         label: Text(
-                          'Dev Bypass',
+                          isAr ? 'تخطي التطوير' : 'Dev Bypass',
                           style: TextStyle(
-                            color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                            color: isDarkMode ? Colors.white70 : Colors.black87,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -109,14 +193,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
+                            colors: [Color(0xFF7C5CFF), Color(0xFF50E3C2)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primaryAccent.withOpacity(0.35),
+                              color: const Color(0xFF7C5CFF).withOpacity(0.35),
                               blurRadius: 24,
                               offset: const Offset(0, 8),
                             ),
@@ -125,26 +209,28 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         child: const Icon(
                           HeroIcons.sparkles,
                           color: Colors.white,
-                          size: 40,
+                          size: 36,
                         ),
                       ),
                       const SizedBox(height: 24),
 
                       // Headlines
                       Text(
-                        'Upgrade to Premium',
+                        isAr ? 'الترقية إلى النسخة المدفوعة' : 'Upgrade to Premium',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                           letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       Text(
-                        'Unlock unlimited reagent scans, precise chemical analysis, and advanced laboratory safety recommendations.',
+                        isAr
+                            ? 'افتح عمليات فحص الكواشف غير المحدودة، والتحليل الكيميائي الدقيق، والتوصيات العلمية المتقدمة لسلامة المختبرات.'
+                            : 'Unlock unlimited reagent scans, precise chemical analysis, and advanced laboratory safety recommendations.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                          color: isDarkMode ? Colors.white70 : Colors.black54,
                           height: 1.5,
                         ),
                       ),
@@ -154,55 +240,51 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       _buildFeatureItem(
                         context,
                         icon: Icons.all_inclusive,
-                        title: 'Unlimited Reagent Scans',
-                        subtitle: 'No scan limits or interruptions.',
+                        title: isAr ? 'عمليات فحص كواشف غير محدودة' : 'Unlimited Reagent Scans',
+                        subtitle: isAr ? 'بدون حدود أو انقطاعات للفحوصات اليومية.' : 'No daily scan limits or interruptions.',
                       ),
                       const SizedBox(height: 16),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.bolt,
-                        title: 'Priority AI Chemical Processing',
-                        subtitle: 'Instant results using advanced vision analysis.',
+                        title: isAr ? 'معالجة كيميائية فورية بالذكاء الاصطناعي' : 'Priority AI Chemical Processing',
+                        subtitle: isAr ? 'نتائج فورية ودقيقة باستخدام تحليل الرؤية الحاسوبية.' : 'Instant, precise results using computer vision analysis.',
                       ),
-                      const SizedBox(height: 16),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.shield_check,
-                        title: 'Comprehensive Safety Reports',
-                        subtitle: 'Full warnings, handling info & lab protocols.',
+                        title: isAr ? 'تقارير سلامة شاملة' : 'Comprehensive Safety Reports',
+                        subtitle: isAr ? 'تحذيرات كاملة وبروتوكولات التعامل الآمن وطرق التخزين.' : 'Full chemical hazard warnings, handling info & lab protocols.',
                       ),
-                      const SizedBox(height: 16),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.cloud_arrow_up,
-                        title: 'Multi-Device Sync',
-                        subtitle: 'Sync counts and results across all platforms.',
+                        title: isAr ? 'مزامنة سحابية آمنة' : 'Secure Cloud Sync',
+                        subtitle: isAr ? 'تزامن سجل الفحوصات والإعدادات بين جميع أجهزتك.' : 'Sync scan history and configurations across all devices.',
                       ),
 
                       const SizedBox(height: 36),
 
-                      // Dynamic Offerings List
+                      // Subscriptions List
                       if (premiumService.isPurchasePending)
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 24.0),
                           child: Center(
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryAccent),
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C5CFF)),
                             ),
                           ),
                         )
-                      else if (offerings.isEmpty)
-                        _buildEmptyOfferingsCard(context)
                       else
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: offerings.length,
+                          itemCount: tiers.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final package = offerings[index];
-                            final isSelected = _selectedPackage == package;
-                            return _buildOfferingCard(context, package, isSelected);
+                            final tier = tiers[index];
+                            final isSelected = _selectedTier?.identifier == tier.identifier;
+                            return _buildTierCard(context, tier, isSelected);
                           },
                         ),
 
@@ -215,28 +297,26 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? AppColors.statusError.withOpacity(0.1)
-                                  : AppColors.lightStatusError.withOpacity(0.08),
+                              color: const Color(0xFFF87171).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: isDarkMode ? AppColors.statusError : AppColors.lightStatusError,
+                                color: const Color(0xFFF87171),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   HeroIcons.exclamation_triangle,
-                                  color: isDarkMode ? AppColors.statusError : AppColors.lightStatusError,
+                                  color: Color(0xFFF87171),
                                   size: 20,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     premiumService.errorMessage!,
-                                    style: TextStyle(
-                                      color: isDarkMode ? AppColors.statusError : AppColors.lightStatusError,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF87171),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -249,11 +329,16 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       ],
 
                       // Action Button
-                      if (offerings.isNotEmpty) ...[
+                      if (tiers.isNotEmpty) ...[
                         GestureDetector(
                           onTap: () {
-                            if (_selectedPackage != null) {
-                              premiumService.buyPremium(_selectedPackage!);
+                            if (_selectedTier != null) {
+                              HapticFeedback.mediumImpact();
+                              if (_selectedTier!.package != null) {
+                                premiumService.buyPremium(_selectedTier!.package!);
+                              } else {
+                                premiumService.simulatePremiumUnlock();
+                              }
                             }
                           },
                           child: Container(
@@ -261,23 +346,23 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             height: 56,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
+                                colors: [Color(0xFF7C5CFF), Color(0xFF6366F1)],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primaryAccent.withOpacity(0.3),
+                                  color: const Color(0xFF7C5CFF).withOpacity(0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
                               ],
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                'Continue to Payment',
-                                style: TextStyle(
+                                isAr ? 'شراء وتفعيل الاشتراك' : 'Purchase Subscription',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -294,11 +379,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       TextButton(
                         onPressed: premiumService.isPurchasePending
                             ? null
-                            : () => premiumService.restorePurchases(),
+                            : () {
+                                HapticFeedback.lightImpact();
+                                premiumService.restorePurchases();
+                              },
                         child: Text(
-                          'Restore Purchases',
+                          isAr ? 'استعادة المشتريات السابقة' : 'Restore Purchases',
                           style: TextStyle(
-                            color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
+                            color: isDarkMode ? Colors.white70 : Colors.black87,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -306,24 +394,43 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       ),
                       const SizedBox(height: 24),
 
+                      // Auto-renewal Terms info (Required by Apple guidelines)
+                      if (_selectedTier != null && _selectedTier!.identifier != 'lifetime')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 24.0),
+                          child: Text(
+                            isAr
+                                ? 'يتم الدفع عبر حساب iTunes الخاص بك عند تأكيد الشراء. يتجدد الاشتراك تلقائيًا ما لم يتم إيقاف التجديد التلقائي قبل 24 ساعة على الأقل من نهاية الفترة الحالية. سيتم محاسبتك على التجديد في غضون 24 ساعة قبل نهاية الفترة الحالية بسعر الخطة المحددة. يمكنك إدارة الاشتراكات وإيقاف التجديد التلقائي من إعدادات حساب iTunes بعد الشراء.'
+                                : 'Payment will be charged to your iTunes Account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Account will be charged for renewal within 24 hours prior to the end of the current period. Subscriptions may be managed and auto-renewal may be turned off by going to your iTunes Account Settings after purchase.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white38 : Colors.black45,
+                              fontSize: 11,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+
                       // Compliance Links
                       Wrap(
                         alignment: WrapAlignment.center,
                         spacing: 16,
+                        runSpacing: 8,
                         children: [
-                          _buildLink('Terms of Service', 'https://colorstest.com/en/safety/'),
-                          _buildLink('Privacy Policy', 'https://colorstest.com/en/privacy/'),
+                          _buildLink(isAr ? 'شروط الخدمة' : 'Terms of Service', 'https://colorstest.com/en/safety/'),
+                          _buildLink(isAr ? 'سياسة الخصوصية' : 'Privacy Policy', 'https://colorstest.com/en/privacy/'),
+                          _buildLink(isAr ? 'شروط استخدام أبل (EULA)' : 'Apple Terms (EULA)', 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
-                      // Medical / Scientific Disclaimer
+                      // Scientific Disclaimer
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDarkMode
-                              ? Colors.white.withOpacity(0.03)
-                              : Colors.black.withOpacity(0.03),
+                              ? Colors.white.withOpacity(0.02)
+                              : Colors.black.withOpacity(0.02),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: isDarkMode ? Colors.white12 : Colors.black12,
@@ -335,14 +442,16 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             Icon(
                               HeroIcons.information_circle,
                               size: 20,
-                              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                              color: isDarkMode ? Colors.white38 : Colors.black45,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Scientific Disclaimer: Reagent ColorTest AI analysis is an educational aid. It does not replace certified laboratory testing or chemical safety protocols. Verify results manually.',
+                                isAr
+                                    ? 'تنبيه علمي: يمثل تحليل الذكاء الاصطناعي لكشف الألوان أداة تعليمية مساعدة. لا يغني عن الفحوصات المختبرية المعتمدة وبروتوكولات السلامة الكيميائية. تحقق من النتائج يدوياً دائماً.'
+                                    : 'Scientific Disclaimer: Reagent ColorTest AI analysis is an educational aid. It does not replace certified laboratory testing or chemical safety protocols. Verify results manually.',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                                  color: isDarkMode ? Colors.white38 : Colors.black45,
                                   height: 1.4,
                                 ),
                               ),
@@ -369,65 +478,60 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     required String subtitle,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(10),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF7C5CFF),
+              size: 20,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isDarkMode ? AppColors.primaryAccent : AppColors.lightPrimaryAccent,
-            size: 22,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: isDarkMode ? Colors.white38 : Colors.black45,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildOfferingCard(BuildContext context, Package package, bool isSelected) {
+  Widget _buildTierCard(BuildContext context, PaywallTier tier, bool isSelected) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final product = package.storeProduct;
-
-    // Standardize title representation
-    final cleanTitle = product.title.split('(').first.trim();
-    
-    // Check type for badge overlay
-    final isLifetime = package.packageType == PackageType.lifetime || cleanTitle.toLowerCase().contains('lifetime');
-    final isAnnual = package.packageType == PackageType.annual || cleanTitle.toLowerCase().contains('annual');
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedPackage = package;
+          _selectedTier = tier;
         });
       },
       child: AnimatedContainer(
@@ -436,19 +540,19 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDarkMode ? AppColors.surfaceElevated : Colors.white)
-              : (isDarkMode ? AppColors.surfaceBase : AppColors.lightSurfaceElevated),
+              ? (isDarkMode ? const Color(0xFF1E222B) : Colors.white)
+              : (isDarkMode ? const Color(0xFF161B22) : const Color(0xFFF1F5F9)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? AppColors.primaryAccent
-                : (isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle),
+                ? const Color(0xFF7C5CFF)
+                : (isDarkMode ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06)),
             width: isSelected ? 2.5 : 1.0,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primaryAccent.withOpacity(0.12),
+                    color: const Color(0xFF7C5CFF).withOpacity(0.12),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
                   )
@@ -464,25 +568,25 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                   Row(
                     children: [
                       Text(
-                        cleanTitle,
+                        tier.title,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
-                      if (isLifetime || isAnnual) ...[
+                      if (tier.badge.isNotEmpty) ...[
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
+                              colors: [Color(0xFF7C5CFF), Color(0xFF50E3C2)],
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            isLifetime ? 'BEST VALUE' : 'SAVE 50%',
+                            tier.badge,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 9,
@@ -495,10 +599,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    product.description,
+                    tier.description,
                     style: TextStyle(
-                      fontSize: 13,
-                      color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                      fontSize: 12.5,
+                      color: isDarkMode ? Colors.white38 : Colors.black45,
                       height: 1.3,
                     ),
                   ),
@@ -510,89 +614,24 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  product.priceString,
+                  tier.priceString,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 Text(
-                  isLifetime ? 'one-time' : (isAnnual ? '/year' : '/month'),
+                  tier.periodSuffix,
                   style: TextStyle(
                     fontSize: 11,
-                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                    color: isDarkMode ? Colors.white38 : Colors.black45,
                   ),
                 ),
               ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyOfferingsCard(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.surfaceBase : AppColors.lightSurfaceElevated,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            HeroIcons.shopping_bag,
-            size: 40,
-            color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Store Unavailable Offline',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Could not load offerings from App Store/Google Play. You can bypass using the simulation button for development.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 20),
-          GestureDetector(
-            onTap: () {
-              ref.read(premiumServiceProvider).simulatePremiumUnlock();
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Simulate Purchase (Bypass)',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

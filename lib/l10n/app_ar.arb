@@ -283,5 +283,17 @@
     "freeTrialStatus": "فترة تجريبية مجانية",
     "subscriptionAndTrials": "الاشتراك والتجربة",
     "privacyPolicy": "سياسة الخصوصية",
-    "viewPrivacyPolicy": "عرض سياسة خصوصية التطبيق"
+    "viewPrivacyPolicy": "عرض سياسة خصوصية التطبيق",
+    "researchMode": "وضع البحث العلمي",
+    "researchModeSubtitle": "تمكين النتائج التحليلية الأولية (قيم Delta E و HEX/RGB)",
+    "referencesLibrary": "مكتبة المراجع العلمية",
+    "referencesLibrarySubtitle": "تصفح مراجع كيمياء ألوان الكواشف",
+    "aboutReferences": "حول المراجع العلمية",
+    "noCompatibleReferences": "لم يتم العثور على مراجع علمية متوافقة لمجموعة بيانات الكاشف هذه.",
+    "legalConsentDisclaimer": "التفسيرات التي تم إنشاؤها بواسطة هذا التطبيق هي ملاحظات تحليلية احتمالية وليست استنتاجات علمية معتمدة. هذا التطبيق مخصص فقط لسير العمل التعليمي والتحليلي ودعم الأبحاث.",
+    "understandLimitations": "أفهم حدود التطبيق وأوافق عليها",
+    "reagentResponse": "استجابة الكاشف",
+    "chemicalColorInterpretation": "تفسير اللون الكيميائي",
+    "possibleMatch": "تطابق محتمل",
+    "confidenceBasedAnalysis": "تحليل قائم على مستوى الثقة"
 } 

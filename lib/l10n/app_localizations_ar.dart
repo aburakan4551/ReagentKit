@@ -788,4 +788,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get viewPrivacyPolicy => 'عرض سياسة خصوصية التطبيق';
+
+  @override
+  String get researchMode => 'وضع البحث العلمي';
+
+  @override
+  String get researchModeSubtitle => 'تمكين النتائج التحليلية الأولية (قيم Delta E و HEX/RGB)';
+
+  @override
+  String get referencesLibrary => 'مكتبة المراجع العلمية';
+
+  @override
+  String get referencesLibrarySubtitle => 'تصفح مراجع كيمياء ألوان الكواشف';
+
+  @override
+  String get aboutReferences => 'حول المراجع العلمية';
+
+  @override
+  String get noCompatibleReferences => 'لم يتم العثور على مراجع علمية متوافقة لمجموعة بيانات الكاشف هذه.';
+
+  @override
+  String get legalConsentDisclaimer => 'التفسيرات التي تم إنشاؤها بواسطة هذا التطبيق هي ملاحظات تحليلية احتمالية وليست استنتاجات علمية معتمدة. هذا التطبيق مخصص فقط لسير العمل التعليمي والتحليلي ودعم الأبحاث.';
+
+  @override
+  String get understandLimitations => 'أفهم حدود التطبيق وأوافق عليها';
+
+  @override
+  String get reagentResponse => 'استجابة الكاشف';
+
+  @override
+  String get chemicalColorInterpretation => 'تفسير اللون الكيميائي';
+
+  @override
+  String get possibleMatch => 'تطابق محتمل';
+
+  @override
+  String get confidenceBasedAnalysis => 'تحليل قائم على مستوى الثقة';
 }

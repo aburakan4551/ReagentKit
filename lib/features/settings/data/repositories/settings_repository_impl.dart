@@ -68,6 +68,15 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
+  Future<void> updateResearchMode(bool enabled) async {
+    try {
+      await _preferencesService.updateResearchMode(enabled);
+    } catch (e) {
+      throw Exception('Failed to update research mode: $e');
+    }
+  }
+
+  @override
   Future<void> resetToDefaults() async {
     try {
       await _preferencesService.clearSettings();

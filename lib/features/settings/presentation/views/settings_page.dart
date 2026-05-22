@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
 import 'package:reagentkit/core/services/premium_service.dart';
+import 'package:reagentkit/features/settings/presentation/views/scientific_references_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -403,6 +404,49 @@ class SettingsPage extends ConsumerWidget {
           ],
         ),
 
+        // Research & References Section
+        _buildEnhancedSection(
+          title: l10n.localeName == 'ar' ? 'البحث العلمي والمراجع' : 'Research & References',
+          icon: HeroIcons.academic_cap,
+          gradient: [
+            const Color(0xFF7C5CFF).withOpacity(0.1),
+            Colors.blue.withOpacity(0.1),
+          ],
+          children: [
+            SettingsSwitchTile(
+              title: l10n.researchMode,
+              subtitle: l10n.researchModeSubtitle,
+              leadingIcon: HeroIcons.beaker,
+              value: ref.watch(researchModeEnabledProvider),
+              onChanged: (value) {
+                ref
+                    .read(settingsControllerProvider.notifier)
+                    .updateResearchMode(value);
+              },
+              isFirst: true,
+            ),
+            SettingsTile(
+              title: l10n.referencesLibrary,
+              subtitle: l10n.referencesLibrarySubtitle,
+              leadingIcon: HeroIcons.book_open,
+              trailing: Icon(
+                HeroIcons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScientificReferencesPage(),
+                  ),
+                );
+              },
+              isLast: true,
+            ),
+          ],
+        ),
+
         // About Section
         _buildEnhancedSection(
           title: l10n.about,
@@ -480,6 +524,23 @@ class SettingsPage extends ConsumerWidget {
             ),
           ],
         ),
+
+        const SizedBox(height: 16),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Text(
+              'Reagent ColorTest - Version 1.0.0\nResearch Use Only - Dataset Version: 2026.05',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                fontSize: 11,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
 
         // Additional spacing at bottom
         SizedBox(height: LayoutHelper.getBottomNavPadding(context)),

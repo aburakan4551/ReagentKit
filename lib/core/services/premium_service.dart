@@ -45,10 +45,20 @@ class PremiumService extends ChangeNotifier {
 
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    // 1. Load basic local cache for fast offline startup
+    // 1. Load basic local cache and secure storage for fast offline startup
     _isPremium = prefs.getBool(_premiumUserKey) ?? false;
-    _freeScansLeft = prefs.getInt(_freeScansKey) ?? 3;
+    try {
+      final secureScansStr = await _secureStorage.read(key: _freeScansKey);
+      if (secureScansStr != null) {
+        _freeScansLeft = int.tryParse(secureScansStr) ?? 3;
+      } else {
+        _freeScansLeft = prefs.getInt(_freeScansKey) ?? 3;
+        await _secureStorage.write(key: _freeScansKey, value: _freeScansLeft.toString());
+      }
+    } catch (e) {
+      Logger.error('Failed to read secure free scans: $e');
+      _freeScansLeft = prefs.getInt(_freeScansKey) ?? 3;
+    }
     notifyListeners();
 
     // 2. Load/Generate persistent device footprint (Keychain survives reinstall)
@@ -177,6 +187,14 @@ class PremiumService extends ChangeNotifier {
       _freeScansLeft--;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_freeScansKey, _freeScansLeft);
+      
+      // Update secure keychain storage
+      try {
+        await _secureStorage.write(key: _freeScansKey, value: _freeScansLeft.toString());
+      } catch (e) {
+        Logger.error('Failed to write secure free scans: $e');
+      }
+
       notifyListeners();
 
       // Sync asynchronously to Firestore

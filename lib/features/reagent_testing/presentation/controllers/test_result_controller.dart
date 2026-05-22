@@ -5,6 +5,9 @@ import '../states/test_result_state.dart';
 import 'test_result_history_controller.dart';
 import '../../data/models/gemini_analysis_models.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../scientific_engine/color_matcher.dart';
+import '../../../../scientific_engine/reagent_interpreter.dart';
+import '../../../../scientific_engine/scientific_constants.dart';
 
 class TestResultController extends StateNotifier<TestResultState> {
   final TestResultHistoryController? _historyController;
@@ -21,17 +24,44 @@ class TestResultController extends StateNotifier<TestResultState> {
     state = const TestResultLoading();
 
     try {
-      // Analyze the observed color against the reagent's drug results
-      final analysisResult = _analyzeColorMatch(reagent, observedColor);
+      // 1. Convert observed color description to RGBColor
+      final rgbColors = ColorMatcher.parseColorDescription(observedColor);
+      final observedRGB = rgbColors.isNotEmpty ? rgbColors.first : const RGBColor(128, 128, 128);
+
+      // 2. Map reagent's drug results to scientific reaction targets
+      final targets = reagent.drugResults.map((r) => ReagentReactionTarget(
+        analyteName: r.drugName,
+        colorText: r.color,
+        colorTextAr: r.colorAr,
+      )).toList();
+
+      // 3. Interpret using Scientific Engine
+      final interpretation = ReagentInterpreter.interpret(
+        observedColor: observedRGB,
+        targets: targets,
+        stabilityIndex: 1.0, // default stable
+      );
+
+      final possibleSubstances = interpretation.matchedAnalyte != null
+          ? [interpretation.matchedAnalyte!]
+          : <String>[];
 
       final testResult = TestResultEntity(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         reagentName: reagent.reagentName,
         observedColor: observedColor,
-        possibleSubstances: analysisResult['substances'] as List<String>,
-        confidencePercentage: analysisResult['confidence'] as int,
+        possibleSubstances: possibleSubstances.isNotEmpty ? possibleSubstances : ['Unknown substance or impure sample'],
+        confidencePercentage: (interpretation.confidence.overallConfidence * 100).toInt(),
         notes: notes,
         testCompletedAt: DateTime.now(),
+        colorMatchConfidence: interpretation.confidence.colorMatchConfidence,
+        aiInterpretationConfidence: interpretation.confidence.aiInterpretationConfidence,
+        stabilityIndex: interpretation.confidence.stabilityIndex,
+        deltaE: interpretation.deltaE,
+        observedHex: observedRGB.toHex(),
+        observedRgb: observedRGB.toString(),
+        interpretationCategory: interpretation.interpretationCategory,
+        algorithmVersion: ScientificConstants.algorithmVersion,
       );
 
       state = TestResultLoaded(testResult: testResult);
@@ -59,48 +89,69 @@ class TestResultController extends StateNotifier<TestResultState> {
         '  - Identified Substances: ${aiResult.identifiedSubstances}',
       );
       Logger.info('  - Confidence Level: ${aiResult.confidenceLevel}');
-      Logger.info(
-        '  - Notes: ${notes?.substring(0, notes.length.clamp(0, 100))}...',
-      );
 
-      // Convert AI confidence level to percentage
-      int confidencePercentage;
+      // Convert AI confidence level to percentage / fraction
+      double aiConfidence = 0.6;
       switch (aiResult.confidenceLevel.toLowerCase()) {
         case 'high':
         case 'very high':
-          confidencePercentage = 90;
+          aiConfidence = 0.9;
           break;
         case 'medium':
         case 'moderate':
-          confidencePercentage = 70;
+          aiConfidence = 0.7;
           break;
         case 'low':
-          confidencePercentage = 50;
+          aiConfidence = 0.5;
           break;
-        default:
-          confidencePercentage = 60;
       }
 
-      // Use AI-identified substances, or fall back to "AI Analysis" if empty
+      // 1. Convert observed color description to RGBColor
+      final rgbColors = ColorMatcher.parseColorDescription(aiResult.observedColorDescription);
+      final observedRGB = rgbColors.isNotEmpty ? rgbColors.first : const RGBColor(128, 128, 128);
+
+      // 2. Map reagent's drug results to scientific reaction targets
+      final targets = reagent.drugResults.map((r) => ReagentReactionTarget(
+        analyteName: r.drugName,
+        colorText: r.color,
+        colorTextAr: r.colorAr,
+      )).toList();
+
+      // 3. Interpret using Scientific Engine
+      final interpretation = ReagentInterpreter.interpret(
+        observedColor: observedRGB,
+        targets: targets,
+        stabilityIndex: 1.0,
+        customAiConfidence: aiConfidence,
+      );
+
+      // Use AI-identified substances, or fall back to interpretation match
       final possibleSubstances = aiResult.identifiedSubstances.isNotEmpty
           ? aiResult.identifiedSubstances
-          : [
-              aiResult.primarySubstance.isNotEmpty
-                  ? aiResult.primarySubstance
-                  : 'AI Analysis Result',
-            ];
-
-      Logger.info('  - Final Possible Substances: $possibleSubstances');
-      Logger.info('  - Final Confidence: $confidencePercentage%');
+          : (interpretation.matchedAnalyte != null
+              ? [interpretation.matchedAnalyte!]
+              : [
+                  aiResult.primarySubstance.isNotEmpty
+                      ? aiResult.primarySubstance
+                      : 'AI Analysis Result',
+                ]);
 
       final testResult = TestResultEntity(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         reagentName: reagent.reagentName,
         observedColor: aiResult.observedColorDescription,
         possibleSubstances: possibleSubstances,
-        confidencePercentage: confidencePercentage,
+        confidencePercentage: (interpretation.confidence.overallConfidence * 100).toInt(),
         notes: notes,
         testCompletedAt: DateTime.now(),
+        colorMatchConfidence: interpretation.confidence.colorMatchConfidence,
+        aiInterpretationConfidence: interpretation.confidence.aiInterpretationConfidence,
+        stabilityIndex: interpretation.confidence.stabilityIndex,
+        deltaE: interpretation.deltaE,
+        observedHex: observedRGB.toHex(),
+        observedRgb: observedRGB.toString(),
+        interpretationCategory: interpretation.interpretationCategory,
+        algorithmVersion: ScientificConstants.algorithmVersion,
       );
 
       state = TestResultLoaded(testResult: testResult);
@@ -112,6 +163,7 @@ class TestResultController extends StateNotifier<TestResultState> {
     }
   }
 
+  // ignore: unused_element
   Map<String, dynamic> _analyzeColorMatch(
     ReagentEntity reagent,
     String observedColor,

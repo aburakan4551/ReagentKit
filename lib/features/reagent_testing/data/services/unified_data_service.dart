@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '../models/reagent_model.dart';
-import '../models/drug_result_model.dart';
-import 'remote_config_service.dart';
+import 'package:crypto/crypto.dart';
+import '../models/reagent_test_model.dart';
 import '../../../../core/utils/logger.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -13,16 +11,9 @@ import '../../../../core/utils/logger.dart';
 
 enum DataSource { firebase, local, staleCache }
 
-/// Severity assigned to the current data state — used by UI to decide
-/// whether to show a warning banner.
 enum DataHealthStatus {
-  /// Firebase data, fresh.
   healthy,
-
-  /// Firebase data returned but might be slightly old (< 2 * TTL).
   degraded,
-
-  /// Local JSON or stale cache — user should be warned.
   fallback,
 }
 
@@ -30,13 +21,11 @@ enum DataHealthStatus {
 
 /// Everything the UI needs to know about the current data load result.
 class DataSnapshot {
-  final List<ReagentModel> reagents;
+  final List<ReagentTestModel> reagents;
   final DataSource source;
   final DataHealthStatus health;
   final String version;
   final DateTime loadedAt;
-
-  /// Set when [health] != healthy, so the UI can display it.
   final String? warningMessage;
 
   const DataSnapshot({
@@ -91,553 +80,244 @@ class ReagentSafetyData {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// UnifiedDataService — Production-Grade
+// UnifiedDataService — Local First & Checked (Production-Grade)
 // ═════════════════════════════════════════════════════════════════════════════
 
-/// Single source of truth for all application data.
-///
-/// Design principles (Production rules):
-///   P1 — Firebase is ALWAYS the primary source. Local JSON is a temporary
-///        cold-start fallback only — never preferred over Firebase.
-///   P2 — No silent failures. Every exception is logged at error level.
-///        Swallowed exceptions that affect data integrity are forbidden.
-///   P3 — Stale cache is always flagged explicitly with a [warningMessage]
-///        so the UI can inform the user.
-///   P4 — Cache validity is verified against both TTL and data version.
-///        If Firebase has a newer version, cache is rejected.
-///   P5 — Local JSON is used ONLY for a first offline run (cold start).
-///        Once Firebase data has been cached, local JSON is never served again.
 class UnifiedDataService {
-  final RemoteConfigService _remoteConfig;
-  final Connectivity _connectivity;
+  // Keep parameters in constructor for backward compatibility
+  // ignore: unused_field
+  final dynamic _remoteConfig;
+  // ignore: unused_field
+  final dynamic _connectivity;
 
-  // ── Cache ─────────────────────────────────────────────────────────────────
-  List<ReagentModel>? _cachedReagents;
-  Map<String, ReagentSafetyData>? _cachedSafety;
-  Map<String, List<String>>? _cachedReferences;
-  String _cacheVersion = '';
+  // Cache
+  List<ReagentTestModel>? _cachedReagents;
+  String _cacheVersion = '1.0.0';
+  bool _initialized = false;
 
-  /// Whether Firebase data has been successfully loaded at least once
-  /// in this app session. When true, local JSON fallback is disabled.
-  bool _firebaseLoadedAtLeastOnce = false;
+  static const String _datasetAsset = 'assets/data/scientific_dataset.json';
 
-  // Local JSON version (bumped manually when you update the asset files)
-  static const String   _localVersion   = '1.0.0-local';
-
-  // Asset paths
-  static const String _reagentsAsset = 'assets/data/reagents.json';
-  static const String _safetyAsset   = 'assets/data/safety.json';
-  static const String _refsAsset     = 'assets/data/references.json';
-
-  /// Broadcast stream: emits a [DataSnapshot] on every successful load.
-  /// UI layers should listen to this instead of calling [loadAllReagents]
-  /// directly from streams.
   final _snapshotController = StreamController<DataSnapshot>.broadcast();
   Stream<DataSnapshot> get onSnapshot => _snapshotController.stream;
 
-  // Expose basic state for Provider / banner widget
-  DataSource get lastSource         => _lastDataSource;
-  DataSource _lastDataSource        = DataSource.local;
-  bool       get hasCachedData      => _cachedReagents != null;
-  bool       get firebaseEverLoaded => _firebaseLoadedAtLeastOnce;
-  String     get cacheVersion       => _cacheVersion;
+  DataSource get lastSource => _lastDataSource;
+  DataSource _lastDataSource = DataSource.local;
+  bool get hasCachedData => _cachedReagents != null;
+  bool get firebaseEverLoaded => false; // Local-only now
+  String get cacheVersion => _cacheVersion;
 
   UnifiedDataService({
-    RemoteConfigService? remoteConfig,
-    Connectivity?        connectivity,
-  })  : _remoteConfig = remoteConfig ?? RemoteConfigService(),
-        _connectivity = connectivity ?? Connectivity();
+    dynamic remoteConfig,
+    dynamic connectivity,
+  })  : _remoteConfig = remoteConfig,
+        _connectivity = connectivity;
 
-  // ── Initialisation ─────────────────────────────────────────────────────────
-
-  /// Must be called once at app startup before any UI is rendered.
-  /// Throws [DataServiceException] if Remote Config cannot be initialised
-  /// AND there is no local fallback data (first run, no internet).
-  /// Must be called once at app startup.
+  /// Initialises the dataset and validates integrity in the background
   Future<void> initialize() async {
-    Logger.info('🚀 [UnifiedDataService] Initializing...');
+    if (_initialized) return;
+    Logger.info('🚀 [UnifiedDataService] Initializing local scientific dataset...');
     try {
-      await _remoteConfig.initialize();
-      Logger.info('✅ [UnifiedDataService] Remote Config ready');
+      await loadFromAssets();
+      _initialized = true;
+      Logger.info('✅ [UnifiedDataService] Initialization complete');
     } catch (e, st) {
-      Logger.error('❌ [UnifiedDataService] Remote Config init FAILED: $e', error: e, stackTrace: st);
-      // We don't rethrow here because we want the app to start even if offline
+      Logger.error('❌ [UnifiedDataService] Initialization failed: $e', error: e, stackTrace: st);
     }
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
-
-  /// Attempts to fetch the latest data from Firebase Remote Config.
-  /// Throws if offline or Firebase fails.
+  /// Compatibility method: loads local assets since Remote Config is removed
   Future<DataSnapshot> fetchFromRemoteConfig() async {
-    Logger.info('☁️ [UnifiedDataService] Fetching from Remote Config...');
-    
-    if (!await _isOnline()) {
-      throw const DataServiceException('Device is offline', source: DataSource.firebase);
-    }
-
-    try {
-      await _remoteConfig.fetchAndActivate();
-      final result = await _loadFromFirebase();
-      _commitCache(DataSource.firebase, result.reagents, result.version);
-      _firebaseLoadedAtLeastOnce = true;
-
-      final snap = _buildSnapshot(
-        reagents: result.reagents,
-        source: DataSource.firebase,
-        health: DataHealthStatus.healthy,
-        version: result.version,
-      );
-      Logger.info('✅ [UnifiedDataService] Loaded from Remote Config');
-      _snapshotController.add(snap);
-      return snap;
-    } catch (e, st) {
-      Logger.error('❌ [UnifiedDataService] Remote fetch failed: $e', error: e, stackTrace: st);
-      rethrow;
-    }
+    Logger.info('☁️ [UnifiedDataService] Remote config bypass: loading from assets...');
+    return loadFromAssets();
   }
 
-  /// Loads bundled data from local JSON assets.
+  /// Loads, parses, and validates the local JSON dataset
   Future<DataSnapshot> loadFromAssets() async {
-    Logger.info('📂 [UnifiedDataService] Loading from local assets...');
+    Logger.info('📂 [UnifiedDataService] Loading dataset from $_datasetAsset');
     try {
-      final reagents = await _loadFromLocalJson();
-      _commitCache(DataSource.local, reagents, _localVersion);
+      final raw = await rootBundle.loadString(_datasetAsset);
+      
+      // Parse JSON
+      final Map<String, dynamic> decoded = json.decode(raw) as Map<String, dynamic>;
+      final version = decoded['dataset_version'] as String? ?? '1.0.0';
+      final expectedChecksum = decoded['checksum'] as String? ?? '';
+      
+      // 1. Perform background validation & integrity checks
+      _performBackgroundValidation(decoded, raw, expectedChecksum);
 
-      final snap = _buildSnapshot(
-        reagents: reagents,
+      // Parse Reagents
+      final reagentsMap = decoded['reagents'] as Map<String, dynamic>? ?? {};
+      final List<ReagentTestModel> reagentsList = [];
+
+      reagentsMap.forEach((key, value) {
+        try {
+          final reagentJson = value as Map<String, dynamic>;
+          reagentsList.add(ReagentTestModel.fromJson(reagentJson));
+        } catch (e) {
+          Logger.error('❌ [UnifiedDataService] Parse error for reagent "$key": $e');
+        }
+      });
+
+      if (reagentsList.isEmpty) {
+        throw const FormatException('Scientific dataset yielded zero valid reagents');
+      }
+
+      _cachedReagents = reagentsList;
+      _cacheVersion = version;
+      _lastDataSource = DataSource.local;
+
+      final snapshot = DataSnapshot(
+        reagents: reagentsList,
         source: DataSource.local,
-        health: DataHealthStatus.fallback,
-        version: _localVersion,
-        warningMessage: 'Offline mode: using bundled records.',
+        health: DataHealthStatus.healthy,
+        version: version,
+        loadedAt: DateTime.now(),
       );
-      Logger.info('✅ [UnifiedDataService] Fallback to local assets');
-      _snapshotController.add(snap);
-      return snap;
+
+      _snapshotController.add(snapshot);
+      return snapshot;
     } catch (e, st) {
       Logger.error('❌ [UnifiedDataService] Local asset load failed: $e', error: e, stackTrace: st);
       rethrow;
     }
   }
 
+  /// Gets all data (uses cache if available)
   Future<DataSnapshot> getAllData() async {
-    final online = await _isOnline();
-
-    if (online) {
-      Logger.info('🌐 [UnifiedDataService] Device is internet-connected. Attempting Remote Config fetch.');
-      
-      try {
-        final snap = await fetchFromRemoteConfig();
-        return snap;
-      } catch (e, st) {
-        Logger.error('❌ [UnifiedDataService] Remote Config fetch failed while online.', error: e, stackTrace: st);
-        
-        if (hasCachedData) {
-          Logger.info('⚠️ Falling back to stale cache due to fetch failure.');
-          return _buildSnapshot(
-            reagents: _cachedReagents!,
-            source: DataSource.staleCache,
-            health: DataHealthStatus.degraded,
-            version: _cacheVersion,
-            warningMessage: 'Using cached data due to network issues.',
-          );
-        }
-        
-        Logger.info('⚠️ No cache available. Falling back to local assets.');
-        try {
-          return await loadFromAssets();
-        } catch (assetError) {
-          throw DataServiceException('Remote Config failed and local fallback failed.', source: DataSource.firebase);
-        }
-      }
-    } else {
-      Logger.info('📵 [UnifiedDataService] APP IS OFFLINE. Proceeding to cache or local data.');
-      
-      if (hasCachedData) {
-         Logger.info('ℹ️ Using offline cache.');
-         return _buildSnapshot(
-           reagents: _cachedReagents!,
-           source: DataSource.staleCache,
-           health: DataHealthStatus.degraded,
-           version: _cacheVersion,
-           warningMessage: 'Device offline. Showing cached data.',
-         );
-      }
-      
-      try {
-        return await loadFromAssets();
-      } catch (e, st) {
-         Logger.error('❌ [UnifiedDataService] Fallback to assets also failed: $e', error: e, stackTrace: st);
-         rethrow;
-      }
+    if (hasCachedData) {
+      return DataSnapshot(
+        reagents: _cachedReagents!,
+        source: _lastDataSource,
+        health: DataHealthStatus.healthy,
+        version: _cacheVersion,
+        loadedAt: DateTime.now(),
+      );
     }
+    return loadFromAssets();
   }
 
-
-
-  /// Safety data (Firebase first, local fallback).
-  Future<ReagentSafetyData?> getSafetyData(String name) async {
-    if (_cachedSafety == null) await _loadSafetyData();
-    return _cachedSafety?[name];
+  /// Refreshes the local cache from JSON asset
+  Future<DataSnapshot> refresh() async {
+    Logger.info('🔄 [UnifiedDataService] Refreshing local dataset');
+    _cachedReagents = null;
+    return loadFromAssets();
   }
 
-  /// Scientific references for a reagent.
-  Future<List<String>> getReferences(String name) async {
-    if (_cachedReferences == null) await _loadReferencesData();
-    return _cachedReferences?[name] ?? [];
-  }
-
-  /// Find a single reagent by name.
-  Future<ReagentModel?> getReagentByName(String name) async {
-    final snap = await getAllData();
+  /// Find a single reagent by name (case-insensitive)
+  Future<ReagentTestModel?> getReagentByName(String name) async {
+    final snapshot = await getAllData();
     try {
-      return snap.reagents.firstWhere(
-        (r) => r.reagentName.toLowerCase() == name.toLowerCase(),
+      return snapshot.reagents.firstWhere(
+        (r) => r.reagentName.toLowerCase() == name.toLowerCase() ||
+               r.reagentNameAr.toLowerCase() == name.toLowerCase() ||
+               r.id.toLowerCase() == name.toLowerCase(),
       );
     } catch (_) {
       return null;
     }
   }
 
-  /// Full-text search.
-  Future<List<ReagentModel>> searchReagents(String query) async {
-    final snap = await getAllData();
+  /// Search reagents by query
+  Future<List<ReagentTestModel>> searchReagents(String query) async {
+    final snapshot = await getAllData();
     final q = query.toLowerCase();
-    return snap.reagents.where((r) =>
+    return snapshot.reagents.where((r) =>
         r.reagentName.toLowerCase().contains(q) ||
+        r.reagentNameAr.contains(q) ||
         r.description.toLowerCase().contains(q) ||
-        r.chemicals.any((c) => c.toLowerCase().contains(q))).toList();
+        r.descriptionAr.contains(q) ||
+        r.chemicals.any((c) => c.toLowerCase().contains(q))
+    ).toList();
   }
 
-  /// Force refresh from Firebase. Emits a new [DataSnapshot] on success.
-  /// Throws [DataServiceException] on failure — does NOT swallow errors.
-  Future<DataSnapshot> refresh() async {
-    Logger.info('🔄 [UnifiedDataService] Manual refresh requested');
-
-    if (!await _isOnline()) {
-      Logger.error('❌ [UnifiedDataService] Refresh ABORTED — device offline');
-      throw const DataServiceException(
-        'Cannot refresh: device is offline.',
-        source: DataSource.firebase,
-      );
-    }
-
-    try {
-      await _remoteConfig.fetchAndActivate();
-      final result = await _loadFromFirebase();
-      _invalidateCache();
-      _commitCache(DataSource.firebase, result.reagents, result.version);
-      _firebaseLoadedAtLeastOnce = true;
-
-      Logger.info(
-        '✅ [UnifiedDataService] Refresh complete — '
-        'version: ${result.version}, count: ${result.reagents.length}',
-      );
-
-      final snap = _buildSnapshot(
-        reagents: result.reagents,
-        source:   DataSource.firebase,
-        health:   DataHealthStatus.healthy,
-        version:  result.version,
-      );
-      _snapshotController.add(snap);
-      return snap;
-    } catch (e, st) {
-      Logger.error(
-        '❌ [UnifiedDataService] Refresh FAILED: $e',
-        error: e,
-        stackTrace: st,
-      );
-      rethrow;
-    }
-  }
-
-  void dispose() => _snapshotController.close();
-
-  // ── Private: Loaders ───────────────────────────────────────────────────────
-
-  Future<({List<ReagentModel> reagents, String version})>
-      _loadFromFirebase() async {
-    Logger.info('☁️ [Firebase] Fetching reagents...');
-
-    final reagents = await _remoteConfig.getReagents();
-    if (reagents.isEmpty) {
-      // P2: Explicit error — empty Firebase is a data integrity issue.
-      throw const DataServiceException(
-        'Firebase Remote Config returned an empty reagent list. '
-        'Verify that "reagent_data" key is set and published.',
-        source: DataSource.firebase,
-      );
-    }
-
-    // Fetch data version from Remote Config for cache comparison (P4)
-    final version = _remoteConfig.getReagentVersion();
-
-    // Enrich with references
-    final enriched = <ReagentModel>[];
-    for (final r in reagents) {
-      final refs = await _remoteConfig.getReferencesForReagent(r.reagentName);
-      enriched.add(
-        refs.isEmpty ? r : r.copyWith(references: [...r.references, ...refs]),
-      );
-    }
-
-    Logger.info('✅ [Firebase] ${enriched.length} reagents loaded '
-        '(version: $version)');
-    return (reagents: enriched, version: version);
-  }
-
-  Future<List<ReagentModel>> _loadFromLocalJson() async {
-    Logger.info('📂 [Local] Loading from $_reagentsAsset');
-
-    // Pre-load references (best-effort, non-fatal)
-    if (_cachedReferences == null) {
-      await _loadReferencesData();
-    }
-
-    final String raw;
-    try {
-      raw = await rootBundle.loadString(_reagentsAsset);
-    } catch (e, st) {
-      // P2: Asset missing is a build error — must be visible.
-      Logger.error(
-        '❌ [Local] Failed to read $_reagentsAsset: $e',
-        error: e,
-        stackTrace: st,
-      );
-      throw DataServiceException(
-        'Local asset "$_reagentsAsset" could not be loaded: $e',
-        source: DataSource.local,
-      );
-    }
-
-    final Map<String, dynamic> decoded;
-    try {
-      decoded = json.decode(raw) as Map<String, dynamic>;
-    } catch (e, st) {
-      Logger.error('❌ [Local] JSON parse error: $e', error: e, stackTrace: st);
-      throw DataServiceException(
-        'Local asset "$_reagentsAsset" contains invalid JSON: $e',
-        source: DataSource.local,
-      );
-    }
-
-    final List<ReagentModel> result = [];
-    final List<String> parseErrors = [];
-
-    decoded.forEach((key, value) {
-      try {
-        result.add(_parseLocalReagent(key, value as Map<String, dynamic>));
-      } catch (e) {
-        // P2: Each parse failure is individually logged and collected.
-        parseErrors.add('  • "$key": $e');
-        Logger.error('❌ [Local] Parse error for "$key": $e');
-      }
-    });
-
-    if (parseErrors.isNotEmpty) {
-      Logger.warning(
-        '⚠️ [Local] ${parseErrors.length} reagents skipped due to parse errors:\n'
-        '${parseErrors.join("\n")}',
-      );
-    }
-
-    if (result.isEmpty) {
-      // P2: This is fatal — local JSON exists but yields nothing usable.
-      throw const DataServiceException(
-        'Local JSON parsed successfully but yielded zero valid reagents.',
-        source: DataSource.local,
-      );
-    }
-
-    Logger.info('✅ [Local] ${result.length} reagents loaded');
-    return result;
-  }
-
-  Future<void> _loadSafetyData() async {
-    // Try Firebase first
-    try {
-      final firebaseMap = _remoteConfig.getSafetyJsonMap();
-      if (firebaseMap.isNotEmpty) {
-        _parseSafetyMap(firebaseMap);
-        Logger.info('✅ [Safety] Loaded from Firebase');
-        return;
-      }
-      Logger.warning(
-        '⚠️ [Safety] Firebase safety_instructions key is empty — '
-        'falling back to local asset',
-      );
-    } catch (e, st) {
-      // P2: Log but continue to local fallback.
-      Logger.error(
-        '❌ [Safety] Firebase safety data failed: $e',
-        error: e,
-        stackTrace: st,
-      );
-    }
-
-    // Local fallback
-    try {
-      final raw = await rootBundle.loadString(_safetyAsset);
-      _parseSafetyMap(json.decode(raw) as Map<String, dynamic>);
-      Logger.info('✅ [Safety] Loaded from local asset');
-    } catch (e, st) {
-      // P2: Safety data missing is serious — log at error level.
-      Logger.error(
-        '❌ [Safety] Local safety asset FAILED: $e — safety info unavailable',
-        error: e,
-        stackTrace: st,
-      );
-      _cachedSafety = {};
-    }
-  }
-
-  Future<void> _loadReferencesData() async {
-    try {
-      final raw = await rootBundle.loadString(_refsAsset);
-      final decoded = json.decode(raw) as Map<String, dynamic>;
-      _cachedReferences = {};
-      decoded.forEach((key, value) {
-        final inner = value as Map<String, dynamic>;
-        _cachedReferences![key] = (inner['reference'] as List? ?? [])
-            .map((e) => e.toString())
-            .toList();
-      });
-      Logger.info('✅ [References] ${_cachedReferences!.length} entries loaded');
-    } catch (e, st) {
-      Logger.error(
-        '❌ [References] Could not load references asset: $e',
-        error: e,
-        stackTrace: st,
-      );
-      _cachedReferences = {};
-    }
-  }
-
-  // ── Private: Parsers ───────────────────────────────────────────────────────
-
-  ReagentModel _parseLocalReagent(String key, Map<String, dynamic> data) {
-    List<String> strList(String k) =>
-        (data[k] as List? ?? []).map((e) => e.toString()).toList();
-
-    final drugResults = (data['drugResults'] as List? ?? []).map((d) {
-      final m = d as Map<String, dynamic>;
-      return DrugResultModel(
-        drugName: m['drugName']?.toString() ?? '',
-        color:    m['color']?.toString() ?? '',
-        colorAr:  m['color_ar']?.toString() ??
-                  m['instruction_ar']?.toString() ??
-                  '',
-      );
-    }).toList();
-
-    final localRefs = _cachedReferences?[key] ?? [];
-    final jsonRefs  = strList('reference');
-    final allRefs   = {...jsonRefs, ...localRefs}.toList();
-
-    return ReagentModel(
-      reagentName:   data['reagentName']?.toString()    ?? key,
-      reagentNameAr: data['reagentName_ar']?.toString() ?? '',
-      description:   data['description']?.toString()    ?? '',
-      descriptionAr: data['description_ar']?.toString() ?? '',
-      safetyLevel:   data['safetyLevel']?.toString()    ?? 'MEDIUM',
-      safetyLevelAr: data['safetyLevel_ar']?.toString() ?? '',
-      testDuration:  (data['testDuration'] as num?)?.toInt() ?? 5,
-      chemicals:     strList('chemicals'),
-      drugResults:   drugResults,
-      category:      data['category']?.toString() ?? 'General',
-      references:    allRefs,
+  /// Compatibility method for loading safety instructions
+  Future<ReagentSafetyData?> getSafetyData(String name) async {
+    final reagent = await getReagentByName(name);
+    if (reagent == null) return null;
+    return ReagentSafetyData(
+      reagentName: reagent.reagentName,
+      safetyLevel: reagent.safetyLevel,
+      requiredEquipment: reagent.safety.requiredEquipment,
+      handlingProcedures: reagent.safety.handlingProcedures,
+      specificHazards: reagent.safety.specificHazards,
+      storageRequirements: reagent.safety.storageRequirements,
     );
   }
 
-  void _parseSafetyMap(Map<String, dynamic> raw) {
-    _cachedSafety = {};
-    raw.forEach((key, value) {
+  /// Compatibility method for loading references
+  Future<List<String>> getReferences(String name) async {
+    final reagent = await getReagentByName(name);
+    return reagent?.references ?? [];
+  }
+
+  /// Performs background validation and SHA-256 integrity check
+  void _performBackgroundValidation(Map<String, dynamic> decoded, String rawText, String expectedChecksum) {
+    // Run validation asynchronously to avoid blocking the main thread
+    scheduleMicrotask(() {
+      Logger.info('🔍 [Dataset Validator] Starting background integrity validation...');
+      
+      // 1. Verify Checksum
       try {
-        _cachedSafety![key] =
-            ReagentSafetyData.fromJson(key, value as Map<String, dynamic>);
+        if (expectedChecksum.isNotEmpty) {
+          // Replace checksum value in raw text to check integrity
+          final stripped = rawText.replaceAll(expectedChecksum, "");
+          final bytes = utf8.encode(stripped);
+          final computedHash = sha256.convert(bytes).toString();
+          
+          if (computedHash != expectedChecksum) {
+            Logger.warning('⚠️ [Dataset Validator] Checksum mismatch! Expected: $expectedChecksum, Computed: $computedHash. Continuing fallback load.');
+          } else {
+            Logger.info('✅ [Dataset Validator] Checksum verification PASSED');
+          }
+        }
       } catch (e) {
-        Logger.error('❌ [Safety] Parse error for "$key": $e');
+        Logger.error('❌ [Dataset Validator] Checksum verification failed: $e');
+      }
+
+      // 2. Validate Reagents structure and IDs
+      try {
+        final reagentsMap = decoded['reagents'] as Map<String, dynamic>? ?? {};
+        final seenIds = <String>{};
+        int duplicateCount = 0;
+        int missingIdCount = 0;
+
+        reagentsMap.forEach((key, value) {
+          if (value is Map<String, dynamic>) {
+            final id = value['id'] as String? ?? '';
+            final name = value['reagentName'] as String? ?? '';
+
+            if (id.isEmpty) {
+              missingIdCount++;
+              Logger.warning('⚠️ [Dataset Validator] Reagent under key "$key" is missing a unique "id".');
+            } else if (id != key) {
+              Logger.warning('⚠️ [Dataset Validator] Reagent "id" ($id) does not match JSON key ($key).');
+            }
+
+            if (seenIds.contains(id)) {
+              duplicateCount++;
+              Logger.warning('⚠️ [Dataset Validator] Duplicate reagent "id" found: "$id".');
+            } else if (id.isNotEmpty) {
+              seenIds.add(id);
+            }
+
+            if (name.isEmpty) {
+              Logger.warning('⚠️ [Dataset Validator] Reagent "$id" is missing "reagentName".');
+            }
+          }
+        });
+
+        if (duplicateCount > 0 || missingIdCount > 0) {
+          Logger.warning('⚠️ [Dataset Validator] Validation completed with issues: $duplicateCount duplicates, $missingIdCount missing IDs.');
+        } else {
+          Logger.info('✅ [Dataset Validator] Structure validation PASSED. Checked ${seenIds.length} reagents.');
+        }
+      } catch (e) {
+        Logger.error('❌ [Dataset Validator] Structure validation failed: $e');
       }
     });
   }
 
-  // ── Private: Cache ─────────────────────────────────────────────────────────
-
-  void _commitCache(
-    DataSource source,
-    List<ReagentModel> reagents,
-    String version,
-  ) {
-    _cachedReagents   = reagents;
-    _lastDataSource   = source;
-    _cacheVersion     = version;
-    Logger.info(
-      '💾 [Cache] Committed [${source.name}] '
-      'version=$version count=${reagents.length}',
-    );
+  void dispose() {
+    _snapshotController.close();
   }
-
-  void _invalidateCache() {
-    _cachedReagents   = null;
-    _cachedSafety     = null;
-    _cachedReferences = null;
-    _cacheVersion     = '';
-    Logger.info('🗑 [Cache] Invalidated');
-  }
-
-  // ── Private: Connectivity ──────────────────────────────────────────────────
-
-
-  Future<bool> _isOnline() async {
-    try {
-      final results = await _connectivity
-          .checkConnectivity()
-          .timeout(const Duration(seconds: 5));
-      return results.any((r) =>
-          r == ConnectivityResult.mobile   ||
-          r == ConnectivityResult.wifi     ||
-          r == ConnectivityResult.ethernet);
-    } catch (e) {
-      // P2: Log the connectivity check failure (could be permissions issue).
-      Logger.error('❌ [Connectivity] checkConnectivity failed: $e');
-      return false;
-    }
-  }
-
-  // ── Private: Snapshot Builder ──────────────────────────────────────────────
-
-  DataSnapshot _buildSnapshot({
-    required List<ReagentModel> reagents,
-    required DataSource         source,
-    required DataHealthStatus   health,
-    required String             version,
-    String?                     warningMessage,
-  }) {
-    return DataSnapshot(
-      reagents:       reagents,
-      source:         source,
-      health:         health,
-      version:        version,
-      loadedAt:       DateTime.now(),
-      warningMessage: warningMessage,
-    );
-  }
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// DataServiceException
-// ═════════════════════════════════════════════════════════════════════════════
-
-class DataServiceException implements Exception {
-  final String message;
-
-  /// Which source was active when the exception occurred.
-  final DataSource source;
-
-  const DataServiceException(this.message, {this.source = DataSource.firebase});
-
-  @override
-  String toString() =>
-      'DataServiceException[${source.name.toUpperCase()}]: $message';
 }

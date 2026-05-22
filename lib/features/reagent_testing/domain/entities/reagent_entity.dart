@@ -1,6 +1,7 @@
 import 'drug_result_entity.dart';
 
 class ReagentEntity {
+  final String id;
   final String reagentName;
   final String reagentNameAr;
   final String description;
@@ -12,8 +13,13 @@ class ReagentEntity {
   final List<DrugResultEntity> drugResults;
   final String category;
   final List<String> references;
+  final List<String> safetyEquipment;
+  final List<String> safetyProcedures;
+  final List<String> safetyHazards;
+  final List<String> safetyStorage;
 
   const ReagentEntity({
+    this.id = '',
     required this.reagentName,
     required this.reagentNameAr,
     required this.description,
@@ -25,6 +31,10 @@ class ReagentEntity {
     required this.drugResults,
     required this.category,
     this.references = const [],
+    this.safetyEquipment = const [],
+    this.safetyProcedures = const [],
+    this.safetyHazards = const [],
+    this.safetyStorage = const [],
   });
 
   @override
@@ -41,7 +51,11 @@ class ReagentEntity {
         _listEquals(other.chemicals, chemicals) &&
         _listEquals(other.drugResults, drugResults) &&
         other.category == category &&
-        _listEquals(other.references, references);
+        _listEquals(other.references, references) &&
+        _listEquals(other.safetyEquipment, safetyEquipment) &&
+        _listEquals(other.safetyProcedures, safetyProcedures) &&
+        _listEquals(other.safetyHazards, safetyHazards) &&
+        _listEquals(other.safetyStorage, safetyStorage);
   }
 
   @override
@@ -56,7 +70,11 @@ class ReagentEntity {
         chemicals.hashCode ^
         drugResults.hashCode ^
         category.hashCode ^
-        references.hashCode;
+        references.hashCode ^
+        safetyEquipment.hashCode ^
+        safetyProcedures.hashCode ^
+        safetyHazards.hashCode ^
+        safetyStorage.hashCode;
   }
 
   bool _listEquals<T>(List<T> a, List<T> b) {
@@ -72,6 +90,6 @@ class ReagentEntity {
     return 'ReagentEntity(reagentName: $reagentName, description: $description, '
         'safetyLevel: $safetyLevel, testDuration: $testDuration, '
         'chemicals: $chemicals, drugResults: ${drugResults.length} results, '
-        'category: $category, references: ${references.length})';
+        'category: $category, references: ${references.length}, safetyEquipment: ${safetyEquipment.length})';
   }
 }

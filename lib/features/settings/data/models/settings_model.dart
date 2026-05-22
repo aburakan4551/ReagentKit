@@ -7,12 +7,14 @@ class SettingsModel {
   final String language;
   final bool pushNotificationsEnabled;
   final bool vibrationEnabled;
+  final bool researchMode;
 
   const SettingsModel({
     required this.themeMode,
     required this.language,
     required this.pushNotificationsEnabled,
     required this.vibrationEnabled,
+    required this.researchMode,
   });
 
   // Convert from Entity to Model
@@ -22,6 +24,7 @@ class SettingsModel {
       language: entity.language,
       pushNotificationsEnabled: entity.pushNotificationsEnabled,
       vibrationEnabled: entity.vibrationEnabled,
+      researchMode: entity.researchMode,
     );
   }
 
@@ -33,6 +36,7 @@ class SettingsModel {
       pushNotificationsEnabled:
           json['pushNotificationsEnabled'] as bool? ?? true,
       vibrationEnabled: json['vibrationEnabled'] as bool? ?? true,
+      researchMode: json['researchMode'] as bool? ?? false,
     );
   }
 
@@ -43,6 +47,7 @@ class SettingsModel {
       'language': language,
       'pushNotificationsEnabled': pushNotificationsEnabled,
       'vibrationEnabled': vibrationEnabled,
+      'researchMode': researchMode,
     };
   }
 
@@ -53,6 +58,7 @@ class SettingsModel {
       language: language,
       pushNotificationsEnabled: pushNotificationsEnabled,
       vibrationEnabled: vibrationEnabled,
+      researchMode: researchMode,
     );
   }
 
@@ -62,6 +68,7 @@ class SettingsModel {
       language: 'en',
       pushNotificationsEnabled: true,
       vibrationEnabled: true,
+      researchMode: false,
     );
   }
 
@@ -70,6 +77,7 @@ class SettingsModel {
     String? language,
     bool? pushNotificationsEnabled,
     bool? vibrationEnabled,
+    bool? researchMode,
   }) {
     return SettingsModel(
       themeMode: themeMode ?? this.themeMode,
@@ -77,6 +85,7 @@ class SettingsModel {
       pushNotificationsEnabled:
           pushNotificationsEnabled ?? this.pushNotificationsEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+      researchMode: researchMode ?? this.researchMode,
     );
   }
 
@@ -112,7 +121,8 @@ class SettingsModel {
         other.themeMode == themeMode &&
         other.language == language &&
         other.pushNotificationsEnabled == pushNotificationsEnabled &&
-        other.vibrationEnabled == vibrationEnabled;
+        other.vibrationEnabled == vibrationEnabled &&
+        other.researchMode == researchMode;
   }
 
   @override
@@ -120,6 +130,7 @@ class SettingsModel {
     return themeMode.hashCode ^
         language.hashCode ^
         pushNotificationsEnabled.hashCode ^
-        vibrationEnabled.hashCode;
+        vibrationEnabled.hashCode ^
+        researchMode.hashCode;
   }
 }

@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
-import '../../../data/services/safety_instructions_service.dart';
-import '../../providers/reagent_testing_providers.dart';
 
 enum SafetyIconType { equipment, procedures, hazards, storage }
 
-class SafetyInformationSection extends ConsumerWidget {
+class SafetyInformationSection extends StatelessWidget {
   final ReagentEntity reagent;
 
   const SafetyInformationSection({super.key, required this.reagent});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
@@ -55,17 +52,93 @@ class SafetyInformationSection extends ConsumerWidget {
   }
 }
 
-class _SafetyDetailsCard extends ConsumerWidget {
+class _SafetyDetailsCard extends StatelessWidget {
   final ReagentEntity reagent;
 
   const _SafetyDetailsCard({required this.reagent});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final safetyService = ref.read(safetyInstructionsServiceProvider);
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    final equipment = reagent.safetyEquipment.isNotEmpty 
+        ? reagent.safetyEquipment 
+        : (isArabic 
+            ? const [
+                "ضع نظارات أمان مقاومة للمواد الكيميائية",
+                "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+                "معطف مختبر بأكمام طويلة",
+                "أحذية مغلقة مقاومة للمواد الكيميائية",
+                "جهاز تنفس عند الضرورة"
+              ]
+            : const [
+                "Chemical-resistant safety goggles",
+                "Chemical-resistant gloves (nitrile or neoprene)",
+                "Lab coat with long sleeves",
+                "Closed-toe chemical-resistant shoes",
+                "Respirator when necessary"
+              ]);
+
+    final procedures = reagent.safetyProcedures.isNotEmpty
+        ? reagent.safetyProcedures
+        : (isArabic
+            ? const [
+                "العمل تحت غطاء الدخان إجباري",
+                "ارتداء قفازات مقاومة للأحماض",
+                "استخدام نظارات الأمان وواقي الوجه",
+                "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+                "استخدام قطرات صغيرة فقط",
+                "عدم خلط الكاشف مباشرة مع الماء"
+              ]
+            : const [
+                "Work under fume hood mandatory",
+                "Wear acid-resistant gloves",
+                "Use safety goggles and face shield",
+                "Keep sodium bicarbonate handy for neutralization",
+                "Use only small drops",
+                "Never mix reagent directly with water"
+              ]);
+
+    final hazards = reagent.safetyHazards.isNotEmpty
+        ? reagent.safetyHazards
+        : (isArabic
+            ? const [
+                "شديد التآكل - يحتوي على حمض الكبريتيك المركز",
+                "يسبب حروق كيميائية شديدة",
+                "أبخرة خطيرة - الفورمالديهايد",
+                "تفاعل طارد للحرارة"
+              ]
+            : const [
+                "Highly corrosive - contains concentrated sulfuric acid",
+                "Causes severe chemical burns",
+                "Dangerous fumes - formaldehyde",
+                "Exothermic reaction"
+              ]);
+
+    final storage = reagent.safetyStorage.isNotEmpty
+        ? reagent.safetyStorage
+        : (isArabic
+            ? const [
+                "التخزين في مكان بارد وجاف",
+                "بعيداً عن المواد القابلة للاشتعال",
+                "في خزانة تخزين أحماض مخصصة",
+                "وضع ملصق تحذيري واضح"
+              ]
+            : const [
+                "Store in cool, dry place",
+                "Away from flammable materials",
+                "In dedicated acid storage cabinet",
+                "Label with clear warning"
+              ]);
+
+    final safetyData = SafetyData(
+      equipment: equipment,
+      handlingProcedures: procedures,
+      specificHazards: hazards,
+      storage: storage,
+    );
 
     return Card(
       elevation: 0,
@@ -75,51 +148,13 @@ class _SafetyDetailsCard extends ConsumerWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: FutureBuilder<SafetyData>(
-          future: _loadSafetyData(safetyService, reagent.reagentName, isArabic),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const _LoadingState();
-            }
-
-            if (snapshot.hasError || !snapshot.hasData) {
-              return _ErrorState(l10n: l10n, theme: theme);
-            }
-
-            return _SafetyContent(safetyData: snapshot.data!, l10n: l10n);
-          },
-        ),
+        child: _SafetyContent(safetyData: safetyData, l10n: l10n),
       ),
-    );
-  }
-
-  Future<SafetyData> _loadSafetyData(
-    SafetyInstructionsService safetyService,
-    String reagentName,
-    bool isArabic,
-  ) async {
-    final results = await Future.wait<List<String>>([
-      safetyService.getEquipmentForReagent(reagentName, isArabic: isArabic),
-      safetyService.getHandlingProceduresForReagent(
-        reagentName,
-        isArabic: isArabic,
-      ),
-      safetyService.getSpecificHazardsForReagent(
-        reagentName,
-        isArabic: isArabic,
-      ),
-      safetyService.getStorageForReagent(reagentName, isArabic: isArabic),
-    ]);
-
-    return SafetyData(
-      equipment: results[0],
-      handlingProcedures: results[1],
-      specificHazards: results[2],
-      storage: results[3],
     );
   }
 }
 
+// ignore: unused_element
 class _LoadingState extends StatelessWidget {
   const _LoadingState();
 
@@ -134,6 +169,7 @@ class _LoadingState extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ErrorState extends StatelessWidget {
   final AppLocalizations l10n;
   final ThemeData theme;

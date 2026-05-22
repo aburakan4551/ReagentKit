@@ -6,6 +6,7 @@ import '../widgets/reagent_detail/reagent_header_card.dart';
 import '../widgets/reagent_detail/safety_information_section.dart';
 import '../widgets/reagent_detail/chemical_components_section.dart';
 import '../widgets/reagent_detail/test_instructions_section.dart';
+import '../widgets/reagent_detail/scientific_references_section.dart';
 import '../widgets/reagent_detail/safety_acknowledgment_section.dart';
 import '../widgets/reagent_detail/start_test_button.dart';
 
@@ -59,6 +60,8 @@ class ReagentDetailBody extends ConsumerWidget {
                     ChemicalComponentsSection(reagent: reagent),
                     const SizedBox(height: 24),
                     TestInstructionsSection(reagent: reagent),
+                    const SizedBox(height: 24),
+                    ScientificReferencesSection(reagent: reagent),
                     const SizedBox(height: 24),
                     SafetyAcknowledgmentSection(reagent: reagent),
                     const SizedBox(height: 24), // Space for bottom button

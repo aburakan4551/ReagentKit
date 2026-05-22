@@ -67,6 +67,14 @@ final vibrationEnabledProvider = Provider<bool>((ref) {
   return true; // Default
 });
 
+final researchModeEnabledProvider = Provider<bool>((ref) {
+  final settingsState = ref.watch(settingsControllerProvider);
+  if (settingsState is SettingsLoaded) {
+    return settingsState.settings.researchMode;
+  }
+  return false; // Default
+});
+
 final localeProvider = Provider<Locale>((ref) {
   final SettingsState settingsState = ref.watch(settingsControllerProvider);
   if (settingsState is SettingsLoaded) {

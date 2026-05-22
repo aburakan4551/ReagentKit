@@ -5,12 +5,14 @@ class SettingsEntity {
   final String language;
   final bool pushNotificationsEnabled;
   final bool vibrationEnabled;
+  final bool researchMode;
 
   const SettingsEntity({
     required this.themeMode,
     required this.language,
     required this.pushNotificationsEnabled,
     required this.vibrationEnabled,
+    this.researchMode = false,
   });
 
   SettingsEntity copyWith({
@@ -18,6 +20,7 @@ class SettingsEntity {
     String? language,
     bool? pushNotificationsEnabled,
     bool? vibrationEnabled,
+    bool? researchMode,
   }) {
     return SettingsEntity(
       themeMode: themeMode ?? this.themeMode,
@@ -25,6 +28,7 @@ class SettingsEntity {
       pushNotificationsEnabled:
           pushNotificationsEnabled ?? this.pushNotificationsEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
+      researchMode: researchMode ?? this.researchMode,
     );
   }
 
@@ -36,7 +40,8 @@ class SettingsEntity {
         other.themeMode == themeMode &&
         other.language == language &&
         other.pushNotificationsEnabled == pushNotificationsEnabled &&
-        other.vibrationEnabled == vibrationEnabled;
+        other.vibrationEnabled == vibrationEnabled &&
+        other.researchMode == researchMode;
   }
 
   @override
@@ -44,6 +49,7 @@ class SettingsEntity {
     return themeMode.hashCode ^
         language.hashCode ^
         pushNotificationsEnabled.hashCode ^
-        vibrationEnabled.hashCode;
+        vibrationEnabled.hashCode ^
+        researchMode.hashCode;
   }
 }
