@@ -42,7 +42,7 @@ class _DisclaimerDialogContent extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 30,
               offset: const Offset(0, 12),
             ),
@@ -60,8 +60,8 @@ class _DisclaimerDialogContent extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.amber.withOpacity(0.2),
-                    Colors.orange.withOpacity(0.2),
+                    Colors.amber.withValues(alpha: 0.2),
+                    Colors.orange.withValues(alpha: 0.2),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(36),

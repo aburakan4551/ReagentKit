@@ -58,7 +58,7 @@ class ResultsPage extends StatelessWidget {
               elevation: 2,
               shadowColor: theme.brightness == Brightness.dark 
                   ? Colors.transparent 
-                  : theme.colorScheme.shadow.withOpacity(0.05),
+                  : theme.colorScheme.shadow.withValues(alpha: 0.05),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(color: theme.dividerColor),

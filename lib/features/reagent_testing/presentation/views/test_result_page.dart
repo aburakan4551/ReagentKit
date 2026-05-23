@@ -165,11 +165,11 @@ class _ModernResultView extends ConsumerWidget {
                 end: Alignment.bottomCenter,
                 colors: theme.brightness == Brightness.dark
                     ? [
-                        theme.colorScheme.surface.withOpacity(0.8),
+                        theme.colorScheme.surface.withValues(alpha: 0.8),
                         theme.scaffoldBackgroundColor,
                       ]
                     : [
-                        theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+                        theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                         theme.colorScheme.surface,
                       ],
               ),
@@ -244,7 +244,7 @@ class _ModernResultView extends ConsumerWidget {
                       BoxShadow(
                         color: theme.brightness == Brightness.dark
                             ? Colors.transparent
-                            : theme.colorScheme.shadow.withOpacity(0.03),
+                            : theme.colorScheme.shadow.withValues(alpha: 0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -310,7 +310,7 @@ class _ModernResultView extends ConsumerWidget {
                       BoxShadow(
                         color: theme.brightness == Brightness.dark
                             ? Colors.transparent
-                            : theme.colorScheme.shadow.withOpacity(0.03),
+                            : theme.colorScheme.shadow.withValues(alpha: 0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -330,7 +330,7 @@ class _ModernResultView extends ConsumerWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.shadow.withOpacity(0.2),
+                              color: theme.colorScheme.shadow.withValues(alpha: 0.2),
                               blurRadius: 4,
                             ),
                           ],
@@ -371,13 +371,13 @@ class _ModernResultView extends ConsumerWidget {
                       color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
                       ),
                       boxShadow: [
                         BoxShadow(
                           color: theme.brightness == Brightness.dark
                               ? Colors.transparent
-                              : theme.colorScheme.shadow.withOpacity(0.03),
+                              : theme.colorScheme.shadow.withValues(alpha: 0.03),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -413,7 +413,7 @@ class _ModernResultView extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFFF87171).withOpacity(0.2)
+                          ? const Color(0xFFF87171).withValues(alpha: 0.2)
                           : const Color(0xFFFCA5A5),
                     ),
                   ),
@@ -447,7 +447,7 @@ class _ModernResultView extends ConsumerWidget {
                         style: AppTypography.getCaption(context).copyWith(height: 1.4),
                       ),
                       Divider(
-                        color: Theme.of(context).dividerColor.withOpacity(0.12),
+                        color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
                         height: 16,
                       ),
                       Text(
@@ -504,7 +504,7 @@ class _ModernResultView extends ConsumerWidget {
           ),
           circularStrokeCap: CircularStrokeCap.round,
           progressColor: accentColor,
-          backgroundColor: accentColor.withOpacity(0.1),
+          backgroundColor: accentColor.withValues(alpha: 0.1),
         ),
         const SizedBox(height: 8),
         Text(
@@ -601,7 +601,7 @@ class _SubstanceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(HeroIcons.beaker, size: 18, color: theme.colorScheme.primary),
@@ -682,14 +682,14 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                   children: [
                     Icon(
                       HeroIcons.information_circle, 
-                      color: theme.colorScheme.onSurface.withOpacity(0.38),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.noReferencesAvailable,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface.withOpacity(0.38),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
                         ),
                       ),
                     ),
@@ -729,7 +729,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withOpacity(0.1),
+                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -745,7 +745,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                               icon: Icon(
                                 HeroIcons.clipboard, 
                                 size: 18, 
-                                color: theme.colorScheme.onSurface.withOpacity(0.54),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.54),
                               ),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: apaString));

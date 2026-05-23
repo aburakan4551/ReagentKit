@@ -110,7 +110,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     theme.colorScheme.surfaceContainerLowest,
                     Color.lerp(
                           theme.colorScheme.surfaceContainerLow,
-                          theme.colorScheme.primary.withOpacity(0.22),
+                          theme.colorScheme.primary.withValues(alpha: 0.22),
                           0.55,
                         ) ??
                         theme.colorScheme.surfaceContainerLow,
@@ -186,10 +186,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.6),
+            color: theme.colorScheme.surface.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: theme.colorScheme.onSurface.withOpacity(0.1),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
               width: 1.5,
             ),
           ),
@@ -431,9 +431,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: theme.colorScheme.error.withOpacity(0.1),
+        color: theme.colorScheme.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.error.withOpacity(0.5)),
+        border: Border.all(color: theme.colorScheme.error.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -462,9 +462,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: successColor.withOpacity(0.1),
+        color: successColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: successColor.withOpacity(0.3)),
+        border: Border.all(color: successColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

@@ -61,24 +61,24 @@ class StatusBadgeTheme extends ThemeExtension<StatusBadgeTheme> {
   }
 
   static StatusBadgeTheme get dark => StatusBadgeTheme(
-    successBg: AppColors.statusSuccess.withOpacity(0.15),
+    successBg: AppColors.statusSuccess.withValues(alpha: 0.15),
     successText: AppColors.statusSuccess,
-    warningBg: AppColors.statusWarning.withOpacity(0.15),
+    warningBg: AppColors.statusWarning.withValues(alpha: 0.15),
     warningText: AppColors.statusWarning,
-    errorBg: AppColors.statusError.withOpacity(0.15),
+    errorBg: AppColors.statusError.withValues(alpha: 0.15),
     errorText: AppColors.statusError,
-    infoBg: AppColors.statusInfo.withOpacity(0.15),
+    infoBg: AppColors.statusInfo.withValues(alpha: 0.15),
     infoText: AppColors.statusInfo,
   );
   
   static StatusBadgeTheme get light => StatusBadgeTheme(
-    successBg: AppColors.lightStatusSuccess.withOpacity(0.1),
+    successBg: AppColors.lightStatusSuccess.withValues(alpha: 0.1),
     successText: AppColors.lightStatusSuccess,
-    warningBg: AppColors.lightStatusWarning.withOpacity(0.1),
+    warningBg: AppColors.lightStatusWarning.withValues(alpha: 0.1),
     warningText: AppColors.lightStatusWarning,
-    errorBg: AppColors.lightStatusError.withOpacity(0.1),
+    errorBg: AppColors.lightStatusError.withValues(alpha: 0.1),
     errorText: AppColors.lightStatusError,
-    infoBg: AppColors.lightStatusInfo.withOpacity(0.1),
+    infoBg: AppColors.lightStatusInfo.withValues(alpha: 0.1),
     infoText: AppColors.lightStatusInfo,
   );
 }

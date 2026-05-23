@@ -92,7 +92,7 @@ class _AdaptiveTextFieldState extends State<AdaptiveTextField> {
             boxShadow: [
               BoxShadow(
                 color: _hasFocus
-                    ? theme.colorScheme.primary.withOpacity(0.12)
+                    ? theme.colorScheme.primary.withValues(alpha: 0.12)
                     : Colors.transparent,
                 blurRadius: 8,
                 spreadRadius: 1,

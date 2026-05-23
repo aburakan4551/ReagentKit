@@ -154,10 +154,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.08),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withOpacity(0.2),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -188,7 +188,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     textInputAction: TextInputAction.done,
                     labelText: l10n.email,
                     hintText: l10n.enterEmailToReset,
-                    prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withOpacity(0.7)),
+                    prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return l10n.pleaseEnterEmail;
@@ -326,10 +326,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.2),
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -442,7 +442,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -453,7 +453,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -502,7 +502,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -517,7 +517,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               AdaptiveTextField(
                 controller: _usernameController,
                 labelText: l10n.username,
-                prefixIcon: Icon(HeroIcons.user, color: theme.colorScheme.primary.withOpacity(0.7)),
+                prefixIcon: Icon(HeroIcons.user, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return l10n.pleaseEnterUsername;
@@ -536,7 +536,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             AdaptiveTextField(
               controller: _emailController,
               labelText: l10n.emailAddress,
-              prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withOpacity(0.7)),
+              prefixIcon: Icon(HeroIcons.envelope, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -554,7 +554,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             AdaptiveTextField(
               controller: _passwordController,
               labelText: l10n.password,
-              prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withOpacity(0.7)),
+              prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
               obscureText: !_isPasswordVisible,
               suffixIcon: IconButton(
                 icon: Icon(
@@ -583,7 +583,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               AdaptiveTextField(
                 controller: _confirmPasswordController,
                 labelText: l10n.confirmPassword,
-                prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withOpacity(0.7)),
+                prefixIcon: Icon(HeroIcons.lock_closed, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
                 obscureText: !_isConfirmPasswordVisible,
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -656,7 +656,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -773,10 +773,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFF6B6B).withOpacity(0.3),
+          color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
           width: 1.5,
         ),
-        color: const Color(0xFFFF6B6B).withOpacity(isDarkMode ? 0.05 : 0.02),
+        color: const Color(0xFFFF6B6B).withValues(alpha: isDarkMode ? 0.05 : 0.02),
       ),
       child: TextButton.icon(
         onPressed: _signOut,
@@ -835,7 +835,7 @@ class ProfileHeaderCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -893,7 +893,7 @@ class ProfileHeaderCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -927,7 +927,7 @@ class ProfileHeaderCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryAccent.withOpacity(0.2),
+                    color: AppColors.primaryAccent.withValues(alpha: 0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -952,7 +952,7 @@ class ProfileHeaderCard extends StatelessWidget {
                         Text(
                           'Unlimited scans and advanced reports active.',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 12,
                           ),
                         ),
@@ -1103,7 +1103,7 @@ class ActivityCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -1153,7 +1153,7 @@ class ActivityCard extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: color.withOpacity(0.3),
+                                  color: color.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 )
@@ -1216,10 +1216,10 @@ class SafetyReminderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: warningColor.withOpacity(isDarkMode ? 0.06 : 0.03),
+        color: warningColor.withValues(alpha: isDarkMode ? 0.06 : 0.03),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: warningColor.withOpacity(0.25),
+          color: warningColor.withValues(alpha: 0.25),
           width: 1,
         ),
       ),
@@ -1231,7 +1231,7 @@ class SafetyReminderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: warningColor.withOpacity(0.12),
+                  color: warningColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -1302,7 +1302,7 @@ class AccountInfoCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -1353,7 +1353,7 @@ class AccountInfoCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: theme.colorScheme.primary, size: 20),

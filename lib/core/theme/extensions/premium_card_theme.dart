@@ -56,8 +56,8 @@ class PremiumCardTheme extends ThemeExtension<PremiumCardTheme> {
     iconColor: AppColors.primaryAccent,
     textColor: Colors.white,
     gradientColors: [
-      AppColors.primaryAccent.withOpacity(0.15),
-      AppColors.secondaryAccent.withOpacity(0.15),
+      AppColors.primaryAccent.withValues(alpha: 0.15),
+      AppColors.secondaryAccent.withValues(alpha: 0.15),
     ],
   );
   
@@ -66,8 +66,8 @@ class PremiumCardTheme extends ThemeExtension<PremiumCardTheme> {
     iconColor: AppColors.lightPrimaryAccent,
     textColor: AppColors.lightTextPrimary,
     gradientColors: [
-      AppColors.lightPrimaryAccent.withOpacity(0.08),
-      AppColors.lightSecondaryAccent.withOpacity(0.08),
+      AppColors.lightPrimaryAccent.withValues(alpha: 0.08),
+      AppColors.lightSecondaryAccent.withValues(alpha: 0.08),
     ],
   );
 }

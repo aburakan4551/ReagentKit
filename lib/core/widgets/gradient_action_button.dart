@@ -76,8 +76,8 @@ class _GradientActionButtonState extends State<GradientActionButton>
                   theme.colorScheme.secondary,
                 ]
               : [
-                  theme.colorScheme.onSurface.withOpacity(0.12),
-                  theme.colorScheme.onSurface.withOpacity(0.08),
+                  theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                  theme.colorScheme.onSurface.withValues(alpha: 0.08),
                 ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -85,7 +85,7 @@ class _GradientActionButtonState extends State<GradientActionButton>
 
     final textColor = widget.onPressed != null
         ? Colors.white
-        : theme.colorScheme.onSurface.withOpacity(0.38);
+        : theme.colorScheme.onSurface.withValues(alpha: 0.38);
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -102,7 +102,7 @@ class _GradientActionButtonState extends State<GradientActionButton>
             boxShadow: widget.onPressed != null && !widget.isLoading
                 ? [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.24),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.24),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),

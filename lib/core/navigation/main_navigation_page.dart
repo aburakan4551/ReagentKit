@@ -91,15 +91,15 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
                 child: Container(
                   height: 72,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surface.withOpacity(0.6),
+                    color: theme.colorScheme.surface.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
-                      color: theme.colorScheme.outline.withOpacity(0.2),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
                       width: 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -140,7 +140,7 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isSelected 
-                ? theme.colorScheme.primary.withOpacity(0.15) 
+                ? theme.colorScheme.primary.withValues(alpha: 0.15) 
                 : Colors.transparent,
             shape: BoxShape.circle,
           ),
@@ -149,7 +149,7 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
             size: isSelected ? 28 : 24,
             color: isSelected 
                 ? theme.colorScheme.primary 
-                : theme.colorScheme.onSurface.withOpacity(0.5),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -189,7 +189,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.12),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -290,7 +290,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    disabledBackgroundColor: theme.dividerColor.withOpacity(0.12),
+                    disabledBackgroundColor: theme.dividerColor.withValues(alpha: 0.12),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -301,7 +301,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: _isChecked ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.38),
+                      color: _isChecked ? Colors.white : theme.colorScheme.onSurface.withValues(alpha: 0.38),
                     ),
                   ),
                 ),

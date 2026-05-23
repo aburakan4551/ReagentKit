@@ -141,10 +141,10 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isError
-                      ? const Color(0xFFFCA5A5).withOpacity(0.3) // Light red border
+                      ? const Color(0xFFFCA5A5).withValues(alpha: 0.3) // Light red border
                       : const Color(
                           0xFF86EFAC,
-                        ).withOpacity(0.3), // Light green border
+                        ).withValues(alpha: 0.3), // Light green border
                   width: 1,
                 ),
                 boxShadow: [
@@ -153,7 +153,7 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                         (isError
                                 ? const Color(0xFFEF4444)
                                 : const Color(0xFF10B981))
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -168,7 +168,7 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                           (isError
                                   ? const Color(0xFFEF4444)
                                   : const Color(0xFF10B981))
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -205,7 +205,7 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                             (isError
                                     ? const Color(0xFFEF4444)
                                     : const Color(0xFF10B981))
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(

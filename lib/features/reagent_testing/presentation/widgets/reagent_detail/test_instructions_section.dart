@@ -32,7 +32,7 @@ class TestInstructionsSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.tertiary.withOpacity(0.12),
+            color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

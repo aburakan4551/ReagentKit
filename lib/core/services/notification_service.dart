@@ -213,12 +213,12 @@ class _NotificationContent extends StatelessWidget {
         color: _getBackgroundColor(type),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: _getBorderColor(type).withOpacity(0.3),
+          color: _getBorderColor(type).withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -229,7 +229,7 @@ class _NotificationContent extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _getBorderColor(type).withOpacity(0.1),
+              color: _getBorderColor(type).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -257,7 +257,7 @@ class _NotificationContent extends StatelessWidget {
                 Text(
                   message,
                   style: TextStyle(
-                    color: _getTextColor(type).withOpacity(0.8),
+                    color: _getTextColor(type).withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -270,7 +270,7 @@ class _NotificationContent extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: _getBorderColor(type).withOpacity(0.1),
+                color: _getBorderColor(type).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
