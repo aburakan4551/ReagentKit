@@ -164,9 +164,9 @@ class _ModernResultView extends ConsumerWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: theme.brightness == Brightness.dark
-                    ? const [
-                        Color(0xFF131722),
-                        Color(0xFF0F1115),
+                    ? [
+                        theme.colorScheme.surface.withOpacity(0.8),
+                        theme.scaffoldBackgroundColor,
                       ]
                     : [
                         theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
@@ -235,30 +235,20 @@ class _ModernResultView extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF161B22)
-                        : Colors.white,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white.withOpacity(0.08)
-                          : const Color(0xFFE6E8F0),
+                      color: theme.dividerColor,
                     ),
-                    boxShadow: theme.brightness == Brightness.dark
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.transparent
+                            : theme.colorScheme.shadow.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,9 +256,7 @@ class _ModernResultView extends ConsumerWidget {
                       Text(
                         isAr ? 'المركبات المحتملة المرصودة:' : 'Possible Substances Detected:',
                         style: AppTypography.getMetadataLabel(context,
-                          color: theme.brightness == Brightness.dark
-                              ? AppColors.textSecondary
-                              : AppColors.lightTextSecondary,
+                          color: theme.colorScheme.onSurfaceVariant,
                           isBold: true,
                         ),
                       ),
@@ -286,17 +274,13 @@ class _ModernResultView extends ConsumerWidget {
                         ),
                       if (testResult.notes != null && testResult.notes!.isNotEmpty) ...[
                         Divider(
-                          color: theme.brightness == Brightness.dark
-                              ? Colors.white10
-                              : const Color(0xFFE6E8F0),
+                          color: theme.dividerColor,
                           height: 24,
                         ),
                         Text(
                           isAr ? 'التفاصيل والتحليل:' : 'Analysis Details:',
                           style: AppTypography.getMetadataLabel(context,
-                            color: theme.brightness == Brightness.dark
-                                ? AppColors.textSecondary
-                                : AppColors.lightTextSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                             isBold: true,
                           ),
                         ),
@@ -317,30 +301,20 @@ class _ModernResultView extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF161B22)
-                        : Colors.white,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white.withOpacity(0.08)
-                          : const Color(0xFFE6E8F0),
+                      color: theme.dividerColor,
                     ),
-                    boxShadow: theme.brightness == Brightness.dark
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ]
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.transparent
+                            : theme.colorScheme.shadow.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
                   child: Row(
                     children: [
@@ -351,14 +325,12 @@ class _ModernResultView extends ConsumerWidget {
                           color: _parseHexColor(testResult.observedHex, testResult.observedColor),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.white24
-                                : const Color(0xFFE6E8F0),
+                            color: theme.dividerColor,
                             width: 2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: theme.colorScheme.shadow.withOpacity(0.2),
                               blurRadius: 4,
                             ),
                           ],
@@ -372,9 +344,7 @@ class _ModernResultView extends ConsumerWidget {
                             Text(
                               isAr ? 'اللون المرصود بالتحليل' : 'Observed Color Reaction',
                               style: AppTypography.getMetadataLabel(context,
-                                color: theme.brightness == Brightness.dark
-                                    ? AppColors.textSecondary
-                                    : AppColors.lightTextSecondary,
+                                color: theme.colorScheme.onSurfaceVariant,
                                 isBold: true,
                               ),
                             ),
@@ -398,28 +368,20 @@ class _ModernResultView extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF161B22)
-                          : Colors.white,
+                      color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: theme.colorScheme.primary.withOpacity(0.3),
                       ),
-                      boxShadow: theme.brightness == Brightness.dark
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ]
-                          : [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.transparent
+                              : theme.colorScheme.shadow.withOpacity(0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
                     ),
                     child: Table(
                       columnWidths: const {
@@ -489,7 +451,7 @@ class _ModernResultView extends ConsumerWidget {
                         height: 16,
                       ),
                       Text(
-                        'التفسيرات الناتجة عن هذا التطبيق هي ملاحظات تحليلية احتمالية وليست استنتاجات علمية معتمدة. هذا التطبيق مخصص فقط لسير العمل التعليمي والتحليلي ودعم الأبحاث.',
+                        'النتائج المعروضة هي تفسيرات تحليلية احتمالية لأغراض تعليمية وبحثية فقط، ولا تمثل نتائج علمية أو مخبرية معتمدة.',
                         style: AppTypography.getCaption(context).copyWith(height: 1.4),
                         textAlign: TextAlign.right,
                       ),
@@ -526,7 +488,6 @@ class _ModernResultView extends ConsumerWidget {
     required String label,
     required Color accentColor,
   }) {
-    final theme = Theme.of(context);
     final percentVal = percentage.clamp(0.0, 1.0);
     return Column(
       children: [
@@ -584,9 +545,7 @@ class _ModernResultView extends ConsumerWidget {
           child: Text(
             label,
             style: AppTypography.getMetadataLabel(context,
-              color: theme.brightness == Brightness.dark
-                  ? AppColors.textSecondary
-                  : AppColors.lightTextSecondary,
+              color: theme.colorScheme.onSurfaceVariant,
               isBold: true,
             ),
           ),
@@ -713,14 +672,10 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark
-                      ? const Color(0xFF161B22)
-                      : Colors.white,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white.withOpacity(0.08)
-                        : const Color(0xFFE6E8F0),
+                    color: theme.dividerColor,
                   ),
                 ),
                 child: Row(
@@ -756,15 +711,11 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                 return Card(
                   margin: EdgeInsets.zero,
                   elevation: 0,
-                  color: theme.brightness == Brightness.dark
-                      ? const Color(0xFF161B22)
-                      : Colors.white,
+                  color: theme.colorScheme.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                     side: BorderSide(
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white.withOpacity(0.08)
-                          : const Color(0xFFE6E8F0),
+                      color: theme.dividerColor,
                     ),
                   ),
                   child: Padding(

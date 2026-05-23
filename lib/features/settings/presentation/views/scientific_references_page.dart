@@ -199,24 +199,18 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                                 onPressed: () => _searchController.clear(),
                               )
                             : null,
-                        fillColor: theme.brightness == Brightness.dark
-                            ? const Color(0xFF161B22)
-                            : Colors.white,
+                        fillColor: theme.colorScheme.surface,
                         filled: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.white.withOpacity(0.08)
-                                : const Color(0xFFE6E8F0),
+                            color: theme.dividerColor,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.white.withOpacity(0.08)
-                                : const Color(0xFFE6E8F0),
+                            color: theme.dividerColor,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
@@ -241,7 +235,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                                 cat == 'All' ? (isAr ? 'الكل' : 'All') : cat,
                                 style: TextStyle(
                                   color: isSelected 
-                                      ? Colors.white 
+                                      ? theme.colorScheme.onPrimary 
                                       : theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -256,17 +250,15 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                                 }
                               },
                               selectedColor: theme.colorScheme.primary,
-                              backgroundColor: theme.brightness == Brightness.dark
-                                  ? const Color(0xFF161B22)
-                                  : Colors.white,
-                              side: BorderSide(
-                                color: isSelected 
-                                    ? Colors.transparent 
-                                    : (theme.brightness == Brightness.dark 
-                                        ? Colors.white.withOpacity(0.08)
-                                        : const Color(0xFFE6E8F0)),
+                              backgroundColor: theme.colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: isSelected 
+                                      ? Colors.transparent 
+                                      : theme.dividerColor,
+                                ),
                               ),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           );
                         }).toList(),
@@ -310,15 +302,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: theme.brightness == Brightness.dark
-                    ? const Color(0xFF161B22)
-                    : Colors.white,
+                color: theme.colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.brightness == Brightness.dark
-                      ? Colors.white.withOpacity(0.04)
-                      : const Color(0xFFE6E8F0),
-                ),
               ),
               child: Icon(
                 HeroIcons.book_open,
@@ -373,24 +358,11 @@ class _ReagentReferenceCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark
-            ? const Color(0xFF161B22)
-            : Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.08)
-              : const Color(0xFFE6E8F0),
+          color: theme.dividerColor,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.brightness == Brightness.dark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,9 +409,7 @@ class _ReagentReferenceCard extends StatelessWidget {
             ),
           ),
           Divider(
-            color: theme.brightness == Brightness.dark
-                ? Colors.white10
-                : const Color(0xFFE6E8F0),
+            color: theme.dividerColor,
             height: 1,
           ),
           // References List
@@ -458,15 +428,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF0F1115)
-                        : const Color(0xFFF8F9FC),
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white.withOpacity(0.04)
-                          : const Color(0xFFE6E8F0),
-                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,9 +469,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                                     isAr ? 'تم نسخ المرجع بنجاح!' : 'Reference copied successfully!',
                                     style: TextStyle(color: theme.colorScheme.onSurface),
                                   ),
-                                  backgroundColor: theme.brightness == Brightness.dark
-                                      ? const Color(0xFF161B22)
-                                      : theme.colorScheme.surfaceContainer,
+                                  backgroundColor: theme.colorScheme.surfaceContainer,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),

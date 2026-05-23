@@ -4,6 +4,7 @@ import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/utils/localization_helper.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/auto_size_text.dart';
 
 class ReagentHeaderCard extends StatelessWidget {
   final ReagentEntity reagent;
@@ -68,8 +69,11 @@ class ReagentHeaderCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        AutoSizeText(
           LocalizationHelper.getLocalizedReagentName(context, reagent),
+          maxLines: 2,
+          minFontSize: 12,
+          overflow: TextOverflow.ellipsis,
           style: AppTypography.getSectionTitle(context).copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -93,12 +97,14 @@ class ReagentHeaderCard extends StatelessWidget {
     return Column(
       children: [
         _buildMetadataChip(
+          context,
           theme,
           HeroIcons.clock, // Duration icon from HeroIcons
           l10n.duration(reagent.testDuration.toString()),
         ),
         const SizedBox(height: 8),
         _buildMetadataChip(
+          context,
           theme,
           HeroIcons.tag, // Category icon from HeroIcons
           '${l10n.category}: ${_translateCategory(reagent.category, l10n)}',
@@ -107,7 +113,7 @@ class ReagentHeaderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMetadataChip(ThemeData theme, IconData icon, String text) {
+  Widget _buildMetadataChip(BuildContext context, ThemeData theme, IconData icon, String text) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

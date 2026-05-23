@@ -67,7 +67,9 @@ class ReagentCard extends StatelessWidget {
   }
 
   Widget _buildIcon(BuildContext context) {
-    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? StatusBadgeTheme.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? 
+        (isDarkMode ? StatusBadgeTheme.dark : StatusBadgeTheme.light);
     Color iconBackgroundColor;
     Color iconColor;
     
@@ -104,7 +106,9 @@ class ReagentCard extends StatelessWidget {
   }
 
   Widget _buildSafetyBadge(BuildContext context) {
-    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? StatusBadgeTheme.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? 
+        (isDarkMode ? StatusBadgeTheme.dark : StatusBadgeTheme.light);
     Color badgeBgColor;
     Color badgeTextColor;
     String level = reagent.safetyLevel.toUpperCase();

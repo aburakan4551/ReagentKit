@@ -128,13 +128,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
     // Background gradient depending on dark/light theme
     final backgroundGradient = isDarkMode
-        ? const LinearGradient(
-            colors: [Color(0xFF0F1115), Color(0xFF161B22)],
+        ? LinearGradient(
+            colors: [theme.scaffoldBackgroundColor, theme.colorScheme.surface],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )
-        : const LinearGradient(
-            colors: [Color(0xFFF8FAFC), Color(0xFFF1F5F9)],
+        : LinearGradient(
+            colors: [theme.scaffoldBackgroundColor, theme.colorScheme.surfaceContainerHighest.withOpacity(0.5)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           );
@@ -428,12 +428,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? Colors.white.withOpacity(0.02)
-                              : Colors.black.withOpacity(0.02),
+                          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isDarkMode ? Colors.white12 : Colors.black12,
+                            color: theme.dividerColor,
                           ),
                         ),
                         child: Row(
@@ -540,13 +538,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDarkMode ? const Color(0xFF1E222B) : Colors.white)
-              : (isDarkMode ? const Color(0xFF161B22) : const Color(0xFFF1F5F9)),
+              ? theme.colorScheme.surface
+              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF7C5CFF)
-                : (isDarkMode ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06)),
+                ? theme.colorScheme.primary
+                : theme.dividerColor,
             width: isSelected ? 2.5 : 1.0,
           ),
           boxShadow: isSelected

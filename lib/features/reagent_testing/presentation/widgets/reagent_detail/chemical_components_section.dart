@@ -17,14 +17,14 @@ class ChemicalComponentsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(theme, l10n),
+        _buildSectionHeader(context, theme, l10n),
         const SizedBox(height: 16),
         _buildChemicalsList(theme),
       ],
     );
   }
 
-  Widget _buildSectionHeader(ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(

@@ -38,6 +38,8 @@ class ResultsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('📊 Test Results'),
@@ -45,7 +47,7 @@ class ResultsPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
       ),
       body: Container(
-        color: Theme.of(context).colorScheme.surface,
+        color: theme.scaffoldBackgroundColor,
         child: ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: recentTests.length,
@@ -54,9 +56,12 @@ class ResultsPage extends StatelessWidget {
             final item = recentTests[index];
             return Card(
               elevation: 2,
-              shadowColor: Colors.black12,
+              shadowColor: theme.brightness == Brightness.dark 
+                  ? Colors.transparent 
+                  : theme.colorScheme.shadow.withOpacity(0.05),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: theme.dividerColor),
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -74,11 +79,14 @@ class ResultsPage extends StatelessWidget {
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 4),
-                  child: Text(item['sample'], style: TextStyle(color: Colors.grey[700])),
+                  child: Text(
+                    item['sample'], 
+                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                  ),
                 ),
                 trailing: Text(
                   item['time'],
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                 ),
                 onTap: () {},
               ),

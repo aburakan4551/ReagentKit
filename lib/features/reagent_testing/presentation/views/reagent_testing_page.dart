@@ -196,7 +196,7 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.80,
               ),
               itemCount: state.reagents.length,
               itemBuilder: (context, index) {

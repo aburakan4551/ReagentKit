@@ -808,7 +808,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noCompatibleReferences => 'لم يتم العثور على مراجع علمية متوافقة لمجموعة بيانات الكاشف هذه.';
 
   @override
-  String get legalConsentDisclaimer => 'التفسيرات التي تم إنشاؤها بواسطة هذا التطبيق هي ملاحظات تحليلية احتمالية وليست استنتاجات علمية معتمدة. هذا التطبيق مخصص فقط لسير العمل التعليمي والتحليلي ودعم الأبحاث.';
+  String get legalConsentDisclaimer => 'النتائج المعروضة هي تفسيرات تحليلية احتمالية لأغراض تعليمية وبحثية فقط، ولا تمثل نتائج علمية أو مخبرية معتمدة.';
 
   @override
   String get understandLimitations => 'أفهم حدود التطبيق وأوافق عليها';

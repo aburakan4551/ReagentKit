@@ -23,6 +23,8 @@ class AppTheme {
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onError: Colors.white,
+      outline: AppColors.borderHighlight,
+      outlineVariant: AppColors.borderSubtle,
     );
 
     return ThemeData(
@@ -30,6 +32,7 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.backgroundBase,
+      dividerColor: AppColors.borderSubtle,
       textTheme: AppTextStyles.getTextTheme(Brightness.dark),
       extensions: [
         StatusBadgeTheme.dark,
@@ -143,6 +146,8 @@ class AppTheme {
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onError: Colors.white,
+      outline: AppColors.lightBorderHighlight,
+      outlineVariant: AppColors.lightBorderSubtle,
     );
 
     return ThemeData(
@@ -150,6 +155,7 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.lightBackgroundBase,
+      dividerColor: AppColors.lightBorderSubtle,
       textTheme: AppTextStyles.getTextTheme(Brightness.light),
       extensions: [
         StatusBadgeTheme.light,

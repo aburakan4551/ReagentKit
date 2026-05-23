@@ -4,7 +4,6 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../controllers/reagent_detail_controller.dart';
-import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 class SafetyAcknowledgmentSection extends ConsumerWidget {
@@ -21,15 +20,11 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
 
     return Card(
       elevation: 0,
-      color: theme.brightness == Brightness.dark
-          ? const Color(0xFF161B22)
-          : Colors.white,
+      color: theme.colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: theme.brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.08)
-              : const Color(0xFFE6E8F0),
+          color: theme.dividerColor,
         ),
       ),
       child: Padding(
@@ -89,9 +84,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
   ) {
     final textStyle = AppTypography.getMetadataValue(
       context,
-      color: theme.brightness == Brightness.dark
-          ? AppColors.textSecondary
-          : AppColors.lightTextSecondary,
+      color: theme.colorScheme.onSurfaceVariant,
     ).copyWith(
       fontSize: 14,
       height: 1.4,
@@ -121,9 +114,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
                   activeColor: theme.colorScheme.primary,
                   checkColor: Colors.white,
                   side: BorderSide(
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white.withOpacity(0.3)
-                        : const Color(0xFFD1D5DB),
+                    color: theme.colorScheme.onSurface.withOpacity(0.3),
                     width: 1.5,
                   ),
                 ),

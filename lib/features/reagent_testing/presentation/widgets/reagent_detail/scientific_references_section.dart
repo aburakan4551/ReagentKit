@@ -32,12 +32,12 @@ class ScientificReferencesSection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF7C5CFF).withOpacity(0.12),
+                color: theme.colorScheme.primary.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
+              child: Icon(
                 HeroIcons.book_open,
-                color: Color(0xFF7C5CFF),
+                color: theme.colorScheme.primary,
                 size: 20,
               ),
             ),
@@ -65,15 +65,11 @@ class ScientificReferencesSection extends StatelessWidget {
             return Card(
               margin: EdgeInsets.zero,
               elevation: 0,
-              color: theme.brightness == Brightness.dark
-                  ? const Color(0xFF161B22)
-                  : theme.colorScheme.surface,
+              color: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                  color: theme.brightness == Brightness.dark
-                      ? Colors.white.withOpacity(0.08)
-                      : const Color(0xFFE6E8F0),
+                  color: theme.dividerColor,
                 ),
               ),
               child: Padding(
@@ -87,13 +83,13 @@ class ScientificReferencesSection extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF7C5CFF).withOpacity(0.1),
+                            color: theme.colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             citation,
-                            style: const TextStyle(
-                              color: Color(0xFF7C5CFF),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 11,
                             ),

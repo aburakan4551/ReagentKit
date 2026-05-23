@@ -50,8 +50,26 @@ class AutoSizeText extends StatelessWidget {
 
           textPainter.layout(maxWidth: maxWidth);
 
-          // If the text exceeds allowed lines or overflows height, reduce font size
-          if (textPainter.didExceedMaxLines || (maxHeight != double.infinity && textPainter.height > maxHeight)) {
+          // Check if any individual word exceeds the maxWidth at this fontSize
+          bool anyWordExceedsWidth = false;
+          final words = text.split(RegExp(r'\s+'));
+          for (final word in words) {
+            if (word.trim().isEmpty) continue;
+            final wordPainter = TextPainter(
+              text: TextSpan(text: word, style: testStyle),
+              textDirection: Directionality.of(context),
+            );
+            wordPainter.layout();
+            if (wordPainter.width > maxWidth) {
+              anyWordExceedsWidth = true;
+              break;
+            }
+          }
+
+          // If the text exceeds allowed lines, overflows height, or any individual word exceeds constraints, reduce font size
+          if (textPainter.didExceedMaxLines || 
+              (maxHeight != double.infinity && textPainter.height > maxHeight) ||
+              anyWordExceedsWidth) {
             fontSize -= stepGranularity;
           } else {
             break;
