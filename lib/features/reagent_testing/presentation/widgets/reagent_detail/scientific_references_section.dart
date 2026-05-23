@@ -4,6 +4,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:reagentkit/scientific_engine/reference_parser.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class ScientificReferencesSection extends StatelessWidget {
   final ReagentEntity reagent;
@@ -72,7 +73,7 @@ class ScientificReferencesSection extends StatelessWidget {
                 side: BorderSide(
                   color: theme.brightness == Brightness.dark
                       ? Colors.white.withOpacity(0.08)
-                      : theme.colorScheme.outlineVariant,
+                      : const Color(0xFFE6E8F0),
                 ),
               ),
               child: Padding(
@@ -134,8 +135,9 @@ class ScientificReferencesSection extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       apaString,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      style: AppTypography.getMetadataValue(context,
                         color: theme.colorScheme.onSurface,
+                      ).copyWith(
                         fontSize: 13,
                         height: 1.4,
                       ),

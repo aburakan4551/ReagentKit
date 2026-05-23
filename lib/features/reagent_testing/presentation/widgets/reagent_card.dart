@@ -47,7 +47,10 @@ class ReagentCard extends StatelessWidget {
             children: [
               AutoSizeText(
                 LocalizationHelper.getLocalizedReagentName(context, reagent),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  height: 1.15,
+                ),
                 maxLines: 2,
                 minFontSize: 12,
                 stepGranularity: 0.5,

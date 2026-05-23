@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 enum SafetyIconType { equipment, procedures, hazards, storage }
 
@@ -43,7 +44,7 @@ class SafetyInformationSection extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           l10n.safetyInformation,
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: AppTypography.getSectionTitle(context).copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -144,7 +145,11 @@ class _SafetyDetailsCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor.withOpacity(0.2)),
+        side: BorderSide(
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF2A3655)
+              : const Color(0xFFE6E8F0),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -262,9 +267,8 @@ class _SafetySection extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: AppTypography.getCardTitle(context).copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -323,7 +327,7 @@ class _SafetyItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(item, style: theme.textTheme.bodyMedium)),
+          Expanded(child: Text(item, style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );

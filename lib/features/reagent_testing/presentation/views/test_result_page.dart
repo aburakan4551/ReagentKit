@@ -485,9 +485,7 @@ class _ModernResultView extends ConsumerWidget {
                         style: AppTypography.getCaption(context).copyWith(height: 1.4),
                       ),
                       Divider(
-                        color: theme.brightness == Brightness.dark
-                            ? Colors.white10
-                            : Colors.black10,
+                        color: Theme.of(context).dividerColor.withOpacity(0.12),
                         height: 16,
                       ),
                       Text(
@@ -729,18 +727,14 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                   children: [
                     Icon(
                       HeroIcons.information_circle, 
-                      color: theme.brightness == Brightness.dark
-                          ? Colors.white38
-                          : Colors.black38,
+                      color: theme.colorScheme.onSurface.withOpacity(0.38),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.noReferencesAvailable,
                         style: TextStyle(
-                          color: theme.brightness == Brightness.dark
-                              ? Colors.white38
-                              : Colors.black38,
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
                         ),
                       ),
                     ),
@@ -800,9 +794,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                               icon: Icon(
                                 HeroIcons.clipboard, 
                                 size: 18, 
-                                color: theme.brightness == Brightness.dark
-                                    ? Colors.white70
-                                    : Colors.black54,
+                                color: theme.colorScheme.onSurface.withOpacity(0.54),
                               ),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: apaString));
@@ -822,9 +814,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                         Text(
                           apaString,
                           style: AppTypography.getMetadataValue(context,
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black,
+                            color: theme.colorScheme.onSurface,
                           ).copyWith(
                             fontSize: 13,
                             height: 1.4,

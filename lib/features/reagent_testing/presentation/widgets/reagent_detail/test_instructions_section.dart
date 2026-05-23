@@ -4,6 +4,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../providers/reagent_testing_providers.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class TestInstructionsSection extends ConsumerWidget {
   final ReagentEntity reagent;
@@ -43,7 +44,7 @@ class TestInstructionsSection extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           l10n.testInstructions,
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: AppTypography.getSectionTitle(context).copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -68,7 +69,11 @@ class _InstructionsCard extends ConsumerWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
+        side: BorderSide(
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF2A3655)
+              : const Color(0xFFE6E8F0),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -168,7 +173,7 @@ class _InstructionItem extends StatelessWidget {
         children: [
           _buildStepNumber(theme),
           const SizedBox(width: 12),
-          Expanded(child: Text(instruction, style: theme.textTheme.bodyMedium)),
+          Expanded(child: Text(instruction, style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );

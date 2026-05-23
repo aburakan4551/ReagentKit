@@ -7,6 +7,7 @@ import 'package:reagentkit/features/reagent_testing/presentation/providers/reage
 import 'package:reagentkit/features/reagent_testing/data/models/reagent_test_model.dart';
 import 'package:reagentkit/scientific_engine/reference_parser.dart';
 import '../../../../core/utils/localization_helper.dart';
+import '../../../../core/theme/app_typography.dart';
 
 // Provider to get all reagents from UnifiedDataService
 final allReagentsProvider = FutureProvider<List<ReagentTestModel>>((ref) async {
@@ -46,48 +47,58 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final reagentsAsync = ref.watch(allReagentsProvider);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return reagentsAsync.when(
       loading: () => Scaffold(
-        backgroundColor: const Color(0xFF0F1115),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             isAr ? 'المراجع العلمية' : 'Scientific References',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            style: AppTypography.getSectionTitle(context).copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-          backgroundColor: const Color(0xFF0F1115),
+          backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+            icon: Icon(
+              LocalizationHelper.getBackChevronIcon(context), 
+              color: theme.colorScheme.onSurface,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: const Center(
+        body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C5CFF)),
+            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
           ),
         ),
       ),
       error: (err, _) => Scaffold(
-        backgroundColor: const Color(0xFF0F1115),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
             isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
-            style: const TextStyle(color: Color(0xFFF87171)),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
-          backgroundColor: const Color(0xFF0F1115),
+          backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+            icon: Icon(
+              LocalizationHelper.getBackChevronIcon(context), 
+              color: theme.colorScheme.onSurface,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
         body: Center(
           child: Text(
             isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
-            style: const TextStyle(color: Color(0xFFF87171)),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
         ),
       ),
@@ -125,25 +136,31 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
         );
 
         return Scaffold(
-          backgroundColor: const Color(0xFF0F1115),
+          backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
             title: Text(
               isAr
                   ? 'المراجع العلمية ($totalReferencesCount)'
                   : 'Scientific References ($totalReferencesCount)',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              style: AppTypography.getSectionTitle(context).copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
-            backgroundColor: const Color(0xFF0F1115),
+            backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: Icon(LocalizationHelper.getBackChevronIcon(context), color: Colors.white),
+              icon: Icon(
+                LocalizationHelper.getBackChevronIcon(context), 
+                color: theme.colorScheme.onSurface,
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
             actions: [
               IconButton(
                 icon: Icon(
                   _sortByAlphabet ? HeroIcons.bars_arrow_down : HeroIcons.bars_arrow_up,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                 ),
                 onPressed: () {
                   setState(() {
@@ -165,30 +182,46 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                     // Search Input
                     TextField(
                       controller: _searchController,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: isAr ? 'ابحث عن كاشف علمي...' : 'Search reagents...',
-                        hintStyle: const TextStyle(color: Colors.white38),
-                        prefixIcon: const Icon(HeroIcons.magnifying_glass, color: Colors.white38),
+                        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.38)),
+                        prefixIcon: Icon(
+                          HeroIcons.magnifying_glass, 
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
+                        ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(HeroIcons.x_mark, color: Colors.white70),
+                                icon: Icon(
+                                  HeroIcons.x_mark, 
+                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                ),
                                 onPressed: () => _searchController.clear(),
                               )
                             : null,
-                        fillColor: const Color(0xFF161B22),
+                        fillColor: theme.brightness == Brightness.dark
+                            ? const Color(0xFF161B22)
+                            : Colors.white,
                         filled: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+                          borderSide: BorderSide(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white.withOpacity(0.08)
+                                : const Color(0xFFE6E8F0),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+                          borderSide: BorderSide(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white.withOpacity(0.08)
+                                : const Color(0xFFE6E8F0),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: Color(0xFF7C5CFF)),
+                          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
                         ),
                       ),
                     ),
@@ -207,7 +240,9 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                               label: Text(
                                 cat == 'All' ? (isAr ? 'الكل' : 'All') : cat,
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.white70,
+                                  color: isSelected 
+                                      ? Colors.white 
+                                      : theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -220,10 +255,16 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                                   HapticFeedback.selectionClick();
                                 }
                               },
-                              selectedColor: const Color(0xFF7C5CFF),
-                              backgroundColor: const Color(0xFF161B22),
+                              selectedColor: theme.colorScheme.primary,
+                              backgroundColor: theme.brightness == Brightness.dark
+                                  ? const Color(0xFF161B22)
+                                  : Colors.white,
                               side: BorderSide(
-                                color: isSelected ? Colors.transparent : Colors.white.withOpacity(0.08),
+                                color: isSelected 
+                                    ? Colors.transparent 
+                                    : (theme.brightness == Brightness.dark 
+                                        ? Colors.white.withOpacity(0.08)
+                                        : const Color(0xFFE6E8F0)),
                               ),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
@@ -238,7 +279,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
               // Reagents & References List
               Expanded(
                 child: filteredList.isEmpty
-                    ? _buildEmptyState(isAr)
+                    ? _buildEmptyState(context, isAr)
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         itemCount: filteredList.length,
@@ -258,7 +299,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
     );
   }
 
-  Widget _buildEmptyState(bool isAr) {
+  Widget _buildEmptyState(BuildContext context, bool isAr) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -268,14 +310,20 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF161B22),
+                color: theme.brightness == Brightness.dark
+                    ? const Color(0xFF161B22)
+                    : Colors.white,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.04)),
+                border: Border.all(
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white.withOpacity(0.04)
+                      : const Color(0xFFE6E8F0),
+                ),
               ),
-              child: const Icon(
+              child: Icon(
                 HeroIcons.book_open,
                 size: 64,
-                color: Colors.white24,
+                color: theme.colorScheme.onSurface.withOpacity(0.24),
               ),
             ),
             const SizedBox(height: 24),
@@ -284,8 +332,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                   ? 'لم يتم العثور على مراجع علمية متوافقة'
                   : 'No compatible scientific references found',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -296,8 +344,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                   ? 'لا توجد مراجع تتطابق مع كاشف البحث المحدد حالياً في قاعدة البيانات.'
                   : 'No compatible scientific references found for this reagent dataset.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white38,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.38),
                 fontSize: 14,
               ),
             ),
@@ -316,6 +364,7 @@ class _ReagentReferenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final parsedRefs = reagent.references
         .where((r) => r.trim().isNotEmpty)
         .map((r) => ReferenceParser.parse(r))
@@ -324,12 +373,20 @@ class _ReagentReferenceCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B22),
+        color: theme.brightness == Brightness.dark
+            ? const Color(0xFF161B22)
+            : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        border: Border.all(
+          color: theme.brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.08)
+              : const Color(0xFFE6E8F0),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.2)
+                : Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -346,10 +403,10 @@ class _ReagentReferenceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7C5CFF).withOpacity(0.1),
+                    color: theme.colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(HeroIcons.beaker, color: Color(0xFF7C5CFF), size: 20),
+                  child: Icon(HeroIcons.beaker, color: theme.colorScheme.primary, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -358,8 +415,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                     children: [
                       Text(
                         isAr ? reagent.reagentNameAr : reagent.reagentName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -367,8 +424,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         reagent.category,
-                        style: const TextStyle(
-                          color: Colors.white38,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -379,7 +436,12 @@ class _ReagentReferenceCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(color: Colors.white10, height: 1),
+          Divider(
+            color: theme.brightness == Brightness.dark
+                ? Colors.white10
+                : const Color(0xFFE6E8F0),
+            height: 1,
+          ),
           // References List
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -396,9 +458,15 @@ class _ReagentReferenceCard extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F1115),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF0F1115)
+                        : const Color(0xFFF8F9FC),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.04)),
+                    border: Border.all(
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white.withOpacity(0.04)
+                          : const Color(0xFFE6E8F0),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,20 +477,24 @@ class _ReagentReferenceCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF7C5CFF).withOpacity(0.1),
+                              color: theme.colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               citation,
-                              style: const TextStyle(
-                                color: Color(0xFF7C5CFF),
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 10,
                               ),
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(HeroIcons.clipboard, size: 16, color: Colors.white70),
+                            icon: Icon(
+                              HeroIcons.clipboard, 
+                              size: 16, 
+                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onPressed: () {
@@ -432,8 +504,15 @@ class _ReagentReferenceCard extends StatelessWidget {
                                 SnackBar(
                                   content: Text(
                                     isAr ? 'تم نسخ المرجع بنجاح!' : 'Reference copied successfully!',
+                                    style: TextStyle(color: theme.colorScheme.onSurface),
                                   ),
-                                  duration: const Duration(seconds: 2),
+                                  backgroundColor: theme.brightness == Brightness.dark
+                                      ? const Color(0xFF161B22)
+                                      : theme.colorScheme.surfaceContainer,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
                               );
                             },
@@ -444,8 +523,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         apaString,
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 12,
                           height: 1.4,
                         ),

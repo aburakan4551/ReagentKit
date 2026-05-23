@@ -3,6 +3,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/utils/localization_helper.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class ReagentHeaderCard extends StatelessWidget {
   final ReagentEntity reagent;
@@ -18,7 +19,11 @@ class ReagentHeaderCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
+        side: BorderSide(
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF2A3655)
+              : const Color(0xFFE6E8F0),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -65,14 +70,14 @@ class ReagentHeaderCard extends StatelessWidget {
       children: [
         Text(
           LocalizationHelper.getLocalizedReagentName(context, reagent),
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: AppTypography.getSectionTitle(context).copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           LocalizationHelper.getLocalizedDescription(context, reagent),
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: AppTypography.getMetadataValue(context,
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
@@ -117,8 +122,10 @@ class ReagentHeaderCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: AppTypography.getCaption(context,
                 color: theme.colorScheme.onSurfaceVariant,
+              ).copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

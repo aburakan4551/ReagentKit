@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class ChemicalComponentsSection extends StatelessWidget {
   final ReagentEntity reagent;
@@ -41,7 +42,7 @@ class ChemicalComponentsSection extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           l10n.chemicalComponents,
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: AppTypography.getSectionTitle(context).copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -54,7 +55,11 @@ class ChemicalComponentsSection extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.dividerColor.withOpacity(0.2)),
+        side: BorderSide(
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF2A3655)
+              : const Color(0xFFE6E8F0),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -87,7 +92,7 @@ class _ChemicalItem extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(chemical, style: theme.textTheme.bodyMedium)),
+          Expanded(child: Text(chemical, style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );
