@@ -11,6 +11,7 @@ import 'package:reagentkit/core/utils/logger.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
 import '../../../../premium/presentation/screens/paywall_screen.dart';
 import 'package:reagentkit/core/config/feature_flags.dart';
+import 'package:reagentkit/core/services/safe_store_sanitizer.dart';
 
 class AIImageAnalysisSection extends ConsumerStatefulWidget {
   final ReagentEntity reagent;
@@ -391,21 +392,21 @@ class _AIImageAnalysisSectionState
           _buildResultRow(
             context,
             l10n.observedColor,
-            result.observedColorDescription,
+            SafeStoreSanitizer.sanitize(result.observedColorDescription),
             HeroIcons.swatch,
           ),
           const SizedBox(height: 8),
           _buildResultRow(
             context,
             _getSubstanceLabel(l10n),
-            result.primarySubstance,
+            SafeStoreSanitizer.sanitize(result.primarySubstance),
             HeroIcons.beaker,
           ),
           const SizedBox(height: 8),
           _buildResultRow(
             context,
             _getConfidenceLabel(l10n),
-            result.confidenceLevel,
+            SafeStoreSanitizer.sanitize(result.confidenceLevel),
             HeroIcons.chart_bar_square,
           ),
           if (result.analysisNotes.isNotEmpty) ...[
@@ -413,7 +414,7 @@ class _AIImageAnalysisSectionState
             _buildResultRow(
               context,
               l10n.analysisNotes,
-              result.analysisNotes,
+              SafeStoreSanitizer.sanitize(result.analysisNotes),
               HeroIcons.document_text,
             ),
           ],

@@ -622,13 +622,14 @@ class UnifiedDataService {
   }) async {
     developer.log('Starting loadPipelineImpl (forceAssetReload: $forceAssetReload, clearCache: $clearCache)', name: 'ScientificParser');
 
-    if (clearCache) {
+    final isSafeStore = _remoteConfig?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
+    if (clearCache || isSafeStore) {
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('scientific_dataset_cache');
         await prefs.remove('scientific_dataset_cache_prev');
         await prefs.remove('scientific_dataset_snapshot');
-        developer.log('Local caches cleared.', name: 'ScientificParser');
+        developer.log('Local caches cleared due to Safe Store Mode or force clear.', name: 'ScientificParser');
       } catch (e) {
         developer.log('Failed to clear cache: $e', name: 'ScientificParser');
       }
@@ -1357,13 +1358,11 @@ class UnifiedDataService {
 
   List<ReagentTestModel> _processAndSanitizeReagents(List<ReagentTestModel> originalList) {
     final rc = _remoteConfig;
-    if (rc == null) return originalList;
-
-    final isSafeStore = rc.safeStoreMode;
-    final isScottEnabled = rc.enableScottTest;
-    final isHighRiskEnabled = rc.enableHighRiskTests;
-    final isHideControlled = rc.hideControlledSubstances;
-    final isScientificReferencesEnabled = rc.enableScientificReferences;
+    final isSafeStore = rc?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
+    final isScottEnabled = rc?.enableScottTest ?? true;
+    final isHighRiskEnabled = rc?.enableHighRiskTests ?? true;
+    final isHideControlled = rc?.hideControlledSubstances ?? false;
+    final isScientificReferencesEnabled = rc?.enableScientificReferences ?? true;
 
     // Filter reagents
     List<ReagentTestModel> filtered = originalList.where((reagent) {
@@ -1395,44 +1394,43 @@ class UnifiedDataService {
 
     // Clone and sanitize visible UI strings
     return filtered.map((reagent) {
-      final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName, isArabic: false);
-      final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr, isArabic: true);
-      final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description, isArabic: false);
-      final sanitizedDescAr = SafeStoreSanitizer.sanitize(reagent.descriptionAr, isArabic: true);
-      final sanitizedSafetyLevelAr = SafeStoreSanitizer.sanitize(reagent.safetyLevelAr, isArabic: true);
+      final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName);
+      final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr);
+      final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description);
+      final sanitizedDescAr = SafeStoreSanitizer.sanitize(reagent.descriptionAr);
+      final sanitizedSafetyLevelAr = SafeStoreSanitizer.sanitize(reagent.safetyLevelAr);
 
       final sanitizedInstructions = reagent.testInstructions.map((step) {
         return ReagentTestInstructionStep(
           step: step.step,
-          instruction: SafeStoreSanitizer.sanitize(step.instruction, isArabic: false),
-          instructionAr: SafeStoreSanitizer.sanitize(step.instructionAr, isArabic: true),
+          instruction: SafeStoreSanitizer.sanitize(step.instruction),
+          instructionAr: SafeStoreSanitizer.sanitize(step.instructionAr),
         );
       }).toList();
 
       List<DrugResultModel> sanitizedReactionResults = reagent.reactionResults;
-      if (isHideControlled) {
-        // If hide_controlled_substances is active, sanitize the drug names in the drug results
-        sanitizedReactionResults = reagent.reactionResults.map((result) {
-          final sanitizedDrugName = SafeStoreSanitizer.sanitize(result.drugName, isArabic: false);
-          return DrugResultModel(
-            drugName: sanitizedDrugName,
-            color: SafeStoreSanitizer.sanitize(result.color, isArabic: false),
-            colorAr: SafeStoreSanitizer.sanitize(result.colorAr, isArabic: true),
-          );
-        }).toList();
-      } else {
-        sanitizedReactionResults = reagent.reactionResults.map((result) {
-          return DrugResultModel(
-            drugName: SafeStoreSanitizer.sanitize(result.drugName, isArabic: false),
-            color: SafeStoreSanitizer.sanitize(result.color, isArabic: false),
-            colorAr: SafeStoreSanitizer.sanitize(result.colorAr, isArabic: true),
-          );
-        }).toList();
-      }
+      sanitizedReactionResults = reagent.reactionResults.map((result) {
+        return DrugResultModel(
+          drugName: SafeStoreSanitizer.sanitize(result.drugName),
+          color: SafeStoreSanitizer.sanitize(result.color),
+          colorAr: SafeStoreSanitizer.sanitize(result.colorAr),
+        );
+      }).toList();
 
       final sanitizedReferences = isScientificReferencesEnabled 
-          ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref, isArabic: false)).toList()
+          ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref)).toList()
           : <String>[];
+
+      // Sanitize chemicals list
+      final sanitizedChemicals = reagent.chemicals.map((c) => SafeStoreSanitizer.sanitize(c)).toList();
+
+      // Sanitize ReagentTestSafetyInfo
+      final sanitizedSafety = ReagentTestSafetyInfo(
+        requiredEquipment: reagent.safety.requiredEquipment.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        handlingProcedures: reagent.safety.handlingProcedures.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        specificHazards: reagent.safety.specificHazards.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        storageRequirements: reagent.safety.storageRequirements.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+      );
 
       return ReagentTestModel(
         id: reagent.id,
@@ -1444,11 +1442,11 @@ class UnifiedDataService {
         safetyLevelAr: sanitizedSafetyLevelAr,
         category: reagent.category,
         testDuration: reagent.testDuration,
-        chemicals: reagent.chemicals,
+        chemicals: sanitizedChemicals,
         testInstructions: sanitizedInstructions,
         reactionResults: sanitizedReactionResults,
         references: sanitizedReferences,
-        safety: reagent.safety,
+        safety: sanitizedSafety,
       );
     }).toList();
   }

@@ -3,6 +3,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../domain/entities/reagent_entity.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/theme/app_typography.dart';
+import 'package:reagentkit/core/services/safe_store_sanitizer.dart';
 
 enum SafetyIconType { equipment, procedures, hazards, storage }
 
@@ -64,7 +65,7 @@ class _SafetyDetailsCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
-    final equipment = reagent.safetyEquipment.isNotEmpty 
+    final equipment = (reagent.safetyEquipment.isNotEmpty 
         ? reagent.safetyEquipment 
         : (isArabic 
             ? const [
@@ -80,9 +81,11 @@ class _SafetyDetailsCard extends StatelessWidget {
                 "Lab coat with long sleeves",
                 "Closed-toe chemical-resistant shoes",
                 "Respirator when necessary"
-              ]);
+              ]))
+        .map((e) => SafeStoreSanitizer.sanitize(e))
+        .toList();
 
-    final procedures = reagent.safetyProcedures.isNotEmpty
+    final procedures = (reagent.safetyProcedures.isNotEmpty
         ? reagent.safetyProcedures
         : (isArabic
             ? const [
@@ -100,9 +103,11 @@ class _SafetyDetailsCard extends StatelessWidget {
                 "Keep sodium bicarbonate handy for neutralization",
                 "Use only small drops",
                 "Never mix reagent directly with water"
-              ]);
+              ]))
+        .map((e) => SafeStoreSanitizer.sanitize(e))
+        .toList();
 
-    final hazards = reagent.safetyHazards.isNotEmpty
+    final hazards = (reagent.safetyHazards.isNotEmpty
         ? reagent.safetyHazards
         : (isArabic
             ? const [
@@ -116,9 +121,11 @@ class _SafetyDetailsCard extends StatelessWidget {
                 "Causes severe chemical burns",
                 "Dangerous fumes - formaldehyde",
                 "Exothermic reaction"
-              ]);
+              ]))
+        .map((e) => SafeStoreSanitizer.sanitize(e))
+        .toList();
 
-    final storage = reagent.safetyStorage.isNotEmpty
+    final storage = (reagent.safetyStorage.isNotEmpty
         ? reagent.safetyStorage
         : (isArabic
             ? const [
@@ -132,7 +139,9 @@ class _SafetyDetailsCard extends StatelessWidget {
                 "Away from flammable materials",
                 "In dedicated acid storage cabinet",
                 "Label with clear warning"
-              ]);
+              ]))
+        .map((e) => SafeStoreSanitizer.sanitize(e))
+        .toList();
 
     final safetyData = SafetyData(
       equipment: equipment,

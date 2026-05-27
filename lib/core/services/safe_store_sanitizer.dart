@@ -22,6 +22,8 @@ class SafeStoreSanitizer {
     'drug test': 'reagent analysis',
     'drug': 'compound',
     'drugs': 'compounds',
+    'cannabis': 'botanical compounds',
+    'khat': 'botanical specimens',
   };
 
   // Arabic replacements dictionary (dangerous -> safe)
@@ -40,36 +42,48 @@ class SafeStoreSanitizer {
     'أفيونات': 'مركبات قلوية',
     'افيونات': 'مركبات قلوية',
     'أفيون': 'مركب قلوي',
+    'حشيش': 'مركب عشبي',
+    'الحشيش': 'المركب العشبي',
+    'قات': 'مركب نباتي',
+    'القات': 'المركب النباتي',
+    'السموم والمخدرات': 'التحاليل الكيميائية والمخبرية',
   };
 
   /// Sanitizes the input [text] by replacing sensitive terminology with safe scientific alternatives.
   /// The sanitization is applied only when [safeStoreMode] is enabled.
-  static String sanitize(String text, {bool isArabic = false}) {
-    if (!safeStoreMode || text.isEmpty) {
+  static String sanitize(String text, {bool? isArabic}) {
+    if (text.isEmpty) {
+      return text;
+    }
+
+    if (!safeStoreMode) {
       return text;
     }
 
     String sanitizedText = text;
 
-    if (isArabic) {
-      // Sort keys by length descending to replace longer phrases first (e.g. "كشف المخدرات" before "مخدرات")
-      final sortedKeys = _arabicReplacements.keys.toList()
-        ..sort((a, b) => b.length.compareTo(a.length));
+    // Apply Arabic replacements
+    final sortedArabicKeys = _arabicReplacements.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
 
-      for (final key in sortedKeys) {
-        final replacement = _arabicReplacements[key]!;
-        // Simple case-insensitive / literal replacement for Arabic
-        sanitizedText = sanitizedText.replaceAll(key, replacement);
-      }
-    } else {
-      // English sanitization
-      final sortedKeys = _englishReplacements.keys.toList()
-        ..sort((a, b) => b.length.compareTo(a.length));
+    for (final key in sortedArabicKeys) {
+      final replacement = _arabicReplacements[key]!;
+      sanitizedText = sanitizedText.replaceAll(key, replacement);
+    }
 
-      for (final key in sortedKeys) {
-        final replacement = _englishReplacements[key]!;
-        sanitizedText = _replaceIgnoreCase(sanitizedText, key, replacement);
-      }
+    // Apply English replacements
+    final sortedEnglishKeys = _englishReplacements.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+
+    for (final key in sortedEnglishKeys) {
+      final replacement = _englishReplacements[key]!;
+      sanitizedText = _replaceIgnoreCase(sanitizedText, key, replacement);
+    }
+
+    // Development logging to track runtime sanitization
+    if (sanitizedText != text) {
+      debugPrint("SAFE STORE BEFORE: $text");
+      debugPrint("SAFE STORE AFTER: $sanitizedText");
     }
 
     return sanitizedText;

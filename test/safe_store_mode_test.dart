@@ -63,7 +63,7 @@ void main() {
 
     test('Does not sanitize when safeStoreMode is false', () {
       expect(SafeStoreSanitizer.sanitize('cocaine'), equals('cocaine'));
-      expect(SafeStoreSanitizer.sanitize('كوكايين', isArabic: true), equals('كوكايين'));
+      expect(SafeStoreSanitizer.sanitize('كوكايين'), equals('كوكايين'));
     });
 
     test('Sanitizes English terms when safeStoreMode is true', () {
@@ -75,17 +75,47 @@ void main() {
       expect(SafeStoreSanitizer.sanitize('Ecstasy'), equals('Forensic chemistry compounds'));
       expect(SafeStoreSanitizer.sanitize('narcotics'), equals('educational chemistry analysis'));
       expect(SafeStoreSanitizer.sanitize('drugs of abuse'), equals('educational chemistry references'));
+      expect(SafeStoreSanitizer.sanitize('cannabis'), equals('botanical compounds'));
+      expect(SafeStoreSanitizer.sanitize('khat'), equals('botanical specimens'));
       expect(SafeStoreSanitizer.sanitize('This is cocaine and heroin testing'), 
              equals('This is controlled compounds and alkaloid compounds testing'));
     });
 
     test('Sanitizes Arabic terms when safeStoreMode is true', () {
       SafeStoreSanitizer.safeStoreMode = true;
-      expect(SafeStoreSanitizer.sanitize('كوكايين', isArabic: true), equals('مركب مرجعي'));
-      expect(SafeStoreSanitizer.sanitize('هيروين', isArabic: true), equals('مركب قلوي'));
-      expect(SafeStoreSanitizer.sanitize('كشف المخدرات', isArabic: true), equals('التحليل الكيميائي'));
-      expect(SafeStoreSanitizer.sanitize('مواد مخدرة', isArabic: true), equals('مركبات خاضعة للتحليل'));
-      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة', isArabic: true), equals('التحليل المخبري في العينة'));
+      expect(SafeStoreSanitizer.sanitize('كوكايين'), equals('مركب مرجعي'));
+      expect(SafeStoreSanitizer.sanitize('هيروين'), equals('مركب قلوي'));
+      expect(SafeStoreSanitizer.sanitize('كشف المخدرات'), equals('التحليل الكيميائي'));
+      expect(SafeStoreSanitizer.sanitize('مواد مخدرة'), equals('مركبات خاضعة للتحليل'));
+      expect(SafeStoreSanitizer.sanitize('حشيش'), equals('مركب عشبي'));
+      expect(SafeStoreSanitizer.sanitize('قات'), equals('مركب نباتي'));
+      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة'), equals('التحليل المخبري في العينة'));
+    });
+
+    test('Sanitizes mixed language strings and does not contain sensitive terms', () {
+      SafeStoreSanitizer.safeStoreMode = true;
+      final mixedText = 'Testing cocaine, heroin, cannabis, khat, LSD, حشيش, قات, هيروين, أمفيتامين';
+      final sanitized = SafeStoreSanitizer.sanitize(mixedText);
+
+      expect(sanitized.toLowerCase().contains('heroin'), isFalse);
+      expect(sanitized.toLowerCase().contains('cocaine'), isFalse);
+      expect(sanitized.toLowerCase().contains('cannabis'), isFalse);
+      expect(sanitized.toLowerCase().contains('khat'), isFalse);
+      expect(sanitized.toLowerCase().contains('lsd'), isFalse);
+      expect(sanitized.contains('حشيش'), isFalse);
+      expect(sanitized.contains('قات'), isFalse);
+      expect(sanitized.contains('هيروين'), isFalse);
+      expect(sanitized.contains('أمفيتامين'), isFalse);
+
+      expect(sanitized.toLowerCase(), contains('controlled compounds'));
+      expect(sanitized.toLowerCase(), contains('alkaloid compounds'));
+      expect(sanitized.toLowerCase(), contains('botanical compounds'));
+      expect(sanitized.toLowerCase(), contains('botanical specimens'));
+      expect(sanitized.toLowerCase(), contains('chemical reagents'));
+      expect(sanitized, contains('مركب عشبي'));
+      expect(sanitized, contains('مركب نباتي'));
+      expect(sanitized, contains('مركب قلوي'));
+      expect(sanitized, contains('مركبات أمينية'));
     });
   });
 

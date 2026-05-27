@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../models/safety_instructions_model.dart';
 import 'remote_config_service.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../core/services/safe_store_sanitizer.dart';
 
 const _kSafetyAsset = 'assets/data/safety.json';
 
@@ -192,13 +193,10 @@ class SafetyInstructionsService {
     bool isArabic = false,
   }) async {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
-    if (safety == null) {
-      // Return default equipment if safety is null (shouldn't happen now)
-      final defaultSafety = _createDefaultSafetyInstructions(reagentName);
-      return defaultSafety.getEquipment(isArabic);
-    }
-
-    return safety.getEquipment(isArabic);
+    final rawList = safety != null
+        ? safety.getEquipment(isArabic)
+        : _createDefaultSafetyInstructions(reagentName).getEquipment(isArabic);
+    return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Get localized handling procedures for a reagent
@@ -207,13 +205,10 @@ class SafetyInstructionsService {
     bool isArabic = false,
   }) async {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
-    if (safety == null) {
-      // Return default handling procedures if safety is null (shouldn't happen now)
-      final defaultSafety = _createDefaultSafetyInstructions(reagentName);
-      return defaultSafety.getHandlingProcedures(isArabic);
-    }
-
-    return safety.getHandlingProcedures(isArabic);
+    final rawList = safety != null
+        ? safety.getHandlingProcedures(isArabic)
+        : _createDefaultSafetyInstructions(reagentName).getHandlingProcedures(isArabic);
+    return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Get localized specific hazards for a reagent
@@ -222,13 +217,10 @@ class SafetyInstructionsService {
     bool isArabic = false,
   }) async {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
-    if (safety == null) {
-      // Return default specific hazards if safety is null (shouldn't happen now)
-      final defaultSafety = _createDefaultSafetyInstructions(reagentName);
-      return defaultSafety.getSpecificHazards(isArabic);
-    }
-
-    return safety.getSpecificHazards(isArabic);
+    final rawList = safety != null
+        ? safety.getSpecificHazards(isArabic)
+        : _createDefaultSafetyInstructions(reagentName).getSpecificHazards(isArabic);
+    return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Get localized storage instructions for a reagent
@@ -237,13 +229,10 @@ class SafetyInstructionsService {
     bool isArabic = false,
   }) async {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
-    if (safety == null) {
-      // Return default storage instructions if safety is null (shouldn't happen now)
-      final defaultSafety = _createDefaultSafetyInstructions(reagentName);
-      return defaultSafety.getStorage(isArabic);
-    }
-
-    return safety.getStorage(isArabic);
+    final rawList = safety != null
+        ? safety.getStorage(isArabic)
+        : _createDefaultSafetyInstructions(reagentName).getStorage(isArabic);
+    return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Get localized test instructions for a reagent
@@ -252,13 +241,10 @@ class SafetyInstructionsService {
     bool isArabic = false,
   }) async {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
-    if (safety == null) {
-      // Return default test instructions if safety is null (shouldn't happen now)
-      final defaultSafety = _createDefaultSafetyInstructions(reagentName);
-      return defaultSafety.getInstructions(isArabic);
-    }
-
-    return safety.getInstructions(isArabic);
+    final rawList = safety != null
+        ? safety.getInstructions(isArabic)
+        : _createDefaultSafetyInstructions(reagentName).getInstructions(isArabic);
+    return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Load safety instructions from [assets/data/safety.json] (local fallback).

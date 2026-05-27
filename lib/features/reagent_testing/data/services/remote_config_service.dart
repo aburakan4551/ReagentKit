@@ -71,6 +71,7 @@ class RemoteConfigService {
       });
 
       await fetchAndActivate();
+      SafeStoreSanitizer.safeStoreMode = safeStoreMode;
       Logger.info('✅ [RemoteConfig] Initialized successfully');
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] Initialization failed: $e',
@@ -87,6 +88,7 @@ class RemoteConfigService {
       if (updated) {
         Logger.info('🔄 [RemoteConfig] New values activated');
       }
+      SafeStoreSanitizer.safeStoreMode = safeStoreMode;
       return updated;
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] fetchAndActivate failed: $e',
@@ -97,7 +99,9 @@ class RemoteConfigService {
 
   Future<bool> activate() async {
     try {
-      return await _remoteConfig.activate();
+      final success = await _remoteConfig.activate();
+      SafeStoreSanitizer.safeStoreMode = safeStoreMode;
+      return success;
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] activate failed: $e',
           error: e, stackTrace: st);
