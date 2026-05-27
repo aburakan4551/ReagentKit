@@ -43,6 +43,20 @@ class FakeFirebaseRemoteConfig extends Fake implements FirebaseRemoteConfig {
   String getString(String key) => _mockValues[key] ?? '';
 
   @override
+  bool getBool(String key) {
+    if (key == 'app_store_review_mode') return false;
+    if (key == 'safe_store_mode') return false;
+    if (key == 'educational_mode') return false;
+    if (key == 'show_sensitive_names') return true;
+    if (key == 'enable_ai_analysis') return true;
+    if (key == 'enable_scientific_references') return true;
+    if (key == 'enable_scott_test') return true;
+    if (key == 'enable_high_risk_tests') return true;
+    if (key == 'hide_controlled_substances') return false;
+    return false;
+  }
+
+  @override
   Stream<RemoteConfigUpdate> get onConfigUpdated => const Stream.empty();
 }
 

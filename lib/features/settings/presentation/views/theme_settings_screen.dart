@@ -136,7 +136,7 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withValues(alpha: 0.24),
+            color: theme.colorScheme.primary.withOpacity(0.24),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -161,7 +161,7 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
                 Text(
                   'Personalize the app appearance',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -196,8 +196,8 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                : Colors.black.withValues(alpha: 0.02),
+                ? theme.colorScheme.primary.withOpacity(0.12)
+                : Colors.black.withOpacity(0.02),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

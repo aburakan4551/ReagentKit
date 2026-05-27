@@ -129,7 +129,7 @@ class _LanguageSettingsScreenState
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.secondary.withValues(alpha: 0.24),
+            color: theme.colorScheme.secondary.withOpacity(0.24),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -154,7 +154,7 @@ class _LanguageSettingsScreenState
                 Text(
                   'The app will update immediately',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -185,8 +185,8 @@ class _LanguageSettingsScreenState
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                : Colors.black.withValues(alpha: 0.02),
+                ? theme.colorScheme.primary.withOpacity(0.12)
+                : Colors.black.withOpacity(0.02),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -212,7 +212,7 @@ class _LanguageSettingsScreenState
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                    color: theme.colorScheme.onSurface.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
@@ -248,7 +248,7 @@ class _LanguageSettingsScreenState
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                              color: theme.colorScheme.primary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -306,10 +306,10 @@ class _LanguageSettingsScreenState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.amber.withValues(alpha: 0.1)
-            : Colors.amber.withValues(alpha: 0.08),
+            ? Colors.amber.withOpacity(0.1)
+            : Colors.amber.withOpacity(0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+        border: Border.all(color: Colors.amber.withOpacity(0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

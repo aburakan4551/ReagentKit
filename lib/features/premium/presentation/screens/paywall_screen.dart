@@ -134,7 +134,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             end: Alignment.bottomCenter,
           )
         : LinearGradient(
-            colors: [theme.scaffoldBackgroundColor, theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)],
+            colors: [theme.scaffoldBackgroundColor, theme.colorScheme.surfaceContainerHighest.withOpacity(0.5)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           );
@@ -200,7 +200,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF7C5CFF).withValues(alpha: 0.35),
+                              color: const Color(0xFF7C5CFF).withOpacity(0.35),
                               blurRadius: 24,
                               offset: const Offset(0, 8),
                             ),
@@ -297,7 +297,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF87171).withValues(alpha: 0.1),
+                              color: const Color(0xFFF87171).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: const Color(0xFFF87171),
@@ -353,7 +353,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF7C5CFF).withValues(alpha: 0.3),
+                                  color: const Color(0xFF7C5CFF).withOpacity(0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -428,7 +428,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: theme.dividerColor,
@@ -484,7 +484,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.03),
+              color: isDarkMode ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -539,7 +539,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.surface
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
@@ -550,7 +550,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF7C5CFF).withValues(alpha: 0.12),
+                    color: const Color(0xFF7C5CFF).withOpacity(0.12),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
                   )

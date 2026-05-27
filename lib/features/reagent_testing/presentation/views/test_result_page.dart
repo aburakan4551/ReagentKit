@@ -54,17 +54,29 @@ class TestResultPage extends ConsumerWidget {
               icon: const Icon(HeroIcons.share),
               onPressed: () {
                 final result = state.testResult;
+                final isAr = Localizations.localeOf(context).languageCode == 'ar';
+                final isReview = SafeStoreSanitizer.appStoreReviewMode;
                 final substances = result.possibleSubstances.isNotEmpty
-                    ? result.possibleSubstances.join(', ')
+                    ? result.possibleSubstances.map((s) => SafeStoreSanitizer.sanitize(s, isArabic: isAr)).join(', ')
                     : l10n.unknownSubstance;
                 
-                final text = '🧪 ${l10n.testResult}:\n'
-                    '${l10n.reagent}: ${result.reagentName}\n'
-                    '${l10n.confidence}: ${result.confidencePercentage}%\n'
-                    '${l10n.possibleSubstances}: $substances\n'
-                    '${l10n.observedColorLabel}: ${result.observedColor}';
+                final text = isReview
+                    ? '🧪 ${isAr ? "التقرير التحليلي" : "Analytical Report"}:\n'
+                      '${isAr ? "المركب" : "Compound"}: ${SafeStoreSanitizer.sanitize(result.reagentName, isArabic: isAr)}\n'
+                      '${isAr ? "النمط التحليلي المرصود" : "Observed Analytical Pattern"}: $substances\n'
+                      '${isAr ? "الاتساق البصري" : "Visual Consistency"}: ${SafeStoreSanitizer.sanitize(result.observedColor, isArabic: isAr)}'
+                    : '🧪 ${l10n.testResult}:\n'
+                      '${l10n.reagent}: ${result.reagentName}\n'
+                      '${l10n.confidence}: ${result.confidencePercentage}%\n'
+                      '${l10n.possibleSubstances}: $substances\n'
+                      '${l10n.observedColorLabel}: ${result.observedColor}';
                 
-                Share.share(text, subject: l10n.testResult);
+                Share.share(
+                  text, 
+                  subject: isReview 
+                      ? (isAr ? 'التقرير التحليلي' : 'Analytical Report') 
+                      : l10n.testResult,
+                );
               },
             ),
         ],
@@ -182,35 +194,37 @@ class _ModernResultView extends ConsumerWidget {
                 end: Alignment.bottomCenter,
                 colors: theme.brightness == Brightness.dark
                     ? [
-                        theme.colorScheme.surface.withValues(alpha: 0.8),
+                        theme.colorScheme.surface.withOpacity(0.8),
                         theme.scaffoldBackgroundColor,
                       ]
                     : [
-                        theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
                         theme.colorScheme.surface,
                       ],
               ),
             ),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildConfidenceIndicator(
-                      context,
-                      percentage: testResult.aiInterpretationConfidence ?? (testResult.confidencePercentage / 100.0),
-                      label: isAr ? 'ثقة تفسير الذكاء الاصطناعي' : 'AI Interpretation',
-                      accentColor: theme.colorScheme.primary,
-                    ),
-                    _buildConfidenceIndicator(
-                      context,
-                      percentage: testResult.colorMatchConfidence ?? (testResult.confidencePercentage / 100.0),
-                      label: isAr ? 'ثقة مطابقة اللون' : 'Color Match',
-                      accentColor: theme.colorScheme.secondary,
-                    ),
-                  ],
-                ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
-                const SizedBox(height: 24),
+                if (!SafeStoreSanitizer.appStoreReviewMode)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildConfidenceIndicator(
+                        context,
+                        percentage: testResult.aiInterpretationConfidence ?? (testResult.confidencePercentage / 100.0),
+                        label: isAr ? 'ثقة تفسير الذكاء الاصطناعي' : 'AI Interpretation',
+                        accentColor: theme.colorScheme.primary,
+                      ),
+                      _buildConfidenceIndicator(
+                        context,
+                        percentage: testResult.colorMatchConfidence ?? (testResult.confidencePercentage / 100.0),
+                        label: isAr ? 'ثقة مطابقة اللون' : 'Color Match',
+                        accentColor: theme.colorScheme.secondary,
+                      ),
+                    ],
+                  ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
+                if (!SafeStoreSanitizer.appStoreReviewMode)
+                  const SizedBox(height: 24),
                 Text(
                   reagentName,
                   style: AppTypography.getSectionTitle(context).copyWith(
@@ -231,7 +245,9 @@ class _ModernResultView extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${isAr ? "مؤشر الاستقرار" : "Stability Index"}: $stabilityText (${(stabilityVal * 100).toInt()}%)',
+                      SafeStoreSanitizer.appStoreReviewMode
+                          ? '${isAr ? "الاتساق التحليلي" : "Analytical Consistency"}: $stabilityText'
+                          : '${isAr ? "مؤشر الاستقرار" : "Stability Index"}: $stabilityText (${(stabilityVal * 100).toInt()}%)',
                       style: AppTypography.getMetadataLabel(context,
                         color: theme.colorScheme.onSurfaceVariant,
                         isBold: true,
@@ -247,7 +263,13 @@ class _ModernResultView extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionLabel(context, isAr ? 'تفسير الذكاء الاصطناعي' : 'AI Interpretation', HeroIcons.cpu_chip),
+                _buildSectionLabel(
+                  context,
+                  SafeStoreSanitizer.appStoreReviewMode
+                      ? (isAr ? 'الملاحظة التحليلية' : 'Analytical Observation')
+                      : (isAr ? 'تفسير الذكاء الاصطناعي' : 'AI Interpretation'),
+                  HeroIcons.cpu_chip,
+                ),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -261,7 +283,7 @@ class _ModernResultView extends ConsumerWidget {
                       BoxShadow(
                         color: theme.brightness == Brightness.dark
                             ? Colors.transparent
-                            : theme.colorScheme.shadow.withValues(alpha: 0.03),
+                            : theme.colorScheme.shadow.withOpacity(0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -271,7 +293,9 @@ class _ModernResultView extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isAr ? 'المركبات المحتملة المرصودة:' : 'Possible Substances Detected:',
+                        SafeStoreSanitizer.appStoreReviewMode
+                            ? (isAr ? 'النمط التحليلي المرصود:' : 'Observed Analytical Pattern:')
+                            : (isAr ? 'المركبات المحتملة المرصودة:' : 'Possible Substances Detected:'),
                         style: AppTypography.getMetadataLabel(context,
                           color: theme.colorScheme.onSurfaceVariant,
                           isBold: true,
@@ -295,7 +319,9 @@ class _ModernResultView extends ConsumerWidget {
                           height: 24,
                         ),
                         Text(
-                          isAr ? 'التفاصيل والتحليل:' : 'Analysis Details:',
+                          SafeStoreSanitizer.appStoreReviewMode
+                              ? (isAr ? 'الملاحظات والتحليل:' : 'Observations & Analysis:')
+                              : (isAr ? 'التفاصيل والتحليل:' : 'Analysis Details:'),
                           style: AppTypography.getMetadataLabel(context,
                             color: theme.colorScheme.onSurfaceVariant,
                             isBold: true,
@@ -327,7 +353,7 @@ class _ModernResultView extends ConsumerWidget {
                       BoxShadow(
                         color: theme.brightness == Brightness.dark
                             ? Colors.transparent
-                            : theme.colorScheme.shadow.withValues(alpha: 0.03),
+                            : theme.colorScheme.shadow.withOpacity(0.03),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -347,7 +373,7 @@ class _ModernResultView extends ConsumerWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.shadow.withValues(alpha: 0.2),
+                              color: theme.colorScheme.shadow.withOpacity(0.2),
                               blurRadius: 4,
                             ),
                           ],
@@ -388,13 +414,13 @@ class _ModernResultView extends ConsumerWidget {
                       color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                        color: theme.colorScheme.primary.withOpacity(0.3),
                       ),
                       boxShadow: [
                         BoxShadow(
                           color: theme.brightness == Brightness.dark
                               ? Colors.transparent
-                              : theme.colorScheme.shadow.withValues(alpha: 0.03),
+                              : theme.colorScheme.shadow.withOpacity(0.03),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -431,7 +457,7 @@ class _ModernResultView extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFFF87171).withValues(alpha: 0.2)
+                          ? const Color(0xFFF87171).withOpacity(0.2)
                           : const Color(0xFFFCA5A5),
                     ),
                   ),
@@ -465,7 +491,7 @@ class _ModernResultView extends ConsumerWidget {
                         style: AppTypography.getCaption(context).copyWith(height: 1.4),
                       ),
                       Divider(
-                        color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+                        color: Theme.of(context).dividerColor.withOpacity(0.12),
                         height: 16,
                       ),
                       Text(
@@ -522,7 +548,7 @@ class _ModernResultView extends ConsumerWidget {
           ),
           circularStrokeCap: CircularStrokeCap.round,
           progressColor: accentColor,
-          backgroundColor: accentColor.withValues(alpha: 0.1),
+          backgroundColor: accentColor.withOpacity(0.1),
         ),
         const SizedBox(height: 8),
         Text(
@@ -619,7 +645,7 @@ class _SubstanceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(HeroIcons.beaker, size: 18, color: theme.colorScheme.primary),
@@ -700,14 +726,14 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                   children: [
                     Icon(
                       HeroIcons.information_circle, 
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                      color: theme.colorScheme.onSurface.withOpacity(0.38),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         l10n.noReferencesAvailable,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
                         ),
                       ),
                     ),
@@ -747,7 +773,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                color: theme.colorScheme.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -763,7 +789,7 @@ class _AcademicReferencesCardSection extends ConsumerWidget {
                               icon: Icon(
                                 HeroIcons.clipboard, 
                                 size: 18, 
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.54),
+                                color: theme.colorScheme.onSurface.withOpacity(0.54),
                               ),
                               onPressed: () {
                                 Clipboard.setData(ClipboardData(text: apaString));

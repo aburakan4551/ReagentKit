@@ -94,7 +94,7 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      color: theme.colorScheme.primary.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -194,7 +194,7 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                    ? theme.colorScheme.primary.withOpacity(0.15)
                                     : theme.colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
@@ -274,9 +274,9 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    color: theme.colorScheme.primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.25)),
+                    border: Border.all(color: theme.colorScheme.primary.withOpacity(0.25)),
                   ),
                   child: Row(
                     children: [

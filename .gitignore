@@ -75,3 +75,6 @@ run_with_api_key.sh
 *.log
 docs/github-actions-ios-secrets.md
 docs/github-actions-ios.md
+
+# App Store validation exclusions
+Flutter/Flutter.framework

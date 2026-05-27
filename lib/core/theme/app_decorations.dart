@@ -12,7 +12,7 @@ class AppDecorations {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -32,12 +32,12 @@ class AppDecorations {
         color: AppColors.overlayDark,
         borderRadius: AppDimensions.roundedXLarge,
         border: Border.all(
-          color: AppColors.borderSubtle.withValues(alpha: 0.5),
+          color: AppColors.borderSubtle.withOpacity(0.5),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )

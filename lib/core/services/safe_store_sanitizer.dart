@@ -1,21 +1,44 @@
 import 'package:flutter/foundation.dart';
+import 'safe_test_name_mapper.dart';
 
 class SafeStoreSanitizer {
   // Flag indicating if safe store mode is currently active
-  static bool safeStoreMode = false;
+  static bool safeStoreMode = true;
+
+  // Flag indicating if app store review mode is currently active (forces stricter naming/UI rules)
+  static bool appStoreReviewMode = true;
 
   // English replacements dictionary (dangerous -> safe)
   static final Map<String, String> _englishReplacements = {
+    'diazepam': 'laboratory reference compounds',
+    'benzodiazepines': 'educational analytical compounds',
+    'opiates': 'laboratory reference compounds',
+    'opioids': 'controlled compounds',
+    'opioid': 'controlled compounds',
+    'narcotics': 'educational chemistry analysis',
+    'THC': 'botanical compounds',
+    'thc': 'botanical compounds',
+    'MDA': 'organic chemistry references',
+    'mda': 'organic chemistry references',
+    'MDMA': 'organic chemistry references',
+    'mdma': 'organic chemistry references',
+    'LSD': 'chemical reagents',
+    'lsd': 'chemical reagents',
+    'substances': 'educational analytical compounds',
+    'substance detection': 'educational reagent analysis',
+    'reagent testing': 'educational reagent analysis',
+    'forensic': 'laboratory educational workflow',
+    'toxicology': 'laboratory educational workflow',
+    'controlled compounds': 'laboratory reference compounds',
+    'AI Interpretation': 'Analytical Observation',
+    'Possible Substances Detected': 'Observed Analytical Pattern',
+    'Possible Substances': 'Observed Analytical Pattern',
     'cocaine': 'controlled compounds',
     'heroin': 'alkaloid compounds',
     'methamphetamine': 'laboratory reference compounds',
-    'lsd': 'chemical reagents',
     'ecstasy': 'forensic chemistry compounds',
-    'narcotics': 'educational chemistry analysis',
     'drug detection': 'laboratory reagent analysis',
     'drugs of abuse': 'educational chemistry references',
-    'opioid': 'controlled compounds',
-    'opioids': 'controlled compounds',
     'amphetamine': 'controlled compounds',
     'amphetamines': 'controlled compounds',
     'drug testing': 'chemical reagent analysis',
@@ -24,29 +47,41 @@ class SafeStoreSanitizer {
     'drugs': 'compounds',
     'cannabis': 'botanical compounds',
     'khat': 'botanical specimens',
+    'opium': 'organic compound',
+    'morphine': 'alkaloid compound',
+    'codeine': 'alkaloid compound',
+    'methadone': 'organic reference compound',
+    'pethidine': 'organic reference compound',
   };
 
   // Arabic replacements dictionary (dangerous -> safe)
   static final Map<String, String> _arabicReplacements = {
+    'ديازيبام': 'مركبات مرجعية مخبرية',
+    'بنزوديازيبين': 'مركبات تحليلية تعليمية',
+    'أفيونات': 'مركبات مرجعية مخبرية',
+    'مواد مخدرة': 'مركبات تحليلية تعليمية',
+    'كشف السموم': 'تحليل كيميائي تعليمي',
+    'تحليل مخدرات': 'تحليل كيميائي تعليمي',
+    'الحشيش': 'مؤشرات مخبرية تعليمية',
+    'حشيش': 'مركبات تحليلية تعليمية',
+    'إم دي إم إيه': 'مركبات عضوية تعليمية',
+    'المؤثرات العقلية': 'مؤشرات مخبرية تعليمية',
     'كشف المخدرات': 'التحليل الكيميائي',
     'فحص المخدرات': 'التحليل الكيميائي',
     'كوكايين': 'مركب مرجعي',
     'هيروين': 'مركب قلوي',
-    'مواد مخدرة': 'مركبات خاضعة للتحليل',
     'مخدرات': 'مركبات خاضعة للتحليل',
     'مخدر': 'مركب خاضع للتحليل',
-    'كشف السموم': 'التحليل المخبري',
     'أمفيتامين': 'مركبات أمينية',
     'امفيتامين': 'مركبات أمينية',
     'أمفيتامينات': 'مركبات أمينية',
-    'أفيونات': 'مركبات قلوية',
     'افيونات': 'مركبات قلوية',
     'أفيون': 'مركب قلوي',
-    'حشيش': 'مركب عشبي',
-    'الحشيش': 'المركب العشبي',
     'قات': 'مركب نباتي',
     'القات': 'المركب النباتي',
     'السموم والمخدرات': 'التحاليل الكيميائية والمخبرية',
+    'تفسير الذكاء الاصطناعي': 'الملاحظة التحليلية',
+    'المركبات المحتملة المرصودة': 'النمط التحليلي المرصود',
   };
 
   /// Sanitizes the input [text] by replacing sensitive terminology with safe scientific alternatives.
@@ -60,7 +95,16 @@ class SafeStoreSanitizer {
       return text;
     }
 
-    String sanitizedText = text;
+    // First map test names if review mode is enabled
+    String sanitizedText = SafeTestNameMapper.mapName(text);
+
+    // Remove confidence percentages and labels if in review mode
+    if (appStoreReviewMode) {
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'\(\s*\d+%\s*(confidence|ثقة)?\s*\)', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'\d+%\s*(confidence|ثقة)?', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'confidence', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'ثقة', caseSensitive: false), '');
+    }
 
     // Apply Arabic replacements
     final sortedArabicKeys = _arabicReplacements.keys.toList()

@@ -185,16 +185,16 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                       style: TextStyle(color: theme.colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: isAr ? 'ابحث عن كاشف علمي...' : 'Search reagents...',
-                        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.38)),
+                        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.38)),
                         prefixIcon: Icon(
                           HeroIcons.magnifying_glass, 
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
                         ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: Icon(
                                   HeroIcons.x_mark, 
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
                                 ),
                                 onPressed: () => _searchController.clear(),
                               )
@@ -308,7 +308,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
               child: Icon(
                 HeroIcons.book_open,
                 size: 64,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.24),
+                color: theme.colorScheme.onSurface.withOpacity(0.24),
               ),
             ),
             const SizedBox(height: 24),
@@ -330,7 +330,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                   : 'No compatible scientific references found for this reagent dataset.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                color: theme.colorScheme.onSurface.withOpacity(0.38),
                 fontSize: 14,
               ),
             ),
@@ -375,7 +375,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    color: theme.colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(HeroIcons.beaker, color: theme.colorScheme.primary, size: 20),
@@ -397,7 +397,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                       Text(
                         reagent.category,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
+                          color: theme.colorScheme.onSurface.withOpacity(0.38),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -440,7 +440,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              color: theme.colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -456,7 +456,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                             icon: Icon(
                               HeroIcons.clipboard, 
                               size: 16, 
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withOpacity(0.7),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -485,7 +485,7 @@ class _ReagentReferenceCard extends StatelessWidget {
                       Text(
                         apaString,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 12,
                           height: 1.4,
                         ),

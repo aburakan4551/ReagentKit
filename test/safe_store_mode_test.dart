@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,19 +6,7 @@ import 'package:reagentkit/core/services/safe_store_backup_manager.dart';
 import 'package:reagentkit/features/reagent_testing/data/services/remote_config_service.dart';
 
 class FakeFirebaseRemoteConfig extends Fake implements FirebaseRemoteConfig {
-  final Map<String, dynamic> _mockValues = {
-    'reagents_data': '{}',
-    'reagent_version': '1.0.0',
-    'educational_mode': false,
-    'safe_store_mode': false,
-    'show_sensitive_names': true,
-    'enable_ai_analysis': true,
-    'enable_scientific_references': true,
-    'enable_scott_test': true,
-    'enable_high_risk_tests': true,
-    'hide_controlled_substances': false,
-    'app_store_review_mode': false,
-  };
+  final Map<String, dynamic> _mockValues = {};
 
   void setMockValue(String key, dynamic value) {
     _mockValues[key] = value;
@@ -29,7 +16,11 @@ class FakeFirebaseRemoteConfig extends Fake implements FirebaseRemoteConfig {
   Future<void> setConfigSettings(RemoteConfigSettings settings) async {}
 
   @override
-  Future<void> setDefaults(Map<String, dynamic> defaults) async {}
+  Future<void> setDefaults(Map<String, dynamic> defaults) async {
+    defaults.forEach((key, value) {
+      _mockValues.putIfAbsent(key, () => value);
+    });
+  }
 
   @override
   Future<bool> fetchAndActivate() async => true;
@@ -86,10 +77,10 @@ void main() {
       expect(SafeStoreSanitizer.sanitize('كوكايين'), equals('مركب مرجعي'));
       expect(SafeStoreSanitizer.sanitize('هيروين'), equals('مركب قلوي'));
       expect(SafeStoreSanitizer.sanitize('كشف المخدرات'), equals('التحليل الكيميائي'));
-      expect(SafeStoreSanitizer.sanitize('مواد مخدرة'), equals('مركبات خاضعة للتحليل'));
-      expect(SafeStoreSanitizer.sanitize('حشيش'), equals('مركب عشبي'));
+      expect(SafeStoreSanitizer.sanitize('مواد مخدرة'), equals('مركبات تحليلية تعليمية'));
+      expect(SafeStoreSanitizer.sanitize('حشيش'), equals('مركبات تحليلية تعليمية'));
       expect(SafeStoreSanitizer.sanitize('قات'), equals('مركب نباتي'));
-      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة'), equals('التحليل المخبري في العينة'));
+      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة'), equals('تحليل كيميائي تعليمي في العينة'));
     });
 
     test('Sanitizes mixed language strings and does not contain sensitive terms', () {
@@ -112,7 +103,7 @@ void main() {
       expect(sanitized.toLowerCase(), contains('botanical compounds'));
       expect(sanitized.toLowerCase(), contains('botanical specimens'));
       expect(sanitized.toLowerCase(), contains('chemical reagents'));
-      expect(sanitized, contains('مركب عشبي'));
+      expect(sanitized, contains('مركبات تحليلية تعليمية'));
       expect(sanitized, contains('مركب نباتي'));
       expect(sanitized, contains('مركب قلوي'));
       expect(sanitized, contains('مركبات أمينية'));
@@ -146,8 +137,20 @@ void main() {
       rcService = RemoteConfigService(remoteConfig: fakeRC);
     });
 
-    test('Default values return correctly', () async {
+    test('Default values return correctly (Review Mode defaults to true)', () async {
       await rcService.initialize();
+      expect(rcService.appStoreReviewMode, isTrue);
+      expect(rcService.safeStoreMode, isTrue);
+      expect(rcService.educationalMode, isTrue);
+      expect(rcService.showSensitiveNames, isFalse);
+      expect(rcService.enableAiAnalysis, isFalse);
+      expect(rcService.enableScientificReferences, isFalse);
+    });
+
+    test('Values return correctly when review mode is false', () async {
+      fakeRC.setMockValue('app_store_review_mode', false);
+      await rcService.initialize();
+      expect(rcService.appStoreReviewMode, isFalse);
       expect(rcService.safeStoreMode, isFalse);
       expect(rcService.educationalMode, isFalse);
       expect(rcService.showSensitiveNames, isTrue);

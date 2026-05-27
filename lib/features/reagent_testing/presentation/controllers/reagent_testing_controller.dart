@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/reagent_entity.dart';
 import '../../domain/repositories/reagent_testing_repository.dart';
-import '../../data/services/unified_data_service.dart';
 import '../states/reagent_testing_state.dart';
 
 class ReagentTestingController extends StateNotifier<ReagentTestingState> {

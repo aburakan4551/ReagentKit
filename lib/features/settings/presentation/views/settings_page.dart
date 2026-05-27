@@ -34,7 +34,7 @@ class SettingsPage extends ConsumerWidget {
             end: Alignment.bottomRight,
             colors: [
               theme.colorScheme.surface,
-              theme.colorScheme.surface.withValues(alpha: 0.8),
+              theme.colorScheme.surface.withOpacity(0.8),
               theme.colorScheme.surfaceContainerLowest,
             ],
           ),
@@ -56,7 +56,7 @@ class SettingsPage extends ConsumerWidget {
                         gradient: LinearGradient(
                           colors: [
                             theme.colorScheme.primary,
-                            theme.colorScheme.primary.withValues(alpha: 0.8),
+                            theme.colorScheme.primary.withOpacity(0.8),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -122,12 +122,12 @@ class SettingsPage extends ConsumerWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.red.withValues(alpha: 0.1),
-              Colors.red.withValues(alpha: 0.05),
+              Colors.red.withOpacity(0.1),
+              Colors.red.withOpacity(0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+          border: Border.all(color: Colors.red.withOpacity(0.3)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -135,7 +135,7 @@ class SettingsPage extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
+                color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Icon(
@@ -193,8 +193,8 @@ class SettingsPage extends ConsumerWidget {
           title: l10n.appearance,
           icon: HeroIcons.paint_brush,
           gradient: [
-            Colors.purple.withValues(alpha: 0.1),
-            Colors.blue.withValues(alpha: 0.1),
+            Colors.purple.withOpacity(0.1),
+            Colors.blue.withOpacity(0.1),
           ],
           children: [
             SettingsDropdownTile<String>(
@@ -258,8 +258,8 @@ class SettingsPage extends ConsumerWidget {
           title: l10n.language,
           icon: HeroIcons.language,
           gradient: [
-            Colors.green.withValues(alpha: 0.1),
-            Colors.teal.withValues(alpha: 0.1),
+            Colors.green.withOpacity(0.1),
+            Colors.teal.withOpacity(0.1),
           ],
           children: [
             SettingsDropdownTile<String>(
@@ -341,8 +341,8 @@ class SettingsPage extends ConsumerWidget {
           title: l10n.subscriptionAndTrials,
           icon: HeroIcons.sparkles,
           gradient: [
-            Colors.amber.withValues(alpha: 0.1),
-            Colors.orange.withValues(alpha: 0.1),
+            Colors.amber.withOpacity(0.1),
+            Colors.orange.withOpacity(0.1),
           ],
           children: [
             SettingsTile(
@@ -355,8 +355,8 @@ class SettingsPage extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: premiumService.isPremium
-                      ? Colors.green.withValues(alpha: 0.12)
-                      : Colors.orange.withValues(alpha: 0.12),
+                      ? Colors.green.withOpacity(0.12)
+                      : Colors.orange.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -409,8 +409,8 @@ class SettingsPage extends ConsumerWidget {
           title: l10n.localeName == 'ar' ? 'البحث العلمي والمراجع' : 'Research & References',
           icon: HeroIcons.academic_cap,
           gradient: [
-            const Color(0xFF7C5CFF).withValues(alpha: 0.1),
-            Colors.blue.withValues(alpha: 0.1),
+            const Color(0xFF7C5CFF).withOpacity(0.1),
+            Colors.blue.withOpacity(0.1),
           ],
           children: [
             SettingsSwitchTile(
@@ -452,8 +452,8 @@ class SettingsPage extends ConsumerWidget {
           title: l10n.about,
           icon: HeroIcons.information_circle,
           gradient: [
-            Colors.indigo.withValues(alpha: 0.1),
-            Colors.purple.withValues(alpha: 0.1),
+            Colors.indigo.withOpacity(0.1),
+            Colors.purple.withOpacity(0.1),
           ],
           children: [
             SettingsTile(
@@ -505,8 +505,8 @@ class SettingsPage extends ConsumerWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      theme.colorScheme.primary.withValues(alpha: 0.2),
-                      theme.colorScheme.primary.withValues(alpha: 0.1),
+                      theme.colorScheme.primary.withOpacity(0.2),
+                      theme.colorScheme.primary.withOpacity(0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -533,7 +533,7 @@ class SettingsPage extends ConsumerWidget {
               'Reagent ColorTest - Version 1.0.0\nResearch Use Only - Dataset Version: 2026.05',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
                 fontSize: 11,
                 height: 1.5,
               ),
@@ -564,7 +564,7 @@ class SettingsPage extends ConsumerWidget {
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: gradient.first.withValues(alpha: 0.3),
+          color: gradient.first.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -597,7 +597,7 @@ class SettingsPage extends ConsumerWidget {
               end: Alignment.bottomRight,
               colors: [
                 theme.colorScheme.surface,
-                theme.colorScheme.surface.withValues(alpha: 0.8),
+                theme.colorScheme.surface.withOpacity(0.8),
               ],
             ),
           ),

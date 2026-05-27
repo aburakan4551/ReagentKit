@@ -30,7 +30,7 @@ class ChemicalComponentsSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.secondary.withValues(alpha: 0.12),
+            color: theme.colorScheme.secondary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import '../models/reagent_model.dart';
 import '../../../../core/utils/logger.dart';
@@ -67,11 +68,12 @@ class RemoteConfigService {
         _enableScottTestKey: true,
         _enableHighRiskTestsKey: true,
         _hideControlledSubstancesKey: false,
-        _appStoreReviewModeKey: false,
+        _appStoreReviewModeKey: true,
       });
 
       await fetchAndActivate();
       SafeStoreSanitizer.safeStoreMode = safeStoreMode;
+      SafeStoreSanitizer.appStoreReviewMode = appStoreReviewMode;
       Logger.info('✅ [RemoteConfig] Initialized successfully');
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] Initialization failed: $e',
@@ -84,11 +86,19 @@ class RemoteConfigService {
 
   Future<bool> fetchAndActivate() async {
     try {
+      final oldReviewMode = appStoreReviewMode;
       final updated = await _remoteConfig.fetchAndActivate();
-      if (updated) {
+      final newReviewMode = appStoreReviewMode;
+      
+      if (updated || oldReviewMode != newReviewMode) {
         Logger.info('🔄 [RemoteConfig] New values activated');
+        if (oldReviewMode != newReviewMode) {
+          Logger.info('⚠️ [RemoteConfig] App Store Review Mode changed from $oldReviewMode to $newReviewMode');
+          await _handleReviewModeChange(newReviewMode);
+        }
       }
       SafeStoreSanitizer.safeStoreMode = safeStoreMode;
+      SafeStoreSanitizer.appStoreReviewMode = appStoreReviewMode;
       return updated;
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] fetchAndActivate failed: $e',
@@ -99,13 +109,39 @@ class RemoteConfigService {
 
   Future<bool> activate() async {
     try {
+      final oldReviewMode = appStoreReviewMode;
       final success = await _remoteConfig.activate();
+      final newReviewMode = appStoreReviewMode;
+      
+      if (success) {
+        if (oldReviewMode != newReviewMode) {
+          Logger.info('⚠️ [RemoteConfig] App Store Review Mode changed from $oldReviewMode to $newReviewMode');
+          await _handleReviewModeChange(newReviewMode);
+        }
+      }
       SafeStoreSanitizer.safeStoreMode = safeStoreMode;
+      SafeStoreSanitizer.appStoreReviewMode = appStoreReviewMode;
       return success;
     } catch (e, st) {
       Logger.error('❌ [RemoteConfig] activate failed: $e',
           error: e, stackTrace: st);
       return false;
+    }
+  }
+
+  Future<void> _handleReviewModeChange(bool reviewMode) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('scientific_dataset_cache');
+      await prefs.remove('scientific_dataset_cache_prev');
+      await prefs.remove('scientific_dataset_snapshot');
+      await prefs.remove('cached_ai_analysis_results');
+      Logger.info('🧹 [RemoteConfig] Cache wiped due to Review Mode change to: $reviewMode');
+      
+      SafeStoreSanitizer.safeStoreMode = reviewMode;
+      SafeStoreSanitizer.appStoreReviewMode = reviewMode;
+    } catch (e) {
+      Logger.error('❌ [RemoteConfig] Failed to handle review mode change: $e');
     }
   }
 

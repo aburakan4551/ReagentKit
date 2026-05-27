@@ -53,7 +53,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withValues(alpha: 0.12),
+            color: theme.colorScheme.primary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
@@ -114,7 +114,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
                   activeColor: theme.colorScheme.primary,
                   checkColor: Colors.white,
                   side: BorderSide(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+                    color: theme.colorScheme.onSurface.withOpacity(0.3),
                     width: 1.5,
                   ),
                 ),

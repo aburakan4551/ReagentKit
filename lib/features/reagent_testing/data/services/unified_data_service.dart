@@ -12,7 +12,6 @@ import '../models/reagent_test_model.dart';
 import '../models/drug_result_model.dart';
 import '../../../../scientific_engine/safe_parsers.dart';
 import '../../../../scientific_engine/validation_profile.dart';
-import '../../../../scientific_engine/dataset_parsing_exception.dart';
 import '../../../../scientific_engine/dataset_migration.dart';
 import '../../../../core/services/crash_analytics.dart';
 import 'remote_config_service.dart';
@@ -384,6 +383,17 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
     int totalReferencesCount = 0;
 
     void processReagent(String key, Map<String, dynamic> val) {
+      // Dynamically inject missing keys for compatibility with flat reagents.json format
+      if (val['id'] == null || val['id'].toString().trim().isEmpty) {
+        val['id'] = key.toLowerCase().replaceAll(' ', '_');
+      }
+      if (val['reagentName'] == null || val['reagentName'].toString().trim().isEmpty) {
+        val['reagentName'] = key;
+      }
+      if (val['category'] == null || val['category'].toString().trim().isEmpty) {
+        val['category'] = 'Primary Tests';
+      }
+
       final refs = val['references'] ?? val['reference'] ?? val['refs'];
       if (refs is List) {
         totalReferencesCount += refs.length;
@@ -529,7 +539,11 @@ class UnifiedDataService {
   String _cacheVersion = '1.0.0';
   bool _initialized = false;
 
-  static const String _datasetAsset = 'assets/data/scientific_dataset.json';
+  String get _datasetAsset {
+    final rc = _remoteConfig;
+    final isReview = rc?.appStoreReviewMode ?? SafeStoreSanitizer.appStoreReviewMode;
+    return isReview ? 'assets/data/reagents_safe_store.json' : 'assets/data/reagents.json';
+  }
 
   final _snapshotController = StreamController<DataSnapshot>.broadcast();
   Stream<DataSnapshot> get onSnapshot => _snapshotController.stream;
@@ -1361,7 +1375,6 @@ class UnifiedDataService {
     final isSafeStore = rc?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
     final isScottEnabled = rc?.enableScottTest ?? true;
     final isHighRiskEnabled = rc?.enableHighRiskTests ?? true;
-    final isHideControlled = rc?.hideControlledSubstances ?? false;
     final isScientificReferencesEnabled = rc?.enableScientificReferences ?? true;
 
     // Filter reagents
