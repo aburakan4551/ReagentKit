@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import '../models/reagent_model.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../core/services/safe_store_sanitizer.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // RemoteConfigService — Production-Grade
@@ -24,6 +25,16 @@ class RemoteConfigService {
   static const String _referencesDataKey    = 'references_data';
   static const String _reagentVersionKey    = 'reagent_version';
   static const String _geminiApiKeyKey      = 'gemini_api_key';
+
+  static const String _educationalModeKey = 'educational_mode';
+  static const String _safeStoreModeKey = 'safe_store_mode';
+  static const String _showSensitiveNamesKey = 'show_sensitive_names';
+  static const String _enableAiAnalysisKey = 'enable_ai_analysis';
+  static const String _enableScientificReferencesKey = 'enable_scientific_references';
+  static const String _enableScottTestKey = 'enable_scott_test';
+  static const String _enableHighRiskTestsKey = 'enable_high_risk_tests';
+  static const String _hideControlledSubstancesKey = 'hide_controlled_substances';
+  static const String _appStoreReviewModeKey = 'app_store_review_mode';
 
   final FirebaseRemoteConfig _remoteConfig;
 
@@ -48,6 +59,15 @@ class RemoteConfigService {
         _referencesDataKey: '{}',
         _reagentVersionKey: '1.0.0',
         _geminiApiKeyKey:   '',
+        _educationalModeKey: false,
+        _safeStoreModeKey: false,
+        _showSensitiveNamesKey: true,
+        _enableAiAnalysisKey: true,
+        _enableScientificReferencesKey: true,
+        _enableScottTestKey: true,
+        _enableHighRiskTestsKey: true,
+        _hideControlledSubstancesKey: false,
+        _appStoreReviewModeKey: false,
       });
 
       await fetchAndActivate();
@@ -246,6 +266,31 @@ class RemoteConfigService {
     Logger.error('❌ [RemoteConfig] No Gemini API key found');
     return '';
   }
+
+  // ── Safe Store Mode Getters ────────────────────────────────────────────────
+
+  bool get appStoreReviewMode => _remoteConfig.getBool(_appStoreReviewModeKey);
+
+  bool get safeStoreMode {
+    final mode = _remoteConfig.getBool(_safeStoreModeKey) || appStoreReviewMode;
+    // Set sanitizer mode dynamically
+    SafeStoreSanitizer.safeStoreMode = mode;
+    return mode;
+  }
+
+  bool get educationalMode => _remoteConfig.getBool(_educationalModeKey) || appStoreReviewMode;
+
+  bool get showSensitiveNames => appStoreReviewMode ? false : _remoteConfig.getBool(_showSensitiveNamesKey);
+
+  bool get enableAiAnalysis => appStoreReviewMode ? false : _remoteConfig.getBool(_enableAiAnalysisKey);
+
+  bool get enableScientificReferences => appStoreReviewMode ? false : _remoteConfig.getBool(_enableScientificReferencesKey);
+
+  bool get enableScottTest => appStoreReviewMode ? false : _remoteConfig.getBool(_enableScottTestKey);
+
+  bool get enableHighRiskTests => appStoreReviewMode ? false : _remoteConfig.getBool(_enableHighRiskTestsKey);
+
+  bool get hideControlledSubstances => appStoreReviewMode ? true : _remoteConfig.getBool(_hideControlledSubstancesKey);
 
   // ── Real-time updates ──────────────────────────────────────────────────────
 

@@ -1,0 +1,141 @@
+import 'dart:convert';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reagentkit/core/services/safe_store_sanitizer.dart';
+import 'package:reagentkit/core/services/safe_store_backup_manager.dart';
+import 'package:reagentkit/features/reagent_testing/data/services/remote_config_service.dart';
+
+class FakeFirebaseRemoteConfig extends Fake implements FirebaseRemoteConfig {
+  final Map<String, dynamic> _mockValues = {
+    'reagents_data': '{}',
+    'reagent_version': '1.0.0',
+    'educational_mode': false,
+    'safe_store_mode': false,
+    'show_sensitive_names': true,
+    'enable_ai_analysis': true,
+    'enable_scientific_references': true,
+    'enable_scott_test': true,
+    'enable_high_risk_tests': true,
+    'hide_controlled_substances': false,
+    'app_store_review_mode': false,
+  };
+
+  void setMockValue(String key, dynamic value) {
+    _mockValues[key] = value;
+  }
+
+  @override
+  Future<void> setConfigSettings(RemoteConfigSettings settings) async {}
+
+  @override
+  Future<void> setDefaults(Map<String, dynamic> defaults) async {}
+
+  @override
+  Future<bool> fetchAndActivate() async => true;
+
+  @override
+  Future<bool> activate() async => true;
+
+  @override
+  String getString(String key) => _mockValues[key]?.toString() ?? '';
+
+  @override
+  bool getBool(String key) {
+    final val = _mockValues[key];
+    if (val is bool) return val;
+    if (val == 'true') return true;
+    return false;
+  }
+
+  @override
+  Stream<RemoteConfigUpdate> get onConfigUpdated => const Stream.empty();
+}
+
+void main() {
+  // Ensure shared_preferences has a mocked storage before running tests
+  SharedPreferences.setMockInitialValues({});
+
+  group('SafeStoreSanitizer Tests', () {
+    setUp(() {
+      SafeStoreSanitizer.safeStoreMode = false;
+    });
+
+    test('Does not sanitize when safeStoreMode is false', () {
+      expect(SafeStoreSanitizer.sanitize('cocaine'), equals('cocaine'));
+      expect(SafeStoreSanitizer.sanitize('كوكايين', isArabic: true), equals('كوكايين'));
+    });
+
+    test('Sanitizes English terms when safeStoreMode is true', () {
+      SafeStoreSanitizer.safeStoreMode = true;
+      expect(SafeStoreSanitizer.sanitize('cocaine'), equals('controlled compounds'));
+      expect(SafeStoreSanitizer.sanitize('heroin'), equals('alkaloid compounds'));
+      expect(SafeStoreSanitizer.sanitize('Lsd'), equals('Chemical reagents')); // Casing preserved (first letter uppercase)
+      expect(SafeStoreSanitizer.sanitize('LSD'), equals('CHEMICAL REAGENTS')); // Casing preserved (all uppercase)
+      expect(SafeStoreSanitizer.sanitize('Ecstasy'), equals('Forensic chemistry compounds'));
+      expect(SafeStoreSanitizer.sanitize('narcotics'), equals('educational chemistry analysis'));
+      expect(SafeStoreSanitizer.sanitize('drugs of abuse'), equals('educational chemistry references'));
+      expect(SafeStoreSanitizer.sanitize('This is cocaine and heroin testing'), 
+             equals('This is controlled compounds and alkaloid compounds testing'));
+    });
+
+    test('Sanitizes Arabic terms when safeStoreMode is true', () {
+      SafeStoreSanitizer.safeStoreMode = true;
+      expect(SafeStoreSanitizer.sanitize('كوكايين', isArabic: true), equals('مركب مرجعي'));
+      expect(SafeStoreSanitizer.sanitize('هيروين', isArabic: true), equals('مركب قلوي'));
+      expect(SafeStoreSanitizer.sanitize('كشف المخدرات', isArabic: true), equals('التحليل الكيميائي'));
+      expect(SafeStoreSanitizer.sanitize('مواد مخدرة', isArabic: true), equals('مركبات خاضعة للتحليل'));
+      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة', isArabic: true), equals('التحليل المخبري في العينة'));
+    });
+  });
+
+  group('SafeStoreBackupManager Tests', () {
+    test('Create and restore backups locally', () async {
+      final success = await SafeStoreBackupManager.createBackup(
+        reagentsData: '{"test_reagent": "original"}',
+        safetyData: '{"safety": "original"}',
+        referencesData: '["ref1"]',
+        version: '2.0.0',
+      );
+
+      expect(success, isTrue);
+
+      final restored = await SafeStoreBackupManager.restoreLatestBackup();
+      expect(restored, isNotNull);
+      expect(restored!['reagents_data'], equals('{"test_reagent": "original"}'));
+      expect(restored['version'], equals('2.0.0'));
+    });
+  });
+
+  group('RemoteConfigService Integration Tests', () {
+    late RemoteConfigService rcService;
+    late FakeFirebaseRemoteConfig fakeRC;
+
+    setUp(() {
+      fakeRC = FakeFirebaseRemoteConfig();
+      rcService = RemoteConfigService(remoteConfig: fakeRC);
+    });
+
+    test('Default values return correctly', () async {
+      await rcService.initialize();
+      expect(rcService.safeStoreMode, isFalse);
+      expect(rcService.educationalMode, isFalse);
+      expect(rcService.showSensitiveNames, isTrue);
+      expect(rcService.enableAiAnalysis, isTrue);
+      expect(rcService.enableScientificReferences, isTrue);
+    });
+
+    test('App Store Review Mode overrides other flags', () async {
+      fakeRC.setMockValue('app_store_review_mode', true);
+      await rcService.initialize();
+
+      expect(rcService.appStoreReviewMode, isTrue);
+      expect(rcService.safeStoreMode, isTrue);
+      expect(rcService.educationalMode, isTrue);
+      expect(rcService.showSensitiveNames, isFalse);
+      expect(rcService.enableAiAnalysis, isFalse);
+      expect(rcService.enableScientificReferences, isFalse);
+      expect(rcService.hideControlledSubstances, isTrue);
+    });
+  });
+}

@@ -3,6 +3,7 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../l10n/app_localizations.dart';
 import '../../features/reagent_testing/domain/entities/reagent_entity.dart';
 import '../../features/reagent_testing/domain/entities/drug_result_entity.dart';
+import 'package:reagentkit/core/services/safe_store_sanitizer.dart';
 
 class LocalizationHelper {
   static String getLocalizedReagentName(
@@ -10,9 +11,10 @@ class LocalizationHelper {
     ReagentEntity reagent,
   ) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    return isArabic && reagent.reagentNameAr.isNotEmpty
+    final name = isArabic && reagent.reagentNameAr.isNotEmpty
         ? reagent.reagentNameAr
         : reagent.reagentName;
+    return SafeStoreSanitizer.sanitize(name, isArabic: isArabic);
   }
 
   static String getLocalizedDescription(
@@ -20,9 +22,10 @@ class LocalizationHelper {
     ReagentEntity reagent,
   ) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    return isArabic && reagent.descriptionAr.isNotEmpty
+    final desc = isArabic && reagent.descriptionAr.isNotEmpty
         ? reagent.descriptionAr
         : reagent.description;
+    return SafeStoreSanitizer.sanitize(desc, isArabic: isArabic);
   }
 
   static String getLocalizedSafetyLevel(
@@ -30,9 +33,10 @@ class LocalizationHelper {
     ReagentEntity reagent,
   ) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    return isArabic && reagent.safetyLevelAr.isNotEmpty
+    final safety = isArabic && reagent.safetyLevelAr.isNotEmpty
         ? reagent.safetyLevelAr
         : reagent.safetyLevel;
+    return SafeStoreSanitizer.sanitize(safety, isArabic: isArabic);
   }
 
   static String getLocalizedDrugColor(
@@ -40,9 +44,10 @@ class LocalizationHelper {
     DrugResultEntity drugResult,
   ) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    return isArabic && drugResult.colorAr.isNotEmpty
+    final color = isArabic && drugResult.colorAr.isNotEmpty
         ? drugResult.colorAr
         : drugResult.color;
+    return SafeStoreSanitizer.sanitize(color, isArabic: isArabic);
   }
 
   static String getLocalizedSafetyLevelTranslation(

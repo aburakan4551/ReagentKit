@@ -15,6 +15,9 @@ import '../../../../scientific_engine/validation_profile.dart';
 import '../../../../scientific_engine/dataset_parsing_exception.dart';
 import '../../../../scientific_engine/dataset_migration.dart';
 import '../../../../core/services/crash_analytics.dart';
+import 'remote_config_service.dart';
+import '../../../../core/services/safe_store_sanitizer.dart';
+import '../../../../core/services/safe_store_backup_manager.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Enums & Value Objects
@@ -518,8 +521,7 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
 // ═════════════════════════════════════════════════════════════════════════════
 
 class UnifiedDataService {
-  // ignore: unused_field
-  final dynamic _remoteConfig;
+  final RemoteConfigService? _remoteConfig;
   // ignore: unused_field
   final dynamic _connectivity;
 
@@ -661,6 +663,15 @@ class UnifiedDataService {
       final migratedRaw = jsonEncode(migratedJson);
 
       final parseOutput = await _verifyAndParse(migratedRaw, profile);
+      
+      // Trigger backup of the original dataset before any review modes or modifications
+      await SafeStoreBackupManager.createBackup(
+        reagentsData: migratedRaw,
+        safetyData: '{}',
+        referencesData: '{}',
+        version: parseOutput.version,
+      );
+
       final List<ReagentTestModel> reagentsList = parseOutput.parsedReagents
           .map((e) => ReagentTestModel.fromJson(e, profile: profile))
           .toList();
@@ -741,12 +752,11 @@ class UnifiedDataService {
 
       _currentWarningSeverity = warningSeverity;
 
-      final snapshot = DataSnapshot(
-        reagents: UnmodifiableListView(reagentsList),
+      final snapshot = _makeSnapshot(
+        reagents: reagentsList,
         source: DataSource.local,
         health: parseOutput.skippedItemsCount > 0 ? DataHealthStatus.degraded : DataHealthStatus.healthy,
         version: parseOutput.version,
-        loadedAt: DateTime.now(),
         diagnostics: diagnostics,
         lifecycleState: _currentLifecycleState,
         integrity: integrity,
@@ -809,12 +819,11 @@ class UnifiedDataService {
           expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
         );
 
-        final snapshot = DataSnapshot(
-          reagents: UnmodifiableListView(reagentsList),
+        final snapshot = _makeSnapshot(
+          reagents: reagentsList,
           source: DataSource.staleCache,
           health: DataHealthStatus.fallback,
           version: parseOutput.version,
-          loadedAt: DateTime.now(),
           diagnostics: diagnostics,
           lifecycleState: DatasetLifecycleState.fallback,
           integrity: ScientificIntegrity.fallback,
@@ -868,12 +877,11 @@ class UnifiedDataService {
           datasetVersion: parseOutput.version,
         );
 
-        final snapshot = DataSnapshot(
-          reagents: UnmodifiableListView(reagentsList),
+        final snapshot = _makeSnapshot(
+          reagents: reagentsList,
           source: DataSource.staleCache,
           health: DataHealthStatus.fallback,
           version: parseOutput.version,
-          loadedAt: DateTime.now(),
           diagnostics: diagnostics,
           lifecycleState: DatasetLifecycleState.fallback,
           integrity: ScientificIntegrity.fallback,
@@ -926,12 +934,11 @@ class UnifiedDataService {
           datasetVersion: version,
         );
 
-        final snapshot = DataSnapshot(
-          reagents: UnmodifiableListView(reagentsList),
+        final snapshot = _makeSnapshot(
+          reagents: reagentsList,
           source: DataSource.staleCache,
           health: DataHealthStatus.fallback,
           version: version,
-          loadedAt: DateTime.now(),
           diagnostics: diagnostics,
           lifecycleState: DatasetLifecycleState.fallback,
           integrity: ScientificIntegrity.fallback,
@@ -1060,14 +1067,13 @@ class UnifiedDataService {
         datasetVersion: _cacheVersion,
       );
 
-      return DataSnapshot(
-        reagents: UnmodifiableListView(_cachedReagents!),
+      return _makeSnapshot(
+        reagents: _cachedReagents!,
         source: _lastDataSource,
         health: _lastDataSource == DataSource.staleCache
             ? DataHealthStatus.fallback
             : DataHealthStatus.healthy,
         version: _cacheVersion,
-        loadedAt: DateTime.now(),
         diagnostics: diagnostics,
         lifecycleState: _currentLifecycleState,
         integrity: _lastDataSource == DataSource.staleCache
@@ -1225,12 +1231,11 @@ class UnifiedDataService {
       datasetVersion: 'emergency_1.0.0',
     );
 
-    return DataSnapshot(
-      reagents: UnmodifiableListView(reagentsList),
+    return _makeSnapshot(
+      reagents: reagentsList,
       source: source,
       health: DataHealthStatus.corrupted,
       version: 'emergency_1.0.0',
-      loadedAt: DateTime.now(),
       diagnostics: diagnostics,
       lifecycleState: lifecycleState,
       integrity: integrity,
@@ -1306,4 +1311,145 @@ class UnifiedDataService {
       ),
     ),
   ];
+
+  // ── Safe Store Mode Snapshot Processor ──────────────────────────────────────
+
+  DataSnapshot _makeSnapshot({
+    required List<ReagentTestModel> reagents,
+    required DataSource source,
+    required DataHealthStatus health,
+    required String version,
+    required DatasetDiagnostics diagnostics,
+    required DatasetLifecycleState lifecycleState,
+    required ScientificIntegrity integrity,
+    required WarningSeverity warningSeverity,
+    String? warningMessage,
+    DatasetMetadata? metadata,
+    DatasetLineage? lineage,
+  }) {
+    final processed = _processAndSanitizeReagents(reagents);
+    
+    final adjustedDiagnostics = DatasetDiagnostics(
+      rawItems: processed.length,
+      parsedItems: processed.length,
+      skippedItems: diagnostics.skippedItems,
+      invalidReferences: diagnostics.invalidReferences,
+      invalidColors: diagnostics.invalidColors,
+      usedFallback: diagnostics.usedFallback,
+      datasetVersion: diagnostics.datasetVersion,
+    );
+
+    return DataSnapshot(
+      reagents: UnmodifiableListView(processed),
+      source: source,
+      health: health,
+      version: version,
+      loadedAt: DateTime.now(),
+      diagnostics: adjustedDiagnostics,
+      lifecycleState: lifecycleState,
+      integrity: integrity,
+      warningSeverity: warningSeverity,
+      warningMessage: warningMessage,
+      metadata: metadata,
+      lineage: lineage,
+    );
+  }
+
+  List<ReagentTestModel> _processAndSanitizeReagents(List<ReagentTestModel> originalList) {
+    final rc = _remoteConfig;
+    if (rc == null) return originalList;
+
+    final isSafeStore = rc.safeStoreMode;
+    final isScottEnabled = rc.enableScottTest;
+    final isHighRiskEnabled = rc.enableHighRiskTests;
+    final isHideControlled = rc.hideControlledSubstances;
+    final isScientificReferencesEnabled = rc.enableScientificReferences;
+
+    // Filter reagents
+    List<ReagentTestModel> filtered = originalList.where((reagent) {
+      final idLower = reagent.id.toLowerCase();
+      
+      // 1. Filter out Scott Test if disabled
+      if (!isScottEnabled && idLower.contains('scott')) {
+        return false;
+      }
+      
+      // 2. Filter out High Risk Tests if disabled
+      if (!isHighRiskEnabled) {
+        final highRiskKeywords = ['scott', 'heroin', 'morphine', 'codeine', 'simon', 'ehrlich', 'liebermann', 'mandelin'];
+        if (highRiskKeywords.any((kw) => idLower.contains(kw))) {
+          return false;
+        }
+      }
+      
+      return true;
+    }).toList();
+
+    // If safe store mode is disabled, we return the filtered list immediately
+    if (!isSafeStore) {
+      return filtered;
+    }
+
+    // Set sanitizer mode dynamically
+    SafeStoreSanitizer.safeStoreMode = true;
+
+    // Clone and sanitize visible UI strings
+    return filtered.map((reagent) {
+      final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName, isArabic: false);
+      final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr, isArabic: true);
+      final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description, isArabic: false);
+      final sanitizedDescAr = SafeStoreSanitizer.sanitize(reagent.descriptionAr, isArabic: true);
+      final sanitizedSafetyLevelAr = SafeStoreSanitizer.sanitize(reagent.safetyLevelAr, isArabic: true);
+
+      final sanitizedInstructions = reagent.testInstructions.map((step) {
+        return ReagentTestInstructionStep(
+          step: step.step,
+          instruction: SafeStoreSanitizer.sanitize(step.instruction, isArabic: false),
+          instructionAr: SafeStoreSanitizer.sanitize(step.instructionAr, isArabic: true),
+        );
+      }).toList();
+
+      List<DrugResultModel> sanitizedReactionResults = reagent.reactionResults;
+      if (isHideControlled) {
+        // If hide_controlled_substances is active, sanitize the drug names in the drug results
+        sanitizedReactionResults = reagent.reactionResults.map((result) {
+          final sanitizedDrugName = SafeStoreSanitizer.sanitize(result.drugName, isArabic: false);
+          return DrugResultModel(
+            drugName: sanitizedDrugName,
+            color: SafeStoreSanitizer.sanitize(result.color, isArabic: false),
+            colorAr: SafeStoreSanitizer.sanitize(result.colorAr, isArabic: true),
+          );
+        }).toList();
+      } else {
+        sanitizedReactionResults = reagent.reactionResults.map((result) {
+          return DrugResultModel(
+            drugName: SafeStoreSanitizer.sanitize(result.drugName, isArabic: false),
+            color: SafeStoreSanitizer.sanitize(result.color, isArabic: false),
+            colorAr: SafeStoreSanitizer.sanitize(result.colorAr, isArabic: true),
+          );
+        }).toList();
+      }
+
+      final sanitizedReferences = isScientificReferencesEnabled 
+          ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref, isArabic: false)).toList()
+          : <String>[];
+
+      return ReagentTestModel(
+        id: reagent.id,
+        reagentName: sanitizedName,
+        reagentNameAr: sanitizedNameAr,
+        description: sanitizedDesc,
+        descriptionAr: sanitizedDescAr,
+        safetyLevel: reagent.safetyLevel,
+        safetyLevelAr: sanitizedSafetyLevelAr,
+        category: reagent.category,
+        testDuration: reagent.testDuration,
+        chemicals: reagent.chemicals,
+        testInstructions: sanitizedInstructions,
+        reactionResults: sanitizedReactionResults,
+        references: sanitizedReferences,
+        safety: reagent.safety,
+      );
+    }).toList();
+  }
 }

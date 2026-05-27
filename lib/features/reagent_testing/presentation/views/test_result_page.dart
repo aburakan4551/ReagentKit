@@ -14,6 +14,7 @@ import '../../../../core/utils/localization_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:reagentkit/core/services/safe_store_sanitizer.dart';
 
 // Provider to fetch references dynamically for a given reagent name
 final reagentReferencesProvider = FutureProvider.family<List<String>, String>((ref, reagentName) async {
@@ -134,6 +135,22 @@ class _ModernResultView extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final isResearchMode = ref.watch(researchModeEnabledProvider);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final rc = ref.watch(remoteConfigServiceProvider);
+
+    final reagentName = SafeStoreSanitizer.sanitize(
+      isAr ? (testResult.reagentName == 'Marquis Test' ? 'اختبار ماركيز' : testResult.reagentName) : testResult.reagentName,
+      isArabic: isAr,
+    );
+
+    final possibleSubstances = testResult.possibleSubstances.map((substance) {
+      return SafeStoreSanitizer.sanitize(substance, isArabic: isAr);
+    }).toList();
+
+    final notes = testResult.notes != null
+        ? SafeStoreSanitizer.sanitize(testResult.notes!, isArabic: isAr)
+        : null;
+
+    final observedColor = SafeStoreSanitizer.sanitize(testResult.observedColor, isArabic: isAr);
 
     final stabilityVal = testResult.stabilityIndex ?? 1.0;
     String stabilityText = isAr ? 'مستقر' : 'Stable Result';
@@ -195,7 +212,7 @@ class _ModernResultView extends ConsumerWidget {
                 ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 24),
                 Text(
-                  isAr ? (testResult.reagentName == 'Marquis Test' ? 'اختبار ماركيز' : testResult.reagentName) : testResult.reagentName,
+                  reagentName,
                   style: AppTypography.getSectionTitle(context).copyWith(
                     letterSpacing: 1.1,
                   ),
@@ -261,8 +278,8 @@ class _ModernResultView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...testResult.possibleSubstances.map((substance) => _SubstanceItem(substance: substance)),
-                      if (testResult.possibleSubstances.isEmpty)
+                      ...possibleSubstances.map((substance) => _SubstanceItem(substance: substance)),
+                      if (possibleSubstances.isEmpty)
                         Text(
                           l10n.unknownSubstance,
                           style: TextStyle(
@@ -272,7 +289,7 @@ class _ModernResultView extends ConsumerWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      if (testResult.notes != null && testResult.notes!.isNotEmpty) ...[
+                      if (notes != null && notes.isNotEmpty) ...[
                         Divider(
                           color: theme.dividerColor,
                           height: 24,
@@ -286,7 +303,7 @@ class _ModernResultView extends ConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          testResult.notes!,
+                          notes,
                           style: AppTypography.getMetadataValue(context).copyWith(
                             height: 1.45,
                           ),
@@ -322,7 +339,7 @@ class _ModernResultView extends ConsumerWidget {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: _parseHexColor(testResult.observedHex, testResult.observedColor),
+                          color: _parseHexColor(testResult.observedHex, observedColor),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: theme.dividerColor,
@@ -350,7 +367,7 @@ class _ModernResultView extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              testResult.observedColor,
+                              observedColor,
                               style: AppTypography.getCardTitle(context).copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -399,10 +416,11 @@ class _ModernResultView extends ConsumerWidget {
                   ).animate().fadeIn(delay: 500.ms),
                   const SizedBox(height: 24),
                 ],
-                _AcademicReferencesCardSection(
-                  reagentName: testResult.reagentName,
-                  possibleSubstances: testResult.possibleSubstances,
-                ).animate().fadeIn(delay: 600.ms),
+                if (rc.enableScientificReferences)
+                  _AcademicReferencesCardSection(
+                    reagentName: testResult.reagentName,
+                    possibleSubstances: testResult.possibleSubstances,
+                  ).animate().fadeIn(delay: 600.ms),
                 const SizedBox(height: 36),
                 Container(
                   padding: const EdgeInsets.all(16),

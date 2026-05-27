@@ -199,12 +199,11 @@ class _AIImageAnalysisSectionState
                     else
                       Consumer(
                         builder: (context, ref, child) {
-                          final geminiServiceAsync = ref.watch(
-                            geminiAnalysisServiceProvider,
-                          );
+                          final geminiServiceAsync = ref.watch(geminiAnalysisServiceProvider);
+                          final enableAi = ref.watch(remoteConfigServiceProvider).enableAiAnalysis;
 
                           return geminiServiceAsync.when(
-                            data: (service) => !FeatureFlags.kEnableAIAnalysis
+                            data: (service) => !enableAi
                                 ? ElevatedButton.icon(
                                     onPressed: null,
                                     icon: Icon(HeroIcons.clock),
@@ -224,7 +223,7 @@ class _AIImageAnalysisSectionState
                                 : Column(
                                     children: [
                                       ElevatedButton.icon(
-                                        onPressed: _analyzeImage,
+                                        onPressed: enableAi ? _analyzeImage : null,
                                         icon: Icon(HeroIcons.sparkles),
                                         label: Text(l10n.analyzeWithAI),
                                         style: ElevatedButton.styleFrom(
@@ -491,7 +490,8 @@ class _AIImageAnalysisSectionState
   }
 
   Future<void> _analyzeImage() async {
-    if (!FeatureFlags.kEnableAIAnalysis) return;
+    final enableAi = ref.read(remoteConfigServiceProvider).enableAiAnalysis;
+    if (!enableAi) return;
     if (_capturedImage == null) return;
     
     final premiumService = ref.read(premiumServiceProvider);
