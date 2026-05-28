@@ -910,150 +910,152 @@ class ProfileHeaderCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          const Divider(height: 1),
-          const SizedBox(height: 20),
-          
-          // Premium Entitlement Status Bar
-          if (isPremium)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+          if (!PremiumService.isPremiumReviewMode) ...[
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 20),
+            
+            // Premium Entitlement Status Bar
+            if (isPremium)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryAccent.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
                 ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryAccent.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ]
-              ),
-              child: Row(
-                children: [
-                  const Icon(HeroIcons.sparkles, color: Colors.white, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  children: [
+                    const Icon(HeroIcons.sparkles, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'PRO Laboratory Account',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            'Unlimited scans and advanced reports active.',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'PRO Laboratory Account',
+                        Text(
+                          'Free Scan Allowance',
                           style: TextStyle(
-                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                           ),
                         ),
                         Text(
-                          'Unlimited scans and advanced reports active.',
+                          '$freeScansLeft / 3 left',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
-                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            )
-          else
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
+                    const SizedBox(height: 12),
+                    // Progress bar showing consumed scans
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: LinearProgressIndicator(
+                        value: freeScansLeft / 3.0,
+                        backgroundColor: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderHighlight,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          freeScansLeft > 0 ? theme.colorScheme.primary : AppColors.statusError,
+                        ),
+                        minHeight: 8,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Need unlimited analysis?',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: onUpgradePressed,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(HeroIcons.sparkles, color: Colors.white, size: 13),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Upgrade',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Free Scan Allowance',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
-                        ),
-                      ),
-                      Text(
-                        '$freeScansLeft / 3 left',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Progress bar showing consumed scans
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: freeScansLeft / 3.0,
-                      backgroundColor: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderHighlight,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        freeScansLeft > 0 ? theme.colorScheme.primary : AppColors.statusError,
-                      ),
-                      minHeight: 8,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Need unlimited analysis?',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: onUpgradePressed,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(HeroIcons.sparkles, color: Colors.white, size: 13),
-                              SizedBox(width: 6),
-                              Text(
-                                'Upgrade',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          ],
         ],
       ),
     );

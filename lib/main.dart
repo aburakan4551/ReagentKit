@@ -13,11 +13,22 @@ import 'features/reagent_testing/data/services/remote_config_service.dart';
 import 'core/utils/logger.dart';
 import 'firebase_options.dart';
 import 'core/globals.dart';
+import 'core/services/build_release_check.dart';
+import 'core/services/review_runtime_guard.dart';
+import 'core/router/app_router.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Run build configuration and environment assertions
+  BuildReleaseCheck.validate();
+  ReviewRuntimeGuard.runGuard();
+
+  if (isPremiumReviewMode) {
+    Logger.info('[Review Mode] Premium features unlocked.');
+  }
   
   // Load environment variables safely
   await dotenv.load(fileName: ".env").catchError((_) {
@@ -189,15 +200,8 @@ class _ReagentTestingAppState extends ConsumerState<ReagentTestingApp> {
       },
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: '/',
-      routes: {'/': (context) => const AuthWrapper()},
-      onGenerateRoute: (settings) {
-        // Handle dynamic routes here if needed
-        return MaterialPageRoute(
-          builder: (context) => const AuthWrapper(),
-          settings: settings,
-        );
-      },
+      initialRoute: AppRouter.home,
+      onGenerateRoute: AppRouter.generateRoute,
 
       debugShowCheckedModeBanner: false,
     );

@@ -337,72 +337,73 @@ class SettingsPage extends ConsumerWidget {
         ),
 
         // Subscription & Trials Section
-        _buildEnhancedSection(
-          title: l10n.subscriptionAndTrials,
-          icon: HeroIcons.sparkles,
-          gradient: [
-            Colors.amber.withOpacity(0.1),
-            Colors.orange.withOpacity(0.1),
-          ],
-          children: [
-            SettingsTile(
-              title: l10n.subscriptionStatus,
-              subtitle: premiumService.isPremium
-                  ? l10n.premiumStatus
-                  : l10n.freeTrialStatus,
-              leadingIcon: HeroIcons.credit_card,
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: premiumService.isPremium
-                      ? Colors.green.withOpacity(0.12)
-                      : Colors.orange.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  premiumService.isPremium
-                      ? (l10n.localeName == 'ar' ? 'نشط' : 'Active')
-                      : (l10n.localeName == 'ar' ? 'تجريبي' : 'Trial'),
-                  style: TextStyle(
+        if (!PremiumService.isPremiumReviewMode)
+          _buildEnhancedSection(
+            title: l10n.subscriptionAndTrials,
+            icon: HeroIcons.sparkles,
+            gradient: [
+              Colors.amber.withOpacity(0.1),
+              Colors.orange.withOpacity(0.1),
+            ],
+            children: [
+              SettingsTile(
+                title: l10n.subscriptionStatus,
+                subtitle: premiumService.isPremium
+                    ? l10n.premiumStatus
+                    : l10n.freeTrialStatus,
+                leadingIcon: HeroIcons.credit_card,
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
                     color: premiumService.isPremium
-                        ? Colors.green.shade700
-                        : Colors.orange.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                        ? Colors.green.withOpacity(0.12)
+                        : Colors.orange.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    premiumService.isPremium
+                        ? (l10n.localeName == 'ar' ? 'نشط' : 'Active')
+                        : (l10n.localeName == 'ar' ? 'تجريبي' : 'Trial'),
+                    style: TextStyle(
+                      color: premiumService.isPremium
+                          ? Colors.green.shade700
+                          : Colors.orange.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
+                isFirst: true,
+                isLast: premiumService.isPremium,
               ),
-              isFirst: true,
-              isLast: premiumService.isPremium,
-            ),
-            if (!premiumService.isPremium) ...[
-              SettingsTile(
-                title: l10n.freeTestsRemaining(premiumService.freeScansLeft),
-                subtitle: l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
-                leadingIcon: HeroIcons.chart_bar,
-              ),
-              SettingsTile(
-                title: l10n.upgradeToPremium,
-                subtitle: l10n.unlimitedTests,
-                leadingIcon: HeroIcons.sparkles,
-                trailing: Icon(
-                  HeroIcons.chevron_right,
-                  size: 16,
-                  color: theme.colorScheme.onSurfaceVariant,
+              if (!premiumService.isPremium) ...[
+                SettingsTile(
+                  title: l10n.freeTestsRemaining(premiumService.freeScansLeft),
+                  subtitle: l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
+                  leadingIcon: HeroIcons.chart_bar,
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PaywallScreen(),
-                    ),
-                  );
-                },
-                isLast: true,
-              ),
+                SettingsTile(
+                  title: l10n.upgradeToPremium,
+                  subtitle: l10n.unlimitedTests,
+                  leadingIcon: HeroIcons.sparkles,
+                  trailing: Icon(
+                    HeroIcons.chevron_right,
+                    size: 16,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PaywallScreen(),
+                      ),
+                    );
+                  },
+                  isLast: true,
+                ),
+              ],
             ],
-          ],
-        ),
+          ),
 
         // Research & References Section
         _buildEnhancedSection(

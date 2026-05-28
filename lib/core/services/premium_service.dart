@@ -5,12 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firestore_service.dart';
 import '../config/get_it_config.dart';
 import '../utils/logger.dart';
+import '../globals.dart' as globals;
+import 'analytics_service.dart';
 
 /// PremiumService handles secure Freemium limits (Firestore/Keychain synced) and RevenueCat subscriptions.
 class PremiumService extends ChangeNotifier {
@@ -23,6 +24,8 @@ class PremiumService extends ChangeNotifier {
   final _firestoreService = getIt<FirestoreService>();
   StreamSubscription<User?>? _authSubscription;
   
+  static bool get isPremiumReviewMode => globals.isPremiumReviewMode;
+
   bool _isPremium = false;
   int _freeScansLeft = 3;
   bool _isPurchasePending = false;
@@ -30,11 +33,11 @@ class PremiumService extends ChangeNotifier {
   String? _deviceId;
   String? _currentUid;
   
-  bool get isPremium => _isPremium;
-  int get freeScansLeft => _freeScansLeft;
-  bool get isPurchasePending => _isPurchasePending;
-  String? get errorMessage => _errorMessage;
-  bool get canAnalyze => _isPremium || _freeScansLeft > 0;
+  bool get isPremium => isPremiumReviewMode ? true : _isPremium;
+  int get freeScansLeft => isPremiumReviewMode ? 999 : _freeScansLeft;
+  bool get isPurchasePending => isPremiumReviewMode ? false : _isPurchasePending;
+  String? get errorMessage => isPremiumReviewMode ? null : _errorMessage;
+  bool get canAnalyze => isPremiumReviewMode ? true : (_isPremium || _freeScansLeft > 0);
 
   List<Package> _activeOfferings = [];
   List<Package> get activeOfferings => _activeOfferings;
@@ -44,6 +47,13 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> _init() async {
+    if (isPremiumReviewMode) {
+      _isPremium = true;
+      _freeScansLeft = 999;
+      notifyListeners();
+      Logger.info('ℹ️ PremiumService initialized in Review Mode (automatic premium enabled)');
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
     // 1. Load basic local cache and secure storage for fast offline startup
     _isPremium = prefs.getBool(_premiumUserKey) ?? false;
@@ -99,6 +109,7 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> _initRevenueCat() async {
+    if (isPremiumReviewMode) return;
     try {
       // Load public API Keys from dotenv, or use mock keys
       final apiKeyIOS = dotenv.env['REVENUECAT_API_KEY_IOS'] ?? 'api_key_placeholder';
@@ -142,6 +153,7 @@ class PremiumService extends ChangeNotifier {
   }
 
   void _updatePremiumStatus(CustomerInfo customerInfo) async {
+    if (isPremiumReviewMode) return;
     final entitlementActive = customerInfo.entitlements.all[entitlementId]?.isActive ?? false;
     if (_isPremium != entitlementActive) {
       _isPremium = entitlementActive;
@@ -152,6 +164,7 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> _syncScansLimit() async {
+    if (isPremiumReviewMode) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       int serverCount = 3;
@@ -181,7 +194,7 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> consumeFreeScan() async {
-    if (_isPremium) return;
+    if (isPremiumReviewMode || _isPremium) return;
     
     if (_freeScansLeft > 0) {
       _freeScansLeft--;
@@ -205,7 +218,7 @@ class PremiumService extends ChangeNotifier {
           await _firestoreService.updateDeviceScansLeft(_deviceId!, _freeScansLeft);
         }
         
-        await FirebaseAnalytics.instance.logEvent(
+        await AnalyticsService.logEvent(
           name: 'free_scan_consumed',
           parameters: {
             'scans_left': _freeScansLeft,
@@ -222,6 +235,10 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> buyPremium(Package package) async {
+    if (isPremiumReviewMode) {
+      Logger.info('[Review Mode] Mock premium purchase bypassed.');
+      return;
+    }
     _isPurchasePending = true;
     _errorMessage = null;
     notifyListeners();
@@ -231,7 +248,7 @@ class PremiumService extends ChangeNotifier {
       _updatePremiumStatus(customerInfo);
       
       try {
-        await FirebaseAnalytics.instance.logEvent(
+        await AnalyticsService.logEvent(
           name: 'premium_purchase_success',
           parameters: {'package_id': package.identifier},
         );
@@ -254,6 +271,10 @@ class PremiumService extends ChangeNotifier {
   }
 
   Future<void> restorePurchases() async {
+    if (isPremiumReviewMode) {
+      Logger.info('[Review Mode] Mock restore purchases bypassed.');
+      return;
+    }
     _isPurchasePending = true;
     _errorMessage = null;
     notifyListeners();
@@ -279,6 +300,10 @@ class PremiumService extends ChangeNotifier {
 
   /// For simulator/sandbox testing fallback
   Future<void> simulatePremiumUnlock() async {
+    if (isPremiumReviewMode) {
+      Logger.info('[Review Mode] Mock simulated premium unlock bypassed.');
+      return;
+    }
     _isPurchasePending = true;
     _errorMessage = null;
     notifyListeners();

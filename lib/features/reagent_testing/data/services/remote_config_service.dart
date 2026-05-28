@@ -4,6 +4,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import '../models/reagent_model.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../core/services/safe_store_sanitizer.dart';
+import '../../../../core/globals.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // RemoteConfigService — Production-Grade
@@ -69,6 +70,9 @@ class RemoteConfigService {
         _enableHighRiskTestsKey: true,
         _hideControlledSubstancesKey: false,
         _appStoreReviewModeKey: true,
+        'paywall_enabled': true,
+        'premium_upsell_enabled': true,
+        'subscriptions_enabled': true,
       });
 
       await fetchAndActivate();
@@ -331,6 +335,14 @@ class RemoteConfigService {
   bool get enableHighRiskTests => appStoreReviewMode ? false : _remoteConfig.getBool(_enableHighRiskTestsKey);
 
   bool get hideControlledSubstances => appStoreReviewMode ? true : _remoteConfig.getBool(_hideControlledSubstancesKey);
+
+  // ── Review Mode Overrides ──────────────────────────────────────────────────
+
+  bool get paywallEnabled => isPremiumReviewMode ? false : _remoteConfig.getBool('paywall_enabled');
+  
+  bool get premiumUpsellEnabled => isPremiumReviewMode ? false : _remoteConfig.getBool('premium_upsell_enabled');
+  
+  bool get subscriptionsEnabled => isPremiumReviewMode ? false : _remoteConfig.getBool('subscriptions_enabled');
 
   // ── Real-time updates ──────────────────────────────────────────────────────
 

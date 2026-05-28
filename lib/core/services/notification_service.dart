@@ -17,6 +17,21 @@ class NotificationService {
     String? title,
     VoidCallback? onTap,
   }) {
+    if (isPremiumReviewMode) {
+      final msgLower = message.toLowerCase();
+      final titleLower = (title ?? '').toLowerCase();
+      if (msgLower.contains('premium') ||
+          msgLower.contains('trial') ||
+          msgLower.contains('offer') ||
+          msgLower.contains('discount') ||
+          titleLower.contains('premium') ||
+          titleLower.contains('trial') ||
+          titleLower.contains('offer') ||
+          titleLower.contains('discount')) {
+        Logger.info('🛡️ [Review Mode] Suppressed push notification/snackbar: "$message"');
+        return;
+      }
+    }
     final scaffoldMessenger = scaffoldMessengerKey.currentState;
     if (scaffoldMessenger == null) {
       Logger.error('❌ NotificationService: scaffoldMessengerKey.currentState is null');

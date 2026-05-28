@@ -6,6 +6,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
+import 'package:reagentkit/core/services/premium_service.dart';
 
 class PaywallTier {
   final String identifier;
@@ -56,6 +57,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (PremiumService.isPremiumReviewMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      });
+      return const Scaffold(body: SizedBox.shrink());
+    }
+
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final premiumService = ref.watch(premiumServiceProvider);

@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/test_result_entity.dart';
 import '../../../../core/utils/logger.dart';
+import '../../../../core/globals.dart';
+import '../../../../core/config/reviewer_demo_seed.dart';
 
 class TestResultHistoryRepository {
   static const String _localStorageKey = 'test_result_history';
@@ -29,6 +31,7 @@ class TestResultHistoryRepository {
 
   // Initialize user document if it doesn't exist - COST OPTIMIZED
   Future<void> _initializeUserDocument() async {
+    if (isPremiumReviewMode) return;
     final user = _auth.currentUser;
     if (user == null || user.email == null) return;
 
@@ -63,6 +66,7 @@ class TestResultHistoryRepository {
       await _saveToLocalStorage(testResult);
 
       // Try to save to Firestore if user is authenticated
+      if (isPremiumReviewMode) return;
       final user = _auth.currentUser;
       if (user?.email != null) {
         try {
@@ -85,18 +89,30 @@ class TestResultHistoryRepository {
       final prefs = await SharedPreferences.getInstance();
       final jsonString = prefs.getString(_localStorageKey);
 
-      if (jsonString == null) return [];
+      if (jsonString == null) {
+        if (isPremiumReviewMode) {
+          return ReviewerDemoSeed.getDemoResults();
+        }
+        return [];
+      }
 
       final List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList.map((json) => TestResultEntity.fromJson(json)).toList()
-        ..sort((a, b) => b.testCompletedAt.compareTo(a.testCompletedAt));
+      final list = jsonList.map((json) => TestResultEntity.fromJson(json)).toList();
+      if (list.isEmpty && isPremiumReviewMode) {
+        return ReviewerDemoSeed.getDemoResults();
+      }
+      return list..sort((a, b) => b.testCompletedAt.compareTo(a.testCompletedAt));
     } catch (e) {
+      if (isPremiumReviewMode) {
+        return ReviewerDemoSeed.getDemoResults();
+      }
       throw Exception('Failed to load local test results: $e');
     }
   }
 
   // Get test results from Firestore tests subcollection for current user
   Future<List<TestResultEntity>> getFirestoreTestResults() async {
+    if (isPremiumReviewMode) return [];
     try {
       final testsRef = _testsRef;
       if (testsRef == null) return [];
@@ -121,6 +137,13 @@ class TestResultHistoryRepository {
 
   // Get all test results - prioritize Firestore if user is authenticated
   Future<List<TestResultEntity>> getAllTestResults() async {
+    if (isPremiumReviewMode) {
+      final local = await getLocalTestResults();
+      if (local.isEmpty) {
+        return ReviewerDemoSeed.getDemoResults();
+      }
+      return local;
+    }
     try {
       final user = _auth.currentUser;
 
