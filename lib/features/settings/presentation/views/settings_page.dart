@@ -478,7 +478,7 @@ class SettingsPage extends ConsumerWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               onTap: () async {
-                final uri = Uri.parse('https://colorstest.com/en/privacy/');
+                final uri = Uri.parse('https://aburakan4551.github.io/reagent-kit-privacy/');
                 try {
                   final launched = await launchUrl(
                     uri,

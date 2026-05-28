@@ -417,8 +417,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         spacing: 16,
                         runSpacing: 8,
                         children: [
-                          _buildLink(isAr ? 'شروط الخدمة' : 'Terms of Service', 'https://colorstest.com/en/safety/'),
-                          _buildLink(isAr ? 'سياسة الخصوصية' : 'Privacy Policy', 'https://colorstest.com/en/privacy/'),
+                          _buildLink(isAr ? 'شروط الخدمة' : 'Terms of Service', 'hhttps://aburakan4551.github.io/reagent-kit-privacy/'),
+                          _buildLink(isAr ? 'سياسة الخصوصية' : 'Privacy Policy', 'https://aburakan4551.github.io/reagent-kit-privacy/'),
                           _buildLink(isAr ? 'شروط استخدام أبل (EULA)' : 'Apple Terms (EULA)', 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
                         ],
                       ),
