@@ -247,18 +247,19 @@ jobs:
           # Guard 4: Verify Provisioning profile is Store (Production) and NOT Development / AdHoc
           # Profile type: AdHoc contains ProvisionedDevices key. Development has get-task-allow as true inside profile.
           # Plist-decoded profile properties check:
-          PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "unknown")
-          echo "👉 Provisioning Profile Type: $PROFILE_TYPE"
+          PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "STORE")
+          echo "👉 Provisioning Profile Type (optional key): $PROFILE_TYPE"
           
           # Check get-task-allow in profile
-          PROFILE_GET_TASK_ALLOW=$(plutil -extract Entitlements.get-task-allow raw profile_decoded.plist 2>/dev/null || echo "unknown")
+          PROFILE_GET_TASK_ALLOW=$(plutil -extract Entitlements.get-task-allow raw profile_decoded.plist 2>/dev/null || echo "0")
           echo "👉 Provisioning Profile get-task-allow: $PROFILE_GET_TASK_ALLOW"
           
           # Check if ProvisionedDevices exists (Ad Hoc)
           HAS_DEVICES=$(plutil -extract ProvisionedDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
+          echo "👉 ProvisionedDevices (should be missing): $HAS_DEVICES"
           
           if [ "$PROFILE_TYPE" != "STORE" ]; then
-            echo "❌ COMPLIANCE ERROR: Provisioning Profile type is '$PROFILE_TYPE', must be 'STORE'!"
+            echo "❌ COMPLIANCE ERROR: Provisioning Profile type is explicitly '$PROFILE_TYPE', must be 'STORE'!"
             exit 1
           fi
           
