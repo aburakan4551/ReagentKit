@@ -292,6 +292,8 @@ def main():
 	</dict>
 	<key>signingStyle</key>
 	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>

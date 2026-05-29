@@ -161,6 +161,10 @@ jobs:
           fi
           echo "📦 Found IPA: $IPA_PATH"
           
+          # Hash 1: Immediately after build
+          echo "🧮 [HASH 1] Calculating SHA256 hash of the generated IPA..."
+          shasum -a 256 "$IPA_PATH"
+          
           # Create extraction directory
           EXTRACT_DIR="build/ios/ipa/extracted"
           mkdir -p "$EXTRACT_DIR"
@@ -177,23 +181,23 @@ jobs:
           echo "📱 Found App Bundle: $APP_PATH"
           
           # 1. security find-identity -p codesigning -v
-          echo "🔐 [1/5] Listing installed signing identities on the runner..."
+          echo "🔐 [1/6] Listing installed signing identities on the runner..."
           security find-identity -p codesigning -v
           
           # 2. codesign -dv --verbose=4 Payload/Runner.app
-          echo "✍️ [2/5] Running codesign diagnostics on the app bundle..."
+          echo "✍️ [2/6] Running codesign diagnostics on the app bundle..."
           codesign -dv --verbose=4 "$APP_PATH"
           
           # 3. codesign --verify --deep --strict Payload/Runner.app
-          echo "🧐 [3/5] Verifying signing integrity strictly..."
+          echo "🧐 [3/6] Verifying signing integrity strictly..."
           codesign --verify --deep --strict "$APP_PATH"
           
           # 4. codesign -d --entitlements :- Payload/Runner.app
-          echo "📜 [4/5] Extracting entitlements..."
+          echo "📜 [4/6] Extracting entitlements..."
           codesign -d --entitlements - "$APP_PATH"
           
           # 5. security cms -D -i Payload/Runner.app/embedded.mobileprovision
-          echo "📄 [5/5] Extracting embedded provisioning profile details..."
+          echo "📄 [5/6] Extracting embedded provisioning profile details..."
           EMBEDDED_PROFILE="$APP_PATH/embedded.mobileprovision"
           if [ -f "$EMBEDDED_PROFILE" ]; then
             security cms -D -i "$EMBEDDED_PROFILE" > profile_decoded.plist
@@ -204,6 +208,48 @@ jobs:
             echo "❌ ERROR: embedded.mobileprovision is MISSING inside the app bundle!"
             exit 1
           fi
+          
+          # 6. Deep recursive audit of nested components for Mixed Signing
+          echo "🔍 [6/6] Starting deep nested signing audit for Mixed Signing..."
+          while IFS= read -r -d '' COMPONENT; do
+            echo "--------------------------------------------------"
+            echo "📦 Auditing Component: $COMPONENT"
+            
+            # Print SHA256 of the component's Info.plist if it exists
+            if [ -f "$COMPONENT/Info.plist" ]; then
+              echo "📄 Info.plist SHA256: $(shasum -a 256 "$COMPONENT/Info.plist" | awk '{print $1}')"
+            fi
+            
+            # Check if codesign thinks it is signed
+            if codesign -d "$COMPONENT" >/dev/null 2>&1; then
+              COMP_INFO=$(codesign -dvvv "$COMPONENT" 2>&1)
+              echo "✅ Status: SIGNED"
+              
+              # Extract authority and team identifier
+              AUTHORITY=$(echo "$COMP_INFO" | grep "Authority=" || true)
+              TEAM_ID=$(echo "$COMP_INFO" | grep "TeamIdentifier=" || true)
+              echo "   $AUTHORITY"
+              echo "   $TEAM_ID"
+              
+              # Check if signed with Apple Distribution or iPhone Distribution
+              echo "$COMP_INFO" | grep -E "Authority=Apple Distribution|Authority=iPhone Distribution" > /dev/null
+              IS_DIST_SIGNED=$?
+              if [ $IS_DIST_SIGNED -ne 0 ]; then
+                echo "❌ COMPLIANCE FAILURE: Nested component is NOT signed with Apple Distribution!"
+                echo "$COMP_INFO" | grep "Authority=" || true
+                exit 1
+              fi
+            else
+              # Unsigned component. Frameworks and appex targets MUST be signed.
+              # Resource bundles (.bundle) might be signed or unsigned depending on Xcode build settings.
+              if [[ "$COMPONENT" == *.framework ]] || [[ "$COMPONENT" == *.appex ]]; then
+                echo "❌ COMPLIANCE FAILURE: Framework or App Extension is UNSIGNED!"
+                exit 1
+              else
+                echo "⚠️ Warning: Component is unsigned (Resource Bundle without binary/signature)."
+              fi
+            fi
+          done < <(find "$APP_PATH" \( -name "*.framework" -o -name "*.bundle" -o -name "*.appex" \) -print0)
           
           # --- AUTOMATED PIPELINE FAILS GUARDS ---
           echo "🚨 Running automated compliance assertions..."
@@ -245,8 +291,6 @@ jobs:
           fi
           
           # Guard 4: Verify Provisioning profile is Store (Production) and NOT Development / AdHoc
-          # Profile type: AdHoc contains ProvisionedDevices key. Development has get-task-allow as true inside profile.
-          # Plist-decoded profile properties check:
           if plutil -extract ProfileDistributionType raw profile_decoded.plist >/dev/null 2>&1; then
             PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist)
           else
@@ -311,6 +355,10 @@ jobs:
             exit 1
           fi
           
+          # Hash 2: Before uploading
+          echo "🧮 [HASH 2] Calculating SHA256 hash of the IPA right before upload..."
+          shasum -a 256 "$IPA_PATH"
+          
           # Create standard private_keys directory in user home
           KEYS_DIR="$HOME/private_keys"
           mkdir -p "$KEYS_DIR"
@@ -334,6 +382,10 @@ jobs:
             --apiKey "$API_KEY_ID" \
             --apiIssuer "$API_ISSUER_ID"
             
+          # Hash 3: After uploading
+          echo "🧮 [HASH 3] Calculating SHA256 hash of the IPA after upload is done..."
+          shasum -a 256 "$IPA_PATH"
+          
           # Clean up private key file
           rm -f "$KEY_FILE"
 
