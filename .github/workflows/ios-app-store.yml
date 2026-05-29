@@ -149,6 +149,131 @@ jobs:
             --dart-define=GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             --verbose
 
+      - name: Forensic Signing Verification
+        run: |
+          echo "🔍 Starting post-build forensic signing verification..."
+          
+          # Find the built IPA
+          IPA_PATH=$(ls build/ios/ipa/*.ipa 2>/dev/null | head -n 1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "❌ ERROR: No IPA file found at build/ios/ipa/"
+            exit 1
+          fi
+          echo "📦 Found IPA: $IPA_PATH"
+          
+          # Create extraction directory
+          EXTRACT_DIR="build/ios/ipa/extracted"
+          mkdir -p "$EXTRACT_DIR"
+          
+          # Unzip IPA
+          echo "🔓 Extracting IPA..."
+          unzip -q "$IPA_PATH" -d "$EXTRACT_DIR"
+          
+          APP_PATH=$(find "$EXTRACT_DIR/Payload" -name "*.app" -maxdepth 2 | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ ERROR: No .app bundle found inside Payload directory of IPA!"
+            exit 1
+          fi
+          echo "📱 Found App Bundle: $APP_PATH"
+          
+          # 1. security find-identity -p codesigning -v
+          echo "🔐 [1/5] Listing installed signing identities on the runner..."
+          security find-identity -p codesigning -v
+          
+          # 2. codesign -dv --verbose=4 Payload/Runner.app
+          echo "✍️ [2/5] Running codesign diagnostics on the app bundle..."
+          codesign -dv --verbose=4 "$APP_PATH"
+          
+          # 3. codesign --verify --deep --strict Payload/Runner.app
+          echo "🧐 [3/5] Verifying signing integrity strictly..."
+          codesign --verify --deep --strict "$APP_PATH"
+          
+          # 4. codesign -d --entitlements :- Payload/Runner.app
+          echo "📜 [4/5] Extracting entitlements..."
+          codesign -d --entitlements - "$APP_PATH"
+          
+          # 5. security cms -D -i Payload/Runner.app/embedded.mobileprovision
+          echo "📄 [5/5] Extracting embedded provisioning profile details..."
+          EMBEDDED_PROFILE="$APP_PATH/embedded.mobileprovision"
+          if [ -f "$EMBEDDED_PROFILE" ]; then
+            security cms -D -i "$EMBEDDED_PROFILE" > profile_decoded.plist
+            # Print profile summary
+            echo "--- Provisioning Profile Plist Summary ---"
+            plutil -p profile_decoded.plist || cat profile_decoded.plist
+          else
+            echo "❌ ERROR: embedded.mobileprovision is MISSING inside the app bundle!"
+            exit 1
+          fi
+          
+          # --- AUTOMATED PIPELINE FAILS GUARDS ---
+          echo "🚨 Running automated compliance assertions..."
+          
+          # Guard 1: Verify Export method in ExportOptions.plist
+          if [ -f "ios/Runner/ExportOptions.plist" ]; then
+            EXPORT_METHOD=$(plutil -extract method raw ios/Runner/ExportOptions.plist 2>/dev/null || echo "unknown")
+            echo "👉 Export Method configured: $EXPORT_METHOD"
+            if [ "$EXPORT_METHOD" != "app-store" ]; then
+              echo "❌ COMPLIANCE ERROR: Export method is '$EXPORT_METHOD', must be 'app-store'!"
+              exit 1
+            fi
+          else
+            echo "❌ COMPLIANCE ERROR: ExportOptions.plist is missing!"
+            exit 1
+          fi
+          
+          # Guard 2: Verify Signing Identity is Apple Distribution (or iPhone Distribution)
+          # We check the authority name in the codesign output
+          CODESIGN_INFO=$(codesign -dvvv "$APP_PATH" 2>&1)
+          echo "$CODESIGN_INFO" | grep -E "Authority=Apple Distribution|Authority=iPhone Distribution" > /dev/null
+          IS_DISTRIBUTION=$?
+          if [ $IS_DISTRIBUTION -ne 0 ]; then
+            echo "❌ COMPLIANCE ERROR: The app bundle is NOT signed with an Apple Distribution certificate!"
+            echo "Actual Authority info:"
+            echo "$CODESIGN_INFO" | grep "Authority=" || true
+            exit 1
+          else
+            echo "✅ Signed with Apple Distribution certificate."
+          fi
+          
+          # Guard 3: Verify get-task-allow is false
+          GET_TASK_ALLOW=$(codesign -d --entitlements - "$APP_PATH" 2>&1 | grep -A 1 "get-task-allow" | grep -E "<true/>|true" > /dev/null; echo $?)
+          if [ $GET_TASK_ALLOW -eq 0 ]; then
+            echo "❌ COMPLIANCE ERROR: 'get-task-allow' is set to true! This is a development signature and will be rejected by Apple."
+            exit 1
+          else
+            echo "✅ 'get-task-allow' is false (correct for App Store submission)."
+          fi
+          
+          # Guard 4: Verify Provisioning profile is Store (Production) and NOT Development / AdHoc
+          # Profile type: AdHoc contains ProvisionedDevices key. Development has get-task-allow as true inside profile.
+          # Plist-decoded profile properties check:
+          PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "unknown")
+          echo "👉 Provisioning Profile Type: $PROFILE_TYPE"
+          
+          # Check get-task-allow in profile
+          PROFILE_GET_TASK_ALLOW=$(plutil -extract Entitlements.get-task-allow raw profile_decoded.plist 2>/dev/null || echo "unknown")
+          echo "👉 Provisioning Profile get-task-allow: $PROFILE_GET_TASK_ALLOW"
+          
+          # Check if ProvisionedDevices exists (Ad Hoc)
+          HAS_DEVICES=$(plutil -extract ProvisionedDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
+          
+          if [ "$PROFILE_TYPE" != "STORE" ]; then
+            echo "❌ COMPLIANCE ERROR: Provisioning Profile type is '$PROFILE_TYPE', must be 'STORE'!"
+            exit 1
+          fi
+          
+          if [ "$PROFILE_GET_TASK_ALLOW" = "1" ] || [ "$PROFILE_GET_TASK_ALLOW" = "true" ]; then
+            echo "❌ COMPLIANCE ERROR: Provisioning profile has 'get-task-allow' set to true (Development profile)!"
+            exit 1
+          fi
+          
+          if [ "$HAS_DEVICES" != "missing" ]; then
+            echo "❌ COMPLIANCE ERROR: Provisioning profile contains provisioned devices (Ad Hoc profile)! For App Store Connect submission, it must be App Store (STORE) without device list."
+            exit 1
+          fi
+          
+          echo "🎉 FORENSIC VERIFICATION PASSED: The build is 100% compliant with Apple App Store Connect submission requirements!"
+
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:

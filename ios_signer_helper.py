@@ -284,7 +284,7 @@ def main():
 	<key>compileBitcode</key>
 	<false/>
 	<key>method</key>
-	<string>app-store-connect</string>
+	<string>app-store</string>
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>{bundle_id}</key>

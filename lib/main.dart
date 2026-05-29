@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/get_it_config.dart';
-import 'core/navigation/auth_wrapper.dart';
 import 'features/settings/presentation/providers/settings_providers.dart';
 import 'features/settings/presentation/states/settings_state.dart';
 import 'features/reagent_testing/data/services/remote_config_service.dart';
