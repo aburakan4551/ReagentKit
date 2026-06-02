@@ -2,7 +2,7 @@ name: Production iOS IPA Build
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, safe-store-review-mode ]
   workflow_dispatch:
     inputs:
       build_name:
@@ -115,6 +115,12 @@ jobs:
           export LC_ALL=en_US.UTF-8
           pod install --repo-update
           cd ..
+
+      - name: Flutter Analyze
+        run: flutter analyze
+
+      - name: Flutter Test
+        run: flutter test
 
       - name: Verify ExportOptions.plist
         run: |
@@ -244,33 +250,47 @@ jobs:
             echo "✅ 'get-task-allow' is false (correct for App Store submission)."
           fi
           
-          # Guard 4: Verify Provisioning profile is Store (Production) and NOT Development / AdHoc
-          # Profile type: AdHoc contains ProvisionedDevices key. Development has get-task-allow as true inside profile.
-          # Plist-decoded profile properties check:
-          PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "unknown")
-          echo "👉 Provisioning Profile Type: $PROFILE_TYPE"
+          # Guard 4: Verify Provisioning profile is App Store (Production) — NOT Development / AdHoc / Enterprise
+          # Apple profiles don't always contain 'ProfileDistributionType'. We use a robust heuristic:
+          #   - App Store: get-task-allow=false, NO ProvisionedDevices, NO ProvisionsAllDevices
+          #   - Development: get-task-allow=true
+          #   - Ad Hoc: has ProvisionedDevices list
+          #   - Enterprise: has ProvisionsAllDevices=true
           
-          # Check get-task-allow in profile
-          PROFILE_GET_TASK_ALLOW=$(plutil -extract Entitlements.get-task-allow raw profile_decoded.plist 2>/dev/null || echo "unknown")
+          # Check get-task-allow in profile entitlements
+          PROFILE_GET_TASK_ALLOW=$(plutil -extract Entitlements.get-task-allow raw profile_decoded.plist 2>/dev/null || echo "false")
           echo "👉 Provisioning Profile get-task-allow: $PROFILE_GET_TASK_ALLOW"
-          
-          # Check if ProvisionedDevices exists (Ad Hoc)
-          HAS_DEVICES=$(plutil -extract ProvisionedDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
-          
-          if [ "$PROFILE_TYPE" != "STORE" ]; then
-            echo "❌ COMPLIANCE ERROR: Provisioning Profile type is '$PROFILE_TYPE', must be 'STORE'!"
-            exit 1
-          fi
           
           if [ "$PROFILE_GET_TASK_ALLOW" = "1" ] || [ "$PROFILE_GET_TASK_ALLOW" = "true" ]; then
             echo "❌ COMPLIANCE ERROR: Provisioning profile has 'get-task-allow' set to true (Development profile)!"
             exit 1
+          else
+            echo "✅ get-task-allow is false/absent (not a Development profile)."
           fi
           
+          # Check if ProvisionedDevices exists (Ad Hoc indicator)
+          HAS_DEVICES=$(plutil -extract ProvisionedDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
           if [ "$HAS_DEVICES" != "missing" ]; then
-            echo "❌ COMPLIANCE ERROR: Provisioning profile contains provisioned devices (Ad Hoc profile)! For App Store Connect submission, it must be App Store (STORE) without device list."
+            echo "❌ COMPLIANCE ERROR: Provisioning profile contains provisioned devices (Ad Hoc profile)! For App Store Connect submission, it must be App Store without device list."
             exit 1
+          else
+            echo "✅ No ProvisionedDevices found (not an Ad Hoc profile)."
           fi
+          
+          # Check if ProvisionsAllDevices exists (Enterprise indicator)
+          PROVISIONS_ALL=$(plutil -extract ProvisionsAllDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
+          if [ "$PROVISIONS_ALL" != "missing" ] && [ "$PROVISIONS_ALL" != "0" ] && [ "$PROVISIONS_ALL" != "false" ]; then
+            echo "❌ COMPLIANCE ERROR: Provisioning profile provisions all devices (Enterprise profile)!"
+            exit 1
+          else
+            echo "✅ Not an Enterprise profile."
+          fi
+          
+          # Optional: Print ProfileDistributionType if present (informational only)
+          PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "N/A")
+          echo "ℹ️  ProfileDistributionType (informational): $PROFILE_TYPE"
+          
+          echo "✅ Profile passed all App Store compliance checks (not Development, not Ad Hoc, not Enterprise)."
           
           echo "🎉 FORENSIC VERIFICATION PASSED: The build is 100% compliant with Apple App Store Connect submission requirements!"
 
