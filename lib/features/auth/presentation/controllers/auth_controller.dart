@@ -282,6 +282,113 @@ class AuthController extends StateNotifier<AuthState> {
     await Future.delayed(const Duration(milliseconds: 800));
     state = AuthAuthenticated(user);
   }
+
+  // Sign in with Apple
+  Future<void> signInWithApple() async {
+    _authUiOperationDepth++;
+    state = const AuthLoading();
+    try {
+      Logger.info('🔧 AuthController: Starting Apple Sign-In');
+      final UserCredential? result = await _authService.signInWithApple();
+
+      if (result?.user == null) {
+        Logger.info('⚠️ AuthController: User canceled Apple Sign-In');
+        state = const AuthUnauthenticated();
+      } else {
+        final User firebaseUser = result!.user!;
+        Logger.info('✅ AuthController: Apple Sign-In successful for ${firebaseUser.uid}');
+
+        UserModel? userProfile;
+        const int maxRetries = 5;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+          try {
+            userProfile = await _authService.getUserProfile(firebaseUser.uid);
+            if (userProfile != null) {
+              break;
+            }
+          } catch (e) {
+            Logger.info('⚠️ AuthController: Profile attempt ${attempt + 1} failed: $e');
+          }
+          await Future<void>.delayed(Duration(milliseconds: 350 * (attempt + 1)));
+        }
+
+        final UserModel resolvedProfile =
+            userProfile ?? _authService.buildSessionUserModelFromFirebaseUser(firebaseUser);
+        NotificationService.showSuccess(
+          title: '🚀 Apple Sign-In Success',
+          message: 'Welcome ${resolvedProfile.username}! Ready to continue testing?',
+        );
+        state = AuthAuthenticated(resolvedProfile.toEntity());
+      }
+    } catch (e) {
+      Logger.info('❌ AuthController: Apple Sign-In error: $e');
+      final String errorMessage = _extractErrorMessage(e);
+      state = AuthError('Apple Sign-In failed: $errorMessage');
+    } finally {
+      _authUiOperationDepth--;
+    }
+  }
+
+  // Re-authenticate with Email
+  Future<bool> reauthenticateWithEmail(String password) async {
+    final currentState = state;
+    state = const AuthLoading();
+    try {
+      await _authService.reauthenticateWithEmail(password);
+      state = currentState;
+      return true;
+    } catch (e) {
+      final String errorMessage = _extractErrorMessage(e);
+      state = AuthError(errorMessage);
+      return false;
+    }
+  }
+
+  // Re-authenticate with Google
+  Future<bool> reauthenticateWithGoogle() async {
+    final currentState = state;
+    state = const AuthLoading();
+    try {
+      await _authService.reauthenticateWithGoogle();
+      state = currentState;
+      return true;
+    } catch (e) {
+      final String errorMessage = _extractErrorMessage(e);
+      state = AuthError(errorMessage);
+      return false;
+    }
+  }
+
+  // Re-authenticate with Apple
+  Future<bool> reauthenticateWithApple() async {
+    final currentState = state;
+    state = const AuthLoading();
+    try {
+      await _authService.reauthenticateWithApple();
+      state = currentState;
+      return true;
+    } catch (e) {
+      final String errorMessage = _extractErrorMessage(e);
+      state = AuthError(errorMessage);
+      return false;
+    }
+  }
+
+  // Delete User Account
+  Future<void> deleteAccount() async {
+    state = const AuthLoading();
+    try {
+      await _authService.deleteUserAccount();
+      state = const AuthUnauthenticated();
+      NotificationService.showSuccess(
+        title: '🗑️ Account Deleted',
+        message: 'Your account and all associated data have been permanently deleted.',
+      );
+    } catch (e) {
+      final String errorMessage = _extractErrorMessage(e);
+      state = AuthError('Failed to delete account: $errorMessage');
+    }
+  }
 }
 
 // Provider for AuthController

@@ -1,10 +1,14 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
+import 'package:crypto/crypto.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../features/auth/data/models/user_model.dart';
 import 'firestore_service.dart';
 import '../utils/logger.dart';
@@ -429,6 +433,211 @@ class AuthService {
       case 'auth-domain-config-required':
       default:
         return 'Unable to sign in at this time. Please try again later.';
+    }
+  }
+
+  // Sign in with Apple
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      Logger.info('🔐 AuthService: Launching Apple Sign-In UI...');
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      Logger.info('🔐 AuthService: Signing into Firebase with Apple credential...');
+      final result = await _auth.signInWithCredential(oauthCredential);
+      
+      if (result.user != null) {
+        final user = result.user!;
+        Logger.info('✅ AuthService: Firebase Apple Sign-In success — uid: ${user.uid}');
+        
+        // Create/update Firestore user profile
+        final existingProfile = await _firestoreService.getUserProfile(user.uid);
+        if (existingProfile == null) {
+          final displayName = [appleCredential.givenName, appleCredential.familyName]
+              .where((name) => name != null && name.isNotEmpty)
+              .join(' ');
+          final username = _generateUsernameFromDisplayName(
+            displayName.isNotEmpty ? displayName : (user.email ?? 'AppleUser'),
+          );
+
+          final userModel = UserModel.fromFirebaseUser(
+            uid: user.uid,
+            email: user.email ?? '',
+            username: username,
+            photoUrl: user.photoURL,
+            displayName: displayName.isNotEmpty ? displayName : null,
+            isEmailVerified: user.emailVerified,
+            phoneNumber: user.phoneNumber,
+            signInMethods: ['apple.com'],
+            provider: 'apple.com',
+          );
+          await _firestoreService.createUserProfile(userModel);
+        } else {
+          await _updateUserLastSignIn(user.uid);
+        }
+        await _clearAllLocalData();
+      }
+      return result;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageForAuthException(e));
+    } catch (e) {
+      Logger.info('❌ AuthService: Apple Sign-In error: $e');
+      throw Exception('Apple Sign-In failed. Please try again.');
+    }
+  }
+
+  String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_';
+    final random = Random.secure();
+    return List.generate(length, (index) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
+  // Re-authenticate with Email
+  Future<void> reauthenticateWithEmail(String password) async {
+    final user = _auth.currentUser;
+    if (user == null || user.email == null) {
+      throw Exception('No user is currently signed in.');
+    }
+    try {
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+      Logger.info('✅ AuthService: Re-authenticated with email');
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageForAuthException(e));
+    } catch (e) {
+      throw Exception('Re-authentication failed: $e');
+    }
+  }
+
+  // Re-authenticate with Google
+  Future<void> reauthenticateWithGoogle() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('No user is currently signed in.');
+    }
+    try {
+      await _googleSignIn.signOut();
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw Exception('Google re-authentication was cancelled.');
+      }
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await user.reauthenticateWithCredential(credential);
+      Logger.info('✅ AuthService: Re-authenticated with Google');
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageForAuthException(e));
+    } catch (e) {
+      throw Exception('Re-authentication failed: $e');
+    }
+  }
+
+  // Re-authenticate with Apple
+  Future<void> reauthenticateWithApple() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('No user is currently signed in.');
+    }
+    try {
+      final rawNonce = _generateNonce();
+      final nonce = _sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final credential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+      await user.reauthenticateWithCredential(credential);
+      Logger.info('✅ AuthService: Re-authenticated with Apple');
+    } on FirebaseAuthException catch (e) {
+      throw Exception(_messageForAuthException(e));
+    } catch (e) {
+      throw Exception('Re-authentication failed: $e');
+    }
+  }
+
+  // Delete User Account and all data
+  Future<void> deleteUserAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('No user is currently signed in.');
+    }
+    final uid = user.uid;
+    final email = user.email;
+
+    try {
+      Logger.info('🗑️ AuthService: Starting deletion of user data for $uid');
+
+      // 1. Delete Firestore resultHistory collection/documents
+      if (email != null && email.isNotEmpty) {
+        final resultHistoryDocRef = firestore.FirebaseFirestore.instance
+            .collection('resultHistory')
+            .doc(email);
+        
+        final testsSubcollection = resultHistoryDocRef.collection('tests');
+        final testsSnapshot = await testsSubcollection.get();
+        final batch = firestore.FirebaseFirestore.instance.batch();
+        for (final doc in testsSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+        await resultHistoryDocRef.delete();
+        Logger.info('✅ AuthService: Deleted resultHistory and subcollection for $email');
+      }
+
+      // 2. Delete Firestore user profile document
+      await _firestoreService.deleteUserProfile(uid);
+      Logger.info('✅ AuthService: Deleted user profile document for $uid');
+
+      // 3. Clear local cache and storage
+      _firestoreService.clearAllCache();
+      await _clearAllLocalData();
+      Logger.info('✅ AuthService: Local data and Firestore cache cleared');
+
+      // 4. Delete Firebase Auth User
+      await user.delete();
+      Logger.info('✅ AuthService: Deleted Firebase Auth User successfully');
+      
+      // Clean up Google session sign-out as well
+      await _googleSignIn.signOut();
+    } on FirebaseAuthException catch (e) {
+      Logger.info('❌ AuthService: FirebaseAuthException during account deletion: ${e.code}');
+      throw Exception(_messageForAuthException(e));
+    } catch (e) {
+      Logger.info('❌ AuthService: Error deleting account data: $e');
+      throw Exception('Failed to delete account data: $e');
     }
   }
 }

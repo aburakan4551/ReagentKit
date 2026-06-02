@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reagentkit/core/services/firestore_service.dart';
 import 'package:reagentkit/core/theme/app_colors.dart';
 import 'package:reagentkit/core/utils/layout_helper.dart';
 import 'package:reagentkit/core/widgets/adaptive_section_title.dart';
@@ -87,6 +89,425 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final authController = ref.read(authControllerProvider.notifier);
     authController.signOut();
     _clearTextFields();
+  }
+
+  bool _isArabic() {
+    return Localizations.localeOf(context).languageCode == 'ar';
+  }
+
+  Widget _buildAccountManagementCard(dynamic user, ThemeData theme, AppLocalizations l10n) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final ar = _isArabic();
+    
+    // Check if the user is signed in with email/password
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final providerId = currentUser?.providerData.isNotEmpty == true
+        ? currentUser!.providerData.first.providerId
+        : 'password';
+    final isEmailProvider = providerId == 'password';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AdaptiveSectionTitle(
+          title: ar ? 'إدارة الحساب' : 'Account Management',
+          showAccentBar: true,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: isDarkMode ? AppColors.surfaceBase : Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Edit Profile (Display Name)
+              ListTile(
+                leading: const Icon(HeroIcons.pencil_square, color: Colors.blue),
+                title: Text(
+                  ar ? 'تعديل الملف الشخصي' : 'Edit Profile',
+                  style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+                ),
+                subtitle: Text(
+                  ar ? 'تغيير الاسم المستعار' : 'Change display name',
+                  style: TextStyle(color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary, fontSize: 12),
+                ),
+                trailing: const Icon(HeroIcons.chevron_right, size: 16),
+                onTap: () => _showEditNameDialog(user),
+              ),
+              const Divider(height: 1),
+              
+              // Change Password (only for Email provider)
+              if (isEmailProvider) ...[
+                ListTile(
+                  leading: const Icon(HeroIcons.key, color: Colors.amber),
+                  title: Text(
+                    ar ? 'تغيير كلمة المرور' : 'Change Password',
+                    style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+                  ),
+                  subtitle: Text(
+                    ar ? 'تحديث بيانات الأمان الخاصة بك' : 'Update your security credentials',
+                    style: TextStyle(color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary, fontSize: 12),
+                  ),
+                  trailing: const Icon(HeroIcons.chevron_right, size: 16),
+                  onTap: _showChangePasswordDialog,
+                ),
+                const Divider(height: 1),
+              ],
+              
+              // Logout
+              ListTile(
+                leading: Icon(HeroIcons.arrow_right_on_rectangle, color: theme.colorScheme.primary),
+                title: Text(
+                  l10n.signOut,
+                  style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+                ),
+                subtitle: Text(
+                  ar ? 'الخروج من الجلسة الحالية' : 'Exit current session',
+                  style: TextStyle(color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary, fontSize: 12),
+                ),
+                trailing: const Icon(HeroIcons.chevron_right, size: 16),
+                onTap: _signOut,
+              ),
+              const Divider(height: 1),
+              
+              // Delete Account
+              ListTile(
+                leading: const Icon(HeroIcons.trash, color: Colors.red),
+                title: Text(
+                  ar ? 'حذف الحساب' : 'Delete Account',
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  ar ? 'حذف حسابك وبياناتك نهائياً' : 'Permanently delete your account and data',
+                  style: TextStyle(color: Colors.red.withOpacity(0.7), fontSize: 12),
+                ),
+                trailing: const Icon(HeroIcons.chevron_right, size: 16, color: Colors.red),
+                onTap: () => _showDeleteAccountWorkflow(user),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showEditNameDialog(dynamic user) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    final ar = _isArabic();
+    final controller = TextEditingController(text: user.displayName ?? user.username);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isDarkMode ? AppColors.surfaceBase : Colors.white,
+          title: Text(
+            ar ? 'تعديل الملف الشخصي' : 'Edit Profile',
+            style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AdaptiveTextField(
+                controller: controller,
+                labelText: ar ? 'الاسم المستعار' : 'Display Name',
+                hintText: ar ? 'أدخل الاسم الجديد' : 'Enter new name',
+                prefixIcon: const Icon(HeroIcons.user),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.primary)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final newName = controller.text.trim();
+                if (newName.isNotEmpty) {
+                  try {
+                    await FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
+                    await FirestoreService().updateUserProfile(
+                      user.uid,
+                      {'displayName': newName},
+                    );
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      NotificationService.showSuccess(
+                        title: ar ? 'نجاح' : 'Success',
+                        message: ar ? 'تم تحديث الملف الشخصي بنجاح' : 'Profile updated successfully',
+                      );
+                    }
+                  } catch (e) {
+                    NotificationService.showError(
+                      title: ar ? 'خطأ' : 'Error',
+                      message: e.toString(),
+                    );
+                  }
+                }
+              },
+              child: Text(ar ? 'حفظ' : 'Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showChangePasswordDialog() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    final ar = _isArabic();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isDarkMode ? AppColors.surfaceBase : Colors.white,
+          title: Text(
+            ar ? 'تغيير كلمة المرور' : 'Change Password',
+            style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AdaptiveTextField(
+                  controller: newPasswordController,
+                  labelText: ar ? 'كلمة المرور الجديدة' : 'New Password',
+                  hintText: 'Minimum 6 characters',
+                  obscureText: true,
+                  prefixIcon: const Icon(HeroIcons.lock_closed),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return l10n.pleaseEnterPassword;
+                    }
+                    if (value.length < 6) {
+                      return l10n.passwordMinLength;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                AdaptiveTextField(
+                  controller: confirmPasswordController,
+                  labelText: l10n.confirmPassword,
+                  hintText: 'Confirm new password',
+                  obscureText: true,
+                  prefixIcon: const Icon(HeroIcons.lock_closed),
+                  validator: (value) {
+                    if (value != newPasswordController.text) {
+                      return l10n.passwordsDoNotMatch;
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.primary)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  try {
+                    await FirebaseAuth.instance.currentUser?.updatePassword(newPasswordController.text);
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      NotificationService.showSuccess(
+                        title: ar ? 'نجاح' : 'Success',
+                        message: ar ? 'تم تغيير كلمة المرور بنجاح' : 'Password changed successfully',
+                      );
+                    }
+                  } catch (e) {
+                    NotificationService.showError(
+                      title: ar ? 'خطأ' : 'Error',
+                      message: e.toString(),
+                    );
+                  }
+                }
+              },
+              child: Text(ar ? 'حفظ' : 'Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteAccountWorkflow(dynamic user) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final ar = _isArabic();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isDarkMode ? AppColors.surfaceBase : Colors.white,
+          title: Row(
+            children: [
+              const Icon(HeroIcons.exclamation_triangle, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(
+                ar ? 'حذف الحساب' : 'Delete Account',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ],
+          ),
+          content: Text(
+            ar ? 'تحذير: هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف جميع بيانات ملفك الشخصي وتاريخ الاختبارات نهائياً.' : 'Warning: This action is permanent and cannot be undone. All your profile, test history, and data will be permanently deleted.',
+            style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.primary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _triggerReauthenticationFlow(user);
+              },
+              child: Text(ar ? 'حذف' : 'Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _triggerReauthenticationFlow(dynamic user) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final ar = _isArabic();
+
+    // Get primary provider ID
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    final providerId = currentUser.providerData.isNotEmpty
+        ? currentUser.providerData.first.providerId
+        : 'password';
+
+    if (providerId == 'password') {
+      final passwordController = TextEditingController();
+      final formKey = GlobalKey<FormState>();
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: isDarkMode ? AppColors.surfaceBase : Colors.white,
+            title: Text(
+              ar ? 'مطلوب إعادة المصادقة' : 'Re-authentication Required',
+              style: TextStyle(color: isDarkMode ? Colors.white : AppColors.lightTextPrimary),
+            ),
+            content: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    ar ? 'الرجاء إدخال كلمة المرور الحالية للتحقق من هويتك قبل حذف الحساب.' : 'Please enter your current password to verify identity before deleting your account.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  AdaptiveTextField(
+                    controller: passwordController,
+                    labelText: l10n.password,
+                    obscureText: true,
+                    prefixIcon: const Icon(HeroIcons.lock_closed),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return l10n.pleaseEnterPassword;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.primary)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  if (formKey.currentState?.validate() ?? false) {
+                    Navigator.of(context).pop();
+                    final success = await ref
+                        .read(authControllerProvider.notifier)
+                        .reauthenticateWithEmail(passwordController.text);
+                    if (success) {
+                      await ref.read(authControllerProvider.notifier).deleteAccount();
+                    }
+                  }
+                },
+                child: Text(ar ? 'تأكيد' : 'Confirm'),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (providerId == 'google.com') {
+      NotificationService.showInfo(
+        title: ar ? 'إعادة المصادقة' : 'Re-authentication',
+        message: ar ? 'جاري تشغيل تسجيل الدخول بـ Google للتحقق من هويتك...' : 'Launching Google Sign-In to verify your identity...',
+      );
+      final success = await ref
+          .read(authControllerProvider.notifier)
+          .reauthenticateWithGoogle();
+      if (success) {
+        await ref.read(authControllerProvider.notifier).deleteAccount();
+      }
+    } else if (providerId == 'apple.com') {
+      NotificationService.showInfo(
+        title: ar ? 'إعادة المصادقة' : 'Re-authentication',
+        message: ar ? 'جاري تشغيل تسجيل الدخول بـ Apple للتحقق من هويتك...' : 'Launching Apple Sign-In to verify your identity...',
+      );
+      final success = await ref
+          .read(authControllerProvider.notifier)
+          .reauthenticateWithApple();
+      if (success) {
+        await ref.read(authControllerProvider.notifier).deleteAccount();
+      }
+    } else {
+      // Fallback: try direct delete
+      await ref.read(authControllerProvider.notifier).deleteAccount();
+    }
   }
 
   void _clearTextFields() {
@@ -422,8 +843,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           const SafetyReminderCard(),
           const SizedBox(height: 24),
           AccountInfoCard(user: user),
-          const SizedBox(height: 32),
-          _buildSignOutButton(l10n, theme),
+          const SizedBox(height: 24),
+          _buildAccountManagementCard(user, theme, l10n),
           SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
         ],
       ),
@@ -760,42 +1181,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSignOutButton(AppLocalizations l10n, ThemeData theme) {
-    final isDarkMode = theme.brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFFF6B6B).withOpacity(0.3),
-          width: 1.5,
-        ),
-        color: const Color(0xFFFF6B6B).withOpacity(isDarkMode ? 0.05 : 0.02),
-      ),
-      child: TextButton.icon(
-        onPressed: _signOut,
-        icon: const Icon(
-          HeroIcons.arrow_right_on_rectangle,
-          color: Color(0xFFFF6B6B),
-          size: 20,
-        ),
-        label: Text(
-          l10n.signOut,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: const Color(0xFFFF6B6B),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
         ),
       ),
     );

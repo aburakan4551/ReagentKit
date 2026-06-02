@@ -1,7 +1,7 @@
 name: reagentkit
 description: "ReagentKit - A professional reagent testing app with Firebase integration."
 publish_to: 'none'
-version: 0.1.1+1
+version: 0.1.1+108
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -44,6 +44,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   google_sign_in: ^6.2.2         # lock resolves 6.2.2; ^7.x is incompatible with current Firebase Auth iOS pod
+  sign_in_with_apple: ^6.1.1
 
 
   

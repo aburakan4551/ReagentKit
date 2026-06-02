@@ -1,7 +1,10 @@
 import 'dart:ui';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../controllers/auth_controller.dart';
 import '../states/auth_state.dart';
 import '../../../settings/presentation/providers/settings_providers.dart';
@@ -154,7 +157,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           const SizedBox(height: 32),
                           _buildAuthForm(authState, l10n),
                           const SizedBox(height: 24),
-                          _buildGoogleSignInButton(authState, l10n),
+                          _buildSocialSignInButtons(authState, l10n),
                           const SizedBox(height: 16),
                           _buildToggleAuthModeButton(l10n),
                         ],
@@ -345,9 +348,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     );
   }
 
-  Widget _buildGoogleSignInButton(AuthState authState, AppLocalizations l10n) {
+  Widget _buildSocialSignInButtons(AuthState authState, AppLocalizations l10n) {
     final isLoading = authState is AuthLoading;
     final theme = Theme.of(context);
+    final isIOS = !kIsWeb && Platform.isIOS;
 
     return Column(
       children: [
@@ -380,6 +384,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
           ),
           style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 50),
             padding: const EdgeInsets.symmetric(
               vertical: 14,
               horizontal: 24,
@@ -393,6 +398,24 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             ),
           ),
         ),
+        if (isIOS) ...[
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 50,
+            width: double.infinity,
+            child: SignInWithAppleButton(
+              onPressed: () async {
+                if (isLoading) return;
+                final authController = ref.read(authControllerProvider.notifier);
+                await authController.signInWithApple();
+              },
+              style: theme.brightness == Brightness.dark
+                  ? SignInWithAppleButtonStyle.white
+                  : SignInWithAppleButtonStyle.black,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ],
       ],
     );
   }
