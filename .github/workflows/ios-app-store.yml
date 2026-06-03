@@ -269,22 +269,22 @@ jobs:
           fi
           
           # Check if ProvisionedDevices exists (Ad Hoc indicator)
-          HAS_DEVICES=$(plutil -extract ProvisionedDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
-          if [ "$HAS_DEVICES" != "missing" ]; then
+          if plutil -extract ProvisionedDevices raw profile_decoded.plist >/dev/null 2>&1; then
             echo "❌ COMPLIANCE ERROR: Provisioning profile contains provisioned devices (Ad Hoc profile)! For App Store Connect submission, it must be App Store without device list."
             exit 1
           else
             echo "✅ No ProvisionedDevices found (not an Ad Hoc profile)."
           fi
           
-          # Check if ProvisionsAllDevices exists (Enterprise indicator)
-          PROVISIONS_ALL=$(plutil -extract ProvisionsAllDevices raw profile_decoded.plist 2>/dev/null || echo "missing")
-          if [ "$PROVISIONS_ALL" != "missing" ] && [ "$PROVISIONS_ALL" != "0" ] && [ "$PROVISIONS_ALL" != "false" ]; then
-            echo "❌ COMPLIANCE ERROR: Provisioning profile provisions all devices (Enterprise profile)!"
-            exit 1
-          else
-            echo "✅ Not an Enterprise profile."
+          # Check if ProvisionsAllDevices exists and is true (Enterprise indicator)
+          if plutil -extract ProvisionsAllDevices raw profile_decoded.plist >/dev/null 2>&1; then
+            PROVISIONS_ALL=$(plutil -extract ProvisionsAllDevices raw profile_decoded.plist 2>/dev/null || echo "false")
+            if [ "$PROVISIONS_ALL" = "1" ] || [ "$PROVISIONS_ALL" = "true" ]; then
+              echo "❌ COMPLIANCE ERROR: Provisioning profile provisions all devices (Enterprise profile)!"
+              exit 1
+            fi
           fi
+          echo "✅ Not an Enterprise profile."
           
           # Optional: Print ProfileDistributionType if present (informational only)
           PROFILE_TYPE=$(plutil -extract ProfileDistributionType raw profile_decoded.plist 2>/dev/null || echo "N/A")
