@@ -49,7 +49,7 @@ base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
 2. اذهب إلى `Actions`.
 3. اختر `Build iOS IPA`.
 4. اضغط `Run workflow`.
-5. أدخل `build_name` و `build_number` جديدين.
+5. أدخل `build_name` و `build_number` جديدين. يجب أن يكون `build_number` أعلى من آخر رقم قبله App Store Connect؛ الرقم الحالي المقترح هو `123`.
 6. في أول تجربة، اترك `upload_to_testflight` غير مفعّل.
 7. بعد انتهاء البناء، حمّل ملف `.ipa` من artifacts.
 
