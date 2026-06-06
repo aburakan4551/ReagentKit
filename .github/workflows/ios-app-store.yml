@@ -141,11 +141,11 @@ jobs:
           BUILD_NAME="${BUILD_NAME:-$PUBSPEC_BUILD_NAME}"
 
           # Build number: use manual input if provided, otherwise auto-generate
-          # using Unix timestamp (seconds since epoch) — guaranteed unique, always
-          # higher than any previously uploaded Apple build.
+          # using GITHUB_RUN_ID — a globally unique, ever-increasing number for
+          # each workflow run. Guaranteed never to collide.
           BUILD_NUMBER="${{ github.event.inputs.build_number }}"
           if [ -z "$BUILD_NUMBER" ]; then
-            BUILD_NUMBER=$(date +%s)
+            BUILD_NUMBER=$GITHUB_RUN_ID
           fi
 
           echo "📦 Build name: $BUILD_NAME"
