@@ -1172,11 +1172,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final isLoading = authState is AuthLoading;
 
     return SignInWithAppleButton(
-      onPressed: isLoading
-          ? null
-          : () {
-              ref.read(authControllerProvider.notifier).signInWithApple();
-            },
+      onPressed: () {
+        if (isLoading) return;
+        ref.read(authControllerProvider.notifier).signInWithApple();
+      },
       style: theme.brightness == Brightness.dark
           ? SignInWithAppleButtonStyle.white
           : SignInWithAppleButtonStyle.black,
