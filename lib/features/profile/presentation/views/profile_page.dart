@@ -1,7 +1,10 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:reagentkit/core/services/firestore_service.dart';
 import 'package:reagentkit/core/theme/app_colors.dart';
 import 'package:reagentkit/core/utils/layout_helper.dart';
@@ -800,6 +803,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildModernAuthForm(authState, l10n, theme),
           const SizedBox(height: 20),
           _buildModernGoogleSignInButton(authState, l10n, theme),
+          if (Platform.isIOS) ...[
+            const SizedBox(height: 12),
+            _buildModernAppleSignInButton(authState, l10n, theme),
+          ],
           const SizedBox(height: 20),
           _buildToggleAuthModeButton(l10n, theme),
           SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
@@ -1154,6 +1161,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildModernAppleSignInButton(
+    AuthState authState,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    final isLoading = authState is AuthLoading;
+
+    return SignInWithAppleButton(
+      onPressed: isLoading
+          ? null
+          : () {
+              ref.read(authControllerProvider.notifier).signInWithApple();
+            },
+      style: theme.brightness == Brightness.dark
+          ? SignInWithAppleButtonStyle.white
+          : SignInWithAppleButtonStyle.black,
+      borderRadius: BorderRadius.circular(16),
     );
   }
 
