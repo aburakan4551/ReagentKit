@@ -1,4 +1,6 @@
-import 'dart:io' show Platform;
+import 'dart:io';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -803,7 +805,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildModernAuthForm(authState, l10n, theme),
           const SizedBox(height: 20),
           _buildModernGoogleSignInButton(authState, l10n, theme),
-          if (Platform.isIOS) ...[
+          if (!kIsWeb && Platform.isIOS) ...[
             const SizedBox(height: 12),
             _buildModernAppleSignInButton(authState, l10n, theme),
           ],
