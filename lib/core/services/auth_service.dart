@@ -426,13 +426,17 @@ class AuthService {
       case 'too-many-requests':
         return 'Too many login attempts. Please wait a few minutes before trying again.';
       case 'operation-not-allowed':
-        return 'This sign-in method is currently unavailable. Please try again later.';
-      case 'network-request-failed':
-        return 'Network error. Please check your connection and try again.';
+        return 'This sign-in method is not enabled for this app. Verify your Firebase Auth configuration.';
+      case 'account-exists-with-different-credential':
+        return 'An account already exists with a different sign-in method. Please sign in using the original provider.';
+      case 'invalid-credential':
+        return 'Invalid authentication credentials. Please try signing in again.';
       case 'credential-already-in-use':
+        return 'This Apple account is already linked with a different user. Please use the correct account or unlink Apple in the existing account.';
       case 'auth-domain-config-required':
+      case 'network-request-failed':
       default:
-        return 'Unable to sign in at this time. Please try again later.';
+        return e.message ?? 'Unable to sign in at this time. Please try again later.';
     }
   }
 
@@ -451,6 +455,23 @@ class AuthService {
         nonce: nonce,
       );
 
+      Logger.info(
+        '🔐 AuthService: Apple credential returned - '
+        'userIdentifier=${appleCredential.userIdentifier}, '
+        'email=${appleCredential.email}, '
+        'identityTokenPresent=${appleCredential.identityToken != null}, '
+        'authorizationCodePresent=${appleCredential.authorizationCode != null}, '
+        'givenName=${appleCredential.givenName}, '
+        'familyName=${appleCredential.familyName}',
+      );
+
+      if (appleCredential.identityToken == null || appleCredential.identityToken!.isEmpty) {
+        Logger.info('❌ AuthService: Apple Sign-In returned no identityToken');
+        throw Exception(
+          'Apple Sign-In did not return an identity token. Ensure Sign in with Apple is enabled in your Apple Developer and Firebase configurations.',
+        );
+      }
+
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
@@ -462,8 +483,7 @@ class AuthService {
       if (result.user != null) {
         final user = result.user!;
         Logger.info('✅ AuthService: Firebase Apple Sign-In success — uid: ${user.uid}');
-        
-        // Create/update Firestore user profile
+
         final existingProfile = await _firestoreService.getUserProfile(user.uid);
         if (existingProfile == null) {
           final displayName = [appleCredential.givenName, appleCredential.familyName]
@@ -492,10 +512,33 @@ class AuthService {
       }
       return result;
     } on FirebaseAuthException catch (e) {
+      Logger.info('❌ AuthService: FirebaseAuthException during Apple Sign-In: ${e.code} — ${e.message}');
+      if (e.code == 'account-exists-with-different-credential' &&
+          e.email != null &&
+          e.email!.isNotEmpty) {
+        try {
+          final methods = await _auth.fetchSignInMethodsForEmail(e.email!);
+          final providerList = methods.isNotEmpty ? methods.join(', ') : 'another provider';
+          throw Exception(
+            'An account already exists for ${e.email}. Sign in using $providerList and link Apple Sign-In from account settings.',
+          );
+        } catch (_) {
+          throw Exception(
+            'An account already exists with a different sign-in provider. Please sign in using the original provider and link Apple Sign-In afterward.',
+          );
+        }
+      }
       throw Exception(_messageForAuthException(e));
+    } on SignInWithAppleAuthorizationException catch (e) {
+      Logger.info('❌ AuthService: SignInWithAppleAuthorizationException: ${e.code} — ${e.message}');
+      throw Exception('Apple Sign-In authorization failed (${e.code}). Please try again.');
+    } on PlatformException catch (e) {
+      Logger.info('❌ AuthService: PlatformException during Apple Sign-In: ${e.code} — ${e.message}');
+      debugPrint('PlatformException details: ${e.details}');
+      throw Exception('Apple Sign-In failed (${e.code}). Please verify iOS configuration and try again.');
     } catch (e) {
       Logger.info('❌ AuthService: Apple Sign-In error: $e');
-      throw Exception('Apple Sign-In failed. Please try again.');
+      throw Exception('Apple Sign-In failed. ${e.toString()}');
     }
   }
 
