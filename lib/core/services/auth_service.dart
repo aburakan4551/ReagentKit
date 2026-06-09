@@ -414,7 +414,6 @@ class AuthService {
     switch (e.code) {
       case 'user-not-found':
       case 'wrong-password':
-      case 'invalid-credential':
       case 'invalid-email':
         return 'Invalid email or password. Please try again.';
       case 'email-already-in-use':
@@ -460,7 +459,7 @@ class AuthService {
         'userIdentifier=${appleCredential.userIdentifier}, '
         'email=${appleCredential.email}, '
         'identityTokenPresent=${appleCredential.identityToken != null}, '
-        'authorizationCodePresent=${appleCredential.authorizationCode != null}, '
+        'authorizationCodePresent=${appleCredential.authorizationCode.isNotEmpty}, '
         'givenName=${appleCredential.givenName}, '
         'familyName=${appleCredential.familyName}',
       );
@@ -517,6 +516,7 @@ class AuthService {
           e.email != null &&
           e.email!.isNotEmpty) {
         try {
+          // ignore: deprecated_member_use
           final methods = await _auth.fetchSignInMethodsForEmail(e.email!);
           final providerList = methods.isNotEmpty ? methods.join(', ') : 'another provider';
           throw Exception(
