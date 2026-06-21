@@ -1,0 +1,81 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android
+android/local.properties
+android/key.properties
+android/*.keystore
+android/*.jks
+android/app/google-services.json
+!android/app/src/main/res/values/strings.xml
+
+# iOS/macOS
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Runner/GoogleService-Info.plist
+ios/Runner/ExportOptions.plist
+macos/Flutter/Generated.xcconfig
+macos/Runner/GoogleService-Info.plist
+macos/Runner/ExportOptions.plist
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+*.xccheckout
+*.xcscmblueprint
+*.xcuserstate
+DerivedData/
+Pods/
+.xcworkspace/
+ios/Pods/
+macos/Pods/
+
+# Environment variables & Secrets
+.env
+.env.*
+*.secret
+secrets.json
+firebase_keys.dart
+GoogleService-Info*.plist
+**/GoogleService-Info.plist
+**/google-services.json
+AuthKey_*.p8
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+profile.b64
+ios_secrets_base64.md
+run_with_api_key.sh
+# Root-level certificates / provisioning files (should never be committed)
+/ReagentKit.p12
+/cerReagentKit.p12
+/ReagentKit_App_Store_Profile.mobileprovision
+/development.cer
+/distribution-3.cer
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+*.iws
+.project
+.settings/
+.classpath
+
+# Misc
+.DS_Store
+*.log
+docs/github-actions-ios-secrets.md
+docs/github-actions-ios.md
+
+# App Store validation exclusions
+Flutter/Flutter.framework
+__pycache__

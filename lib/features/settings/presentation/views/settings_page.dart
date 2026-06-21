@@ -1,0 +1,693 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:reagentkit/l10n/app_localizations.dart';
+import 'package:reagentkit/core/utils/layout_helper.dart';
+import '../states/settings_state.dart';
+import '../widgets/settings_section.dart';
+import '../widgets/settings_tile.dart';
+import '../providers/settings_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
+import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
+import 'package:reagentkit/core/services/premium_service.dart';
+import 'package:reagentkit/features/settings/presentation/views/scientific_references_page.dart';
+
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsState = ref.watch(settingsControllerProvider);
+    final currentTheme = ref.watch(currentThemeModeProvider);
+    final currentLanguage = ref.watch(currentLanguageProvider);
+    final premiumService = ref.watch(premiumServiceProvider);
+
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.surface,
+              theme.colorScheme.surface.withOpacity(0.8),
+              theme.colorScheme.surfaceContainerLowest,
+            ],
+          ),
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 120,
+              floating: false,
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withOpacity(0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        HeroIcons.cog_6_tooth,
+                        color: theme.colorScheme.onPrimary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.settings,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                centerTitle: true,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: _buildBody(
+                context,
+                l10n,
+                ref,
+                settingsState,
+                currentTheme,
+                currentLanguage,
+                premiumService,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    AppLocalizations l10n,
+    WidgetRef ref,
+    SettingsState settingsState,
+    String currentTheme,
+    String currentLanguage,
+    PremiumService premiumService,
+  ) {
+    final theme = Theme.of(context);
+
+    if (settingsState is SettingsLoading) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.6,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (settingsState is SettingsError) {
+      return Container(
+        margin: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.red.withOpacity(0.1),
+              Colors.red.withOpacity(0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.red.withOpacity(0.3)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Icon(
+                HeroIcons.exclamation_triangle,
+                size: 48,
+                color: Colors.red.shade600,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.errorLoadingSettings,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              settingsState.message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.red.shade600,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Retry loading settings
+              },
+              icon: Icon(HeroIcons.arrow_path),
+              label: Text(l10n.retry),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade600,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+
+        // Appearance Section
+        _buildEnhancedSection(
+          title: l10n.appearance,
+          icon: HeroIcons.paint_brush,
+          gradient: [
+            Colors.purple.withOpacity(0.1),
+            Colors.blue.withOpacity(0.1),
+          ],
+          children: [
+            SettingsDropdownTile<String>(
+              title: l10n.theme,
+              subtitle: l10n.themeSubtitle,
+              leadingIcon: _getThemeIcon(currentTheme),
+              value: currentTheme,
+              items: [
+                DropdownMenuItem(
+                  value: 'light',
+                  child: Row(
+                    children: [
+                      Icon(HeroIcons.sun, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.lightTheme),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'dark',
+                  child: Row(
+                    children: [
+                      Icon(HeroIcons.moon, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.darkTheme),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'system',
+                  child: Row(
+                    children: [
+                      Icon(HeroIcons.computer_desktop, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.systemTheme),
+                    ],
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  final themeMode = switch (value) {
+                    'light' => ThemeMode.light,
+                    'dark' => ThemeMode.dark,
+                    'system' => ThemeMode.system,
+                    _ => ThemeMode.system,
+                  };
+                  ref
+                      .read(settingsControllerProvider.notifier)
+                      .updateTheme(themeMode);
+                }
+              },
+              isFirst: true,
+              isLast: true,
+            ),
+          ],
+        ),
+
+        // Language Section
+        _buildEnhancedSection(
+          title: l10n.language,
+          icon: HeroIcons.language,
+          gradient: [
+            Colors.green.withOpacity(0.1),
+            Colors.teal.withOpacity(0.1),
+          ],
+          children: [
+            SettingsDropdownTile<String>(
+              title: l10n.appLanguage,
+              subtitle: l10n.appLanguageSubtitle,
+              leadingIcon: HeroIcons.globe_alt,
+              value: currentLanguage,
+              items: [
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'EN',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(l10n.english),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'ar',
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'AR',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.orange.shade700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(l10n.arabic),
+                    ],
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  ref
+                      .read(settingsControllerProvider.notifier)
+                      .changeLanguage(value);
+                }
+              },
+              isFirst: true,
+              isLast: true,
+            ),
+          ],
+        ),
+
+        // Subscription & Trials Section
+        if (!PremiumService.isPremiumReviewMode)
+          _buildEnhancedSection(
+            title: l10n.subscriptionAndTrials,
+            icon: HeroIcons.sparkles,
+            gradient: [
+              Colors.amber.withOpacity(0.1),
+              Colors.orange.withOpacity(0.1),
+            ],
+            children: [
+              SettingsTile(
+                title: l10n.subscriptionStatus,
+                subtitle: premiumService.isPremium
+                    ? l10n.premiumStatus
+                    : l10n.freeTrialStatus,
+                leadingIcon: HeroIcons.credit_card,
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: premiumService.isPremium
+                        ? Colors.green.withOpacity(0.12)
+                        : Colors.orange.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    premiumService.isPremium
+                        ? (l10n.localeName == 'ar' ? 'نشط' : 'Active')
+                        : (l10n.localeName == 'ar' ? 'تجريبي' : 'Trial'),
+                    style: TextStyle(
+                      color: premiumService.isPremium
+                          ? Colors.green.shade700
+                          : Colors.orange.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                isFirst: true,
+                isLast: premiumService.isPremium,
+              ),
+              if (!premiumService.isPremium) ...[
+                SettingsTile(
+                  title: l10n.freeTestsRemaining(premiumService.freeScansLeft),
+                  subtitle: l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
+                  leadingIcon: HeroIcons.chart_bar,
+                ),
+                SettingsTile(
+                  title: l10n.upgradeToPremium,
+                  subtitle: l10n.unlimitedTests,
+                  leadingIcon: HeroIcons.sparkles,
+                  trailing: Icon(
+                    HeroIcons.chevron_right,
+                    size: 16,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PaywallScreen(),
+                      ),
+                    );
+                  },
+                  isLast: true,
+                ),
+              ],
+            ],
+          ),
+
+        // Research & References Section
+        _buildEnhancedSection(
+          title: l10n.localeName == 'ar' ? 'البحث العلمي والمراجع' : 'Research & References',
+          icon: HeroIcons.academic_cap,
+          gradient: [
+            const Color(0xFF7C5CFF).withOpacity(0.1),
+            Colors.blue.withOpacity(0.1),
+          ],
+          children: [
+            SettingsSwitchTile(
+              title: l10n.researchMode,
+              subtitle: l10n.researchModeSubtitle,
+              leadingIcon: HeroIcons.beaker,
+              value: ref.watch(researchModeEnabledProvider),
+              onChanged: (value) {
+                ref
+                    .read(settingsControllerProvider.notifier)
+                    .updateResearchMode(value);
+              },
+              isFirst: true,
+            ),
+            SettingsTile(
+              title: l10n.referencesLibrary,
+              subtitle: l10n.referencesLibrarySubtitle,
+              leadingIcon: HeroIcons.book_open,
+              trailing: Icon(
+                HeroIcons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScientificReferencesPage(),
+                  ),
+                );
+              },
+              isLast: true,
+            ),
+          ],
+        ),
+
+        // About Section
+        _buildEnhancedSection(
+          title: l10n.about,
+          icon: HeroIcons.information_circle,
+          gradient: [
+            Colors.indigo.withOpacity(0.1),
+            Colors.purple.withOpacity(0.1),
+          ],
+          children: [
+            SettingsTile(
+              title: l10n.developers,
+              subtitle: l10n.developersSubtitle,
+              leadingIcon: HeroIcons.code_bracket,
+              trailing: Icon(
+                HeroIcons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              onTap: () => _showDevelopersDialog(context, l10n),
+              isFirst: true,
+            ),
+            SettingsTile(
+              title: l10n.privacyPolicy,
+              subtitle: l10n.viewPrivacyPolicy,
+              leadingIcon: HeroIcons.shield_check,
+              trailing: Icon(
+                HeroIcons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              onTap: () async {
+                final uri = Uri.parse('https://aburakan4551.github.io/reagent-kit-privacy/');
+                try {
+                  final launched = await launchUrl(
+                    uri,
+                    mode: LaunchMode.inAppBrowserView,
+                  );
+                  if (!launched) {
+                    throw 'Could not launch privacy policy';
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                }
+              },
+            ),
+            SettingsTile(
+              title: l10n.version,
+              subtitle: '1.0.0',
+              leadingIcon: HeroIcons.tag,
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary.withOpacity(0.2),
+                      theme.colorScheme.primary.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Latest',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+              isLast: true,
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Text(
+              'Reagent ColorTest - Version 1.0.0\nResearch Use Only - Dataset Version: 2026.05',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                fontSize: 11,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Additional spacing at bottom
+        SizedBox(height: LayoutHelper.getBottomNavPadding(context)),
+      ],
+    );
+  }
+
+  Widget _buildEnhancedSection({
+    required String title,
+    required IconData icon,
+    required List<Color> gradient,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradient,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: gradient.first.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: SettingsSection(title: title, icon: icon, children: children),
+    );
+  }
+
+  IconData _getThemeIcon(String theme) {
+    return switch (theme) {
+      'light' => HeroIcons.sun,
+      'dark' => HeroIcons.moon,
+      'system' => HeroIcons.computer_desktop,
+      _ => HeroIcons.computer_desktop,
+    };
+  }
+
+  void _showDevelopersDialog(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                theme.colorScheme.surface,
+                theme.colorScheme.surface.withOpacity(0.8),
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue.shade400, Colors.blue.shade600],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      HeroIcons.code_bracket,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.developersDialogTitle,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.reagentTestingApp,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.theDevelopers,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(l10n.developerOneName),
+              Text(l10n.developerTwoName),
+              const SizedBox(height: 16),
+              Text(
+                l10n.aboutTheApp,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Text(l10n.aboutTheAppContent),
+              const SizedBox(height: 16),
+              Text(
+                l10n.contact,
+                style: TextStyle(color: theme.colorScheme.primary),
+              ),
+              const SizedBox(height: 24),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: Text(
+                    l10n.ok,
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

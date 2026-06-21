@@ -1,0 +1,97 @@
+name: reagentkit
+description: "ReagentKit - A professional reagent testing app with Firebase integration."
+publish_to: 'none'
+version: 0.1.3+1 # build number overridden by build_ipa.sh or CI workflow
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.7.0
+  cloud_firestore: ^5.6.12
+  firebase_remote_config: ^5.5.0
+  firebase_analytics: ^11.4.0
+  
+  # State Management
+  flutter_riverpod: ^2.6.1
+  
+  # Dependency Injection
+  get_it: ^7.6.4
+  
+  # Storage & Configuration
+  shared_preferences: ^2.2.2
+  flutter_dotenv: ^5.1.0
+  flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.3
+  
+  # In-App Purchases
+  in_app_purchase: ^3.2.0
+  purchases_flutter: ^8.2.0
+  
+  # Network connectivity
+  connectivity_plus: ^6.1.5
+  share_plus: ^10.1.4
+  
+  # Internationalization
+  flutter_localizations:
+    sdk: flutter
+  intl: ">=0.19.0 <0.21.0"      # flexible range to support both local SDK and remote GHA build environment
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  google_sign_in: ^6.2.2         # lock resolves 6.2.2; ^7.x is incompatible with current Firebase Auth iOS pod
+  sign_in_with_apple: ^6.1.1
+
+
+  
+  # Image Processing and AI
+  image_picker: ^1.1.2
+  google_generative_ai: ^0.4.7
+  http: ^1.2.1
+  palette_generator: ^0.3.3
+  
+  # Icons
+  icons_plus: ^5.0.0
+  go_router: ^14.0.0
+  
+  # UI and Animations
+  flutter_animate: ^4.5.0
+  lottie: ^3.1.2
+  percent_indicator: ^4.2.3
+  google_fonts: ^6.2.1
+  url_launcher: ^6.3.1
+  firebase_crashlytics: ^4.3.10
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/reagent_icon.png"
+  min_sdk_android: 21
+  min_sdk_ios: 13
+  min_sdk_web: 21
+  remove_alpha_ios: true
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  freezed: ^2.4.5
+  json_serializable: ^6.7.1
+  flutter_launcher_icons: ^0.14.4  # dev-only: not needed at runtime
+
+flutter:
+  uses-material-design: true
+  generate: true
+  
+  assets:
+    - assets/images/
+    - assets/data/reagents.json
+    - assets/data/references.json
+    - assets/data/safety.json
+    - assets/data/scientific_dataset.json

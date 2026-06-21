@@ -1,0 +1,836 @@
+{
+  "Marquis": {
+    "reagentName": "Marquis",
+    "reagentName_ar": "ماركيز",
+    "description": "Primary reagent for detecting MDMA, amphetamines, and opiates",
+    "description_ar": "الكاشف الأساسي لاكتشاف MDMA والأمفيتامينات والمواد الأفيونية",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 1,
+    "chemicals": [
+      "Formaldehyde",
+      "Concentrated Sulfuric Acid"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "orange > brownish",
+        "color_ar": "برتقالي > بني"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "yellow > green",
+        "color_ar": "أصفر > أخضر"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "DMT",
+        "color": "yellow > orange > brown",
+        "color_ar": "أصفر > برتقالي > بني"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no instant reaction",
+        "color_ar": "لا يوجد تفاعل فوري"
+      },
+      {
+        "drugName": "MDA",
+        "color": "instant purple/brown > black",
+        "color_ar": "بنفسجي/بني فوري > أسود"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant purple/brown > black",
+        "color_ar": "بنفسجي/بني فوري > أسود"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no change or yellowish",
+        "color_ar": "لا تغيير أو مصفر"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "red-orange > brown",
+        "color_ar": "برتقالي محمر > بني"
+      },
+      {
+        "drugName": "Psilocybin",
+        "color": "orange",
+        "color_ar": "برتقالي"
+      }
+    ]
+  },
+  "Gallic": {
+    "reagentName": "Gallic",
+    "reagentName_ar": "غاليك",
+    "description": "Chemical reagent for substance identification",
+    "description_ar": "كاشف كيميائي لتحديد المواد",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "MDA",
+        "color": "green > brown (60 sec +)",
+        "color_ar": "أخضر > بني (60 ثانية +)"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "green>brown",
+        "color_ar": "أخضر > بني"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Morris": {
+    "reagentName": "Morris",
+    "reagentName_ar": "موريس",
+    "description": "Secondary test for various stimulants",
+    "description_ar": "اختبار ثانوي لمختلف المنشطات",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 5,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "bright blue",
+        "color_ar": "أزرق ساطع"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "violet / violet-blue",
+        "color_ar": "بنفسجي / أزرق بنفسجي"
+      },
+      {
+        "drugName": "LSD",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "MDA",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "purple",
+        "color_ar": "بنفسجي"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "pale green",
+        "color_ar": "أخضر باهت"
+      },
+      {
+        "drugName": "Morris A",
+        "color": "pale green",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Morris B",
+        "color": "pale green",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Scott": {
+    "reagentName": "Scott",
+    "reagentName_ar": "سكوت",
+    "description": "Cocaine-specific reagent test",
+    "description_ar": "اختبار كاشف محدد للكوكايين",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Cobalt Thiocyanate",
+      "Hydrochloric Acid",
+      "Chloroform"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "bright blue",
+        "color_ar": "أزرق ساطع"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "MDA",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "blue spots",
+        "color_ar": "بقع زرقاء"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Robadope": {
+    "reagentName": "Robadope",
+    "reagentName_ar": "روبادوب",
+    "description": "Chemical reagent for substance identification",
+    "description_ar": "كاشف كيميائي لتحديد المواد",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "pink",
+        "color_ar": "وردي"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "(slow) pink",
+        "color_ar": "وردي (بطيء)"
+      },
+      {
+        "drugName": "DMT",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "MDA",
+        "color": "red orange",
+        "color_ar": "برتقالي محمر"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "no pink color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Froehde": {
+    "reagentName": "Froehde",
+    "reagentName_ar": "فروهده",
+    "description": "Detects opiates and morphine derivatives",
+    "description_ar": "يكشف المواد الأفيونية ومشتقات المورفين",
+    "safetyLevel": "EXTREME",
+    "safetyLevel_ar": "خطر شديد",
+    "testDuration": 1,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "clear or red",
+        "color_ar": "شفاف أو أحمر"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "yellow > green",
+        "color_ar": "أصفر > أخضر"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "DMT",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no instant reaction",
+        "color_ar": "لا يوجد تفاعل فوري"
+      },
+      {
+        "drugName": "MDA",
+        "color": "instant black",
+        "color_ar": "أسود فوري"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant black",
+        "color_ar": "أسود فوري"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "clear or red",
+        "color_ar": "شفاف أو أحمر"
+      }
+    ]
+  },
+  "Mandelin": {
+    "reagentName": "Mandelin",
+    "reagentName_ar": "مانديلين",
+    "description": "Identifies ketamine and PCP compounds",
+    "description_ar": "يحدد مركبات الكيتامين و PCP",
+    "safetyLevel": "EXTREME",
+    "safetyLevel_ar": "خطر شديد",
+    "testDuration": 1,
+    "chemicals": [
+      "Ammonium Metavanadate",
+      "Concentrated Sulfuric Acid"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "slow (dark) green",
+        "color_ar": "أخضر (داكن) بطيء"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "greenish brown",
+        "color_ar": "بني مخضر"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "short reddish",
+        "color_ar": "احمرار قصير"
+      },
+      {
+        "drugName": "DMT",
+        "color": "(faint) green > brown",
+        "color_ar": "أخضر (باهت) > بني"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "deep brownish orange/red",
+        "color_ar": "برتقالي بني داكن / أحمر"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no instant reaction",
+        "color_ar": "لا يوجد تفاعل فوري"
+      },
+      {
+        "drugName": "MDA",
+        "color": "instant purple/blue > black",
+        "color_ar": "بنفسجي/أزرق فوري > أسود"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant purple/blue > black",
+        "color_ar": "بنفسجي/أزرق فوري > أسود"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "short reddish",
+        "color_ar": "احمرار قصير"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "slow (dark) green",
+        "color_ar": "أخضر (داكن) بطيء"
+      },
+      {
+        "drugName": "No Change",
+        "color": "no change",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Folin": {
+    "reagentName": "Folin",
+    "reagentName_ar": "فولين",
+    "description": "Chemical reagent for substance identification",
+    "description_ar": "كاشف كيميائي لتحديد المواد",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "(light) orange",
+        "color_ar": "برتقالي (فاتح)"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "MDA",
+        "color": "None",
+        "color_ar": "لا يوجد"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "orange",
+        "color_ar": "برتقالي"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "orange or pink",
+        "color_ar": "برتقالي أو وردي"
+      }
+    ]
+  },
+  "Hofmann": {
+    "reagentName": "Hofmann",
+    "reagentName_ar": "هوفمان",
+    "description": "Chemical reagent for substance identification",
+    "description_ar": "كاشف كيميائي لتحديد المواد",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "DMT",
+        "color": "yellow",
+        "color_ar": "أصفر"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "blue",
+        "color_ar": "أزرق"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Psilocybin",
+        "color": "yellow / green",
+        "color_ar": "أصفر / أخضر"
+      }
+    ]
+  },
+  "Zimmermann": {
+    "reagentName": "Zimmermann",
+    "reagentName_ar": "زيمرمان",
+    "description": "Chemical reagent for substance identification",
+    "description_ar": "كاشف كيميائي لتحديد المواد",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 40,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "possible violet spots",
+        "color_ar": "بقع بنفسجية محتملة"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "no change / faint yellow",
+        "color_ar": "لا تغيير / أصفر باهت"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "purple ring / brown",
+        "color_ar": "حلقة بنفسجية / بني"
+      }
+    ]
+  },
+  "Ehrlich": {
+    "reagentName": "Ehrlich",
+    "reagentName_ar": "إيرليخ",
+    "description": "Detects psychedelics like LSD, DMT, and psilocybin",
+    "description_ar": "يكشف المهلوسات مثل LSD و DMT والسيلوسيبين",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 5,
+    "chemicals": [
+      "4-Dimethylaminobenzaldehyde",
+      "Hydrochloric Acid",
+      "Ethanol"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "DMT",
+        "color": "pink > magenta / red",
+        "color_ar": "وردي > أرجواني / أحمر"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "pink > purple",
+        "color_ar": "وردي > بنفسجي"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Psilocybin",
+        "color": "purple",
+        "color_ar": "بنفسجي"
+      }
+    ]
+  },
+  "Liebermann": {
+    "reagentName": "Liebermann",
+    "reagentName_ar": "ليبرمان",
+    "description": "Tests for amphetamines and cocaine",
+    "description_ar": "اختبارات للأمفيتامينات والكوكايين",
+    "safetyLevel": "EXTREME",
+    "safetyLevel_ar": "خطر شديد",
+    "testDuration": 1,
+    "chemicals": [
+      "Potassium Nitrite",
+      "Concentrated Sulfuric Acid"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "orange > red",
+        "color_ar": "برتقالي > أحمر"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "yellow > black",
+        "color_ar": "أصفر > أسود"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "yellow / orange",
+        "color_ar": "أصفر / برتقالي"
+      },
+      {
+        "drugName": "DMT",
+        "color": "brown > black",
+        "color_ar": "بني > أسود"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "light yellow",
+        "color_ar": "أصفر فاتح"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no instant reaction",
+        "color_ar": "لا يوجد تفاعل فوري"
+      },
+      {
+        "drugName": "MDA",
+        "color": "instant black",
+        "color_ar": "أسود فوري"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant black",
+        "color_ar": "أسود فوري"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "yellow / orange",
+        "color_ar": "أصفر / برتقالي"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "orange reddish",
+        "color_ar": "برتقالي محمر"
+      },
+      {
+        "drugName": "No Change",
+        "color": "no change",
+        "color_ar": "لا يوجد تغير في اللون"
+      }
+    ]
+  },
+  "Mecke": {
+    "reagentName": "Mecke",
+    "reagentName_ar": "ميكي",
+    "description": "Secondary confirmation test for MDMA and amphetamines",
+    "description_ar": "اختبار تأكيد ثانوي لـ MDMA والأمفيتامينات",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 1,
+    "chemicals": [
+      "Selenous Acid",
+      "Concentrated Sulfuric Acid"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "yellow > olive brownish",
+        "color_ar": "أصفر > بني زيتوني"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "DMT",
+        "color": "brown / green",
+        "color_ar": "بني / أخضر"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no instant reaction",
+        "color_ar": "لا يوجد تفاعل فوري"
+      },
+      {
+        "drugName": "MDA",
+        "color": "instant green > blue/black",
+        "color_ar": "أخضر فوري > أزرق/أسود"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant green > blue/black",
+        "color_ar": "أخضر فوري > أزرق/أسود"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "no color change",
+        "color_ar": "لا يوجد تغير في اللون"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "yellow",
+        "color_ar": "أصفر"
+      },
+      {
+        "drugName": "Psilocybin",
+        "color": "yellow green > brownish",
+        "color_ar": "أخضر مصفر > بني"
+      }
+    ]
+  },
+  "Simon's": {
+    "reagentName": "Simon's",
+    "reagentName_ar": "سايمون",
+    "description": "Specific test for secondary amines (MDMA)",
+    "description_ar": "اختبار محدد للأمينات الثانوية (MDMA)",
+    "safetyLevel": "HIGH",
+    "safetyLevel_ar": "عالي",
+    "testDuration": 1,
+    "chemicals": [
+      "Chemical Reagent"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Amphetamine",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "2C-B",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "Cocaine",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "DMT",
+        "color": "Black precipitates with Simon A, no change with B",
+        "color_ar": "رواسب سوداء مع كاشف سايمون أ، لا تغيير مع ب"
+      },
+      {
+        "drugName": "Ketamine",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "LSD",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "MDA",
+        "color": "no blue color change",
+        "color_ar": "لا يوجد تغير في اللون الأزرق"
+      },
+      {
+        "drugName": "MDMA",
+        "color": "instant dark blue",
+        "color_ar": "أزرق داكن فوري"
+      },
+      {
+        "drugName": "Mephedrone",
+        "color": "slow blue",
+        "color_ar": "أزرق بطيء"
+      },
+      {
+        "drugName": "Methamphetamine",
+        "color": "instant dark blue",
+        "color_ar": "أزرق داكن فوري"
+      }
+    ]
+  }
+}
