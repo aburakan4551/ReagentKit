@@ -459,7 +459,7 @@ class AuthService {
         'userIdentifier=${appleCredential.userIdentifier}, ' 
         'email=${appleCredential.email}, ' 
         'identityTokenPresent=${appleCredential.identityToken != null}, ' 
-        'authorizationCode=${appleCredential.authorizationCode}', 
+        'authorizationCode=${appleCredential.authorizationCode}, ' 
         'givenName=${appleCredential.givenName}, ' 
         'familyName=${appleCredential.familyName}',
       );
