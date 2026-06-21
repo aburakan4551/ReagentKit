@@ -459,7 +459,7 @@ class AuthService {
         'userIdentifier=${appleCredential.userIdentifier}, ' 
         'email=${appleCredential.email}, ' 
         'identityTokenPresent=${appleCredential.identityToken != null}, ' 
-        'authorizationCodePresent=${appleCredential.authorizationCode != null}, ' 
+        'authorizationCode=${appleCredential.authorizationCode}', 
         'givenName=${appleCredential.givenName}, ' 
         'familyName=${appleCredential.familyName}',
       );
@@ -515,17 +515,9 @@ class AuthService {
       if (e.code == 'account-exists-with-different-credential' &&
           e.email != null &&
           e.email!.isNotEmpty) {
-        try {
-          final methods = await _auth.fetchSignInMethodsForEmail(e.email!);
-          final providerList = methods.isNotEmpty ? methods.join(', ') : 'another provider';
-          throw Exception(
-            'An account already exists for ${e.email}. Sign in using $providerList and link Apple Sign-In from account settings.',
-          );
-        } catch (_) {
-          throw Exception(
-            'An account already exists with a different sign-in provider. Please sign in using the original provider and link Apple Sign-In afterward.',
-          );
-        }
+        throw Exception(
+          'An account already exists for ${e.email}. Please sign in using your original sign-in method, then link Apple Sign-In from account settings.',
+        );
       }
       throw Exception(_messageForAuthException(e));
     } on SignInWithAppleAuthorizationException catch (e) {
