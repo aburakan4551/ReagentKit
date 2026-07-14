@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firestore_service.dart';
 import '../config/get_it_config.dart';
@@ -22,8 +21,7 @@ class PremiumService extends ChangeNotifier {
   
   final _secureStorage = const FlutterSecureStorage();
   final _firestoreService = getIt<FirestoreService>();
-  StreamSubscription<User?>? _authSubscription;
-  
+
   static bool get isPremiumReviewMode => globals.isPremiumReviewMode;
 
   bool _isPremium = false;
@@ -31,7 +29,6 @@ class PremiumService extends ChangeNotifier {
   bool _isPurchasePending = false;
   String? _errorMessage;
   String? _deviceId;
-  String? _currentUid;
   
   bool get isPremium => isPremiumReviewMode ? true : _isPremium;
   int get freeScansLeft => isPremiumReviewMode ? 999 : _freeScansLeft;
@@ -91,14 +88,8 @@ class PremiumService extends ChangeNotifier {
     // 3. Initialize RevenueCat
     await _initRevenueCat();
 
-    // 4. Setup Auth State listener to sync scan counts
-    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+    // 4. Sync scan limits for this device
     await _syncScansLimit();
-
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) async {
-      _currentUid = user?.uid;
-      await _syncScansLimit();
-    });
   }
 
   String _generateUniqueId() {
@@ -125,7 +116,7 @@ class PremiumService extends ChangeNotifier {
       
       // Configure purchases_flutter
       final configuration = PurchasesConfiguration(apiKey)
-        ..appUserID = _currentUid ?? _deviceId;
+        ..appUserID = _deviceId;
         
       await Purchases.configure(configuration);
 
@@ -169,18 +160,8 @@ class PremiumService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       int serverCount = 3;
 
-      if (_currentUid != null) {
-        // Logged-in user: get count from Firestore
-        serverCount = await _firestoreService.getUserScansLeft(_currentUid!);
-        
-        // Anti-bypass check: If guest had fewer scans, sync guest's lower limit to the account
-        final guestCount = prefs.getInt(_freeScansKey) ?? 3;
-        if (guestCount < serverCount && guestCount >= 0) {
-          serverCount = guestCount;
-          await _firestoreService.updateUserScansLeft(_currentUid!, serverCount);
-        }
-      } else if (_deviceId != null) {
-        // Guest user: get count from device collection in Firestore
+      if (_deviceId != null) {
+        // Device-only entitlement: get count from device collection in Firestore
         serverCount = await _firestoreService.getDeviceScansLeft(_deviceId!);
       }
 
@@ -212,9 +193,7 @@ class PremiumService extends ChangeNotifier {
 
       // Sync asynchronously to Firestore
       try {
-        if (_currentUid != null) {
-          await _firestoreService.updateUserScansLeft(_currentUid!, _freeScansLeft);
-        } else if (_deviceId != null) {
+        if (_deviceId != null) {
           await _firestoreService.updateDeviceScansLeft(_deviceId!, _freeScansLeft);
         }
         
@@ -222,7 +201,7 @@ class PremiumService extends ChangeNotifier {
           name: 'free_scan_consumed',
           parameters: {
             'scans_left': _freeScansLeft,
-            'user_type': _currentUid != null ? 'registered' : 'guest'
+            'user_type': 'guest'
           },
         );
       } catch (e) {
@@ -319,7 +298,6 @@ class PremiumService extends ChangeNotifier {
 
   @override
   void dispose() {
-    _authSubscription?.cancel();
     super.dispose();
   }
 }
