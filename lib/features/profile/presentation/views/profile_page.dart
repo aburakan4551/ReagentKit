@@ -7,7 +7,6 @@ import 'package:reagentkit/core/widgets/adaptive_section_title.dart';
 import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
 import 'package:reagentkit/core/services/premium_service.dart';
 import 'package:reagentkit/features/reagent_testing/presentation/providers/reagent_testing_providers.dart';
-import 'package:reagentkit/features/reagent_testing/presentation/states/test_result_history_state.dart';
 import 'package:reagentkit/features/reagent_testing/domain/entities/test_result_entity.dart';
 import 'package:reagentkit/l10n/app_localizations.dart';
 

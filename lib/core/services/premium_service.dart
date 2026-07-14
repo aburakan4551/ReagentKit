@@ -295,9 +295,4 @@ class PremiumService extends ChangeNotifier {
     notifyListeners();
     Logger.info('✅ Simulated Premium unlocked successfully.');
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
