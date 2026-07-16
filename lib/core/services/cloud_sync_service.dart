@@ -10,7 +10,8 @@ class CloudSyncService {
     required int scansLeft,
   }) async {
     if (isPremiumReviewMode) {
-      Logger.info('🛡️ [Cloud Security] Blocked database sync for premium state during review mode.');
+      Logger.info(
+          '🛡️ [Cloud Security] Blocked database sync for premium state during review mode.');
       return;
     }
     // Production Firestore synchronization logic goes here

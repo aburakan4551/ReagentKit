@@ -49,7 +49,8 @@ void main() {
       // deltaE = 14.0, which yields low confidence.
       // observed color far from yellow and purple: RGB(0, 0, 0)
       final result = ReagentInterpreter.interpret(
-        observedColor: const RGBColor(0, 0, 0), // Black, targets are purple/yellow
+        observedColor:
+            const RGBColor(0, 0, 0), // Black, targets are purple/yellow
         targets: targets,
         stabilityIndex: 0.1, // highly unstable
         ambientBrightness: 0.1, // low light
@@ -76,10 +77,8 @@ void main() {
       // Verify that it maps to a successful (reliable) but lower category suggestion
       expect(result.isSuccessful, true);
       expect(result.matchedAnalyte, 'Substance B');
-      expect(
-        ['Analytical Suggestion', 'High Reliability', 'Reference Match'], 
-        contains(result.interpretationCategory)
-      );
+      expect(['Analytical Suggestion', 'High Reliability', 'Reference Match'],
+          contains(result.interpretationCategory));
     });
   });
 }

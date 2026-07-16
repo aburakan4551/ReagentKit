@@ -26,7 +26,8 @@ class TestInstructionsSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(
+      BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
@@ -173,7 +174,9 @@ class _InstructionItem extends StatelessWidget {
         children: [
           _buildStepNumber(theme),
           const SizedBox(width: 12),
-          Expanded(child: Text(instruction, style: AppTypography.getMetadataValue(context))),
+          Expanded(
+              child: Text(instruction,
+                  style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );

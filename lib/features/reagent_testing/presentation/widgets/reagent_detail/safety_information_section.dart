@@ -27,7 +27,8 @@ class SafetyInformationSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(
+      BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
@@ -65,81 +66,81 @@ class _SafetyDetailsCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
-    final equipment = (reagent.safetyEquipment.isNotEmpty 
-        ? reagent.safetyEquipment 
-        : (isArabic 
-            ? const [
-                "ضع نظارات أمان مقاومة للمواد الكيميائية",
-                "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
-                "معطف مختبر بأكمام طويلة",
-                "أحذية مغلقة مقاومة للمواد الكيميائية",
-                "جهاز تنفس عند الضرورة"
-              ]
-            : const [
-                "Chemical-resistant safety goggles",
-                "Chemical-resistant gloves (nitrile or neoprene)",
-                "Lab coat with long sleeves",
-                "Closed-toe chemical-resistant shoes",
-                "Respirator when necessary"
-              ]))
+    final equipment = (reagent.safetyEquipment.isNotEmpty
+            ? reagent.safetyEquipment
+            : (isArabic
+                ? const [
+                    "ضع نظارات أمان مقاومة للمواد الكيميائية",
+                    "قفازات مقاومة للمواد الكيميائية (نيتريل أو نيوبرين)",
+                    "معطف مختبر بأكمام طويلة",
+                    "أحذية مغلقة مقاومة للمواد الكيميائية",
+                    "جهاز تنفس عند الضرورة"
+                  ]
+                : const [
+                    "Chemical-resistant safety goggles",
+                    "Chemical-resistant gloves (nitrile or neoprene)",
+                    "Lab coat with long sleeves",
+                    "Closed-toe chemical-resistant shoes",
+                    "Respirator when necessary"
+                  ]))
         .map((e) => SafeStoreSanitizer.sanitize(e))
         .toList();
 
     final procedures = (reagent.safetyProcedures.isNotEmpty
-        ? reagent.safetyProcedures
-        : (isArabic
-            ? const [
-                "العمل تحت غطاء الدخان إجباري",
-                "ارتداء قفازات مقاومة للأحماض",
-                "استخدام نظارات الأمان وواقي الوجه",
-                "الاحتفاظ ببيكربونات الصوديوم للتحييد",
-                "استخدام قطرات صغيرة فقط",
-                "عدم خلط الكاشف مباشرة مع الماء"
-              ]
-            : const [
-                "Work under fume hood mandatory",
-                "Wear acid-resistant gloves",
-                "Use safety goggles and face shield",
-                "Keep sodium bicarbonate handy for neutralization",
-                "Use only small drops",
-                "Never mix reagent directly with water"
-              ]))
+            ? reagent.safetyProcedures
+            : (isArabic
+                ? const [
+                    "العمل تحت غطاء الدخان إجباري",
+                    "ارتداء قفازات مقاومة للأحماض",
+                    "استخدام نظارات الأمان وواقي الوجه",
+                    "الاحتفاظ ببيكربونات الصوديوم للتحييد",
+                    "استخدام قطرات صغيرة فقط",
+                    "عدم خلط الكاشف مباشرة مع الماء"
+                  ]
+                : const [
+                    "Work under fume hood mandatory",
+                    "Wear acid-resistant gloves",
+                    "Use safety goggles and face shield",
+                    "Keep sodium bicarbonate handy for neutralization",
+                    "Use only small drops",
+                    "Never mix reagent directly with water"
+                  ]))
         .map((e) => SafeStoreSanitizer.sanitize(e))
         .toList();
 
     final hazards = (reagent.safetyHazards.isNotEmpty
-        ? reagent.safetyHazards
-        : (isArabic
-            ? const [
-                "شديد التآكل - يحتوي على حمض الكبريتيك المركز",
-                "يسبب حروق كيميائية شديدة",
-                "أبخرة خطيرة - الفورمالديهايد",
-                "تفاعل طارد للحرارة"
-              ]
-            : const [
-                "Highly corrosive - contains concentrated sulfuric acid",
-                "Causes severe chemical burns",
-                "Dangerous fumes - formaldehyde",
-                "Exothermic reaction"
-              ]))
+            ? reagent.safetyHazards
+            : (isArabic
+                ? const [
+                    "شديد التآكل - يحتوي على حمض الكبريتيك المركز",
+                    "يسبب حروق كيميائية شديدة",
+                    "أبخرة خطيرة - الفورمالديهايد",
+                    "تفاعل طارد للحرارة"
+                  ]
+                : const [
+                    "Highly corrosive - contains concentrated sulfuric acid",
+                    "Causes severe chemical burns",
+                    "Dangerous fumes - formaldehyde",
+                    "Exothermic reaction"
+                  ]))
         .map((e) => SafeStoreSanitizer.sanitize(e))
         .toList();
 
     final storage = (reagent.safetyStorage.isNotEmpty
-        ? reagent.safetyStorage
-        : (isArabic
-            ? const [
-                "التخزين في مكان بارد وجاف",
-                "بعيداً عن المواد القابلة للاشتعال",
-                "في خزانة تخزين أحماض مخصصة",
-                "وضع ملصق تحذيري واضح"
-              ]
-            : const [
-                "Store in cool, dry place",
-                "Away from flammable materials",
-                "In dedicated acid storage cabinet",
-                "Label with clear warning"
-              ]))
+            ? reagent.safetyStorage
+            : (isArabic
+                ? const [
+                    "التخزين في مكان بارد وجاف",
+                    "بعيداً عن المواد القابلة للاشتعال",
+                    "في خزانة تخزين أحماض مخصصة",
+                    "وضع ملصق تحذيري واضح"
+                  ]
+                : const [
+                    "Store in cool, dry place",
+                    "Away from flammable materials",
+                    "In dedicated acid storage cabinet",
+                    "Label with clear warning"
+                  ]))
         .map((e) => SafeStoreSanitizer.sanitize(e))
         .toList();
 
@@ -336,7 +337,9 @@ class _SafetyItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Text(item, style: AppTypography.getMetadataValue(context))),
+          Expanded(
+              child:
+                  Text(item, style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );

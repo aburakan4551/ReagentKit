@@ -34,7 +34,8 @@ class ReagentRarityTheme extends ThemeExtension<ReagentRarityTheme> {
   }
 
   @override
-  ThemeExtension<ReagentRarityTheme> lerp(ThemeExtension<ReagentRarityTheme>? other, double t) {
+  ThemeExtension<ReagentRarityTheme> lerp(
+      ThemeExtension<ReagentRarityTheme>? other, double t) {
     if (other is! ReagentRarityTheme) return this;
     return ReagentRarityTheme(
       commonColor: Color.lerp(commonColor, other.commonColor, t)!,
@@ -46,18 +47,18 @@ class ReagentRarityTheme extends ThemeExtension<ReagentRarityTheme> {
   }
 
   static ReagentRarityTheme get dark => const ReagentRarityTheme(
-    commonColor: AppColors.rarityCommon,
-    uncommonColor: AppColors.rarityUncommon,
-    rareColor: AppColors.rarityRare,
-    epicColor: AppColors.rarityEpic,
-    legendaryColor: AppColors.rarityLegendary,
-  );
-  
+        commonColor: AppColors.rarityCommon,
+        uncommonColor: AppColors.rarityUncommon,
+        rareColor: AppColors.rarityRare,
+        epicColor: AppColors.rarityEpic,
+        legendaryColor: AppColors.rarityLegendary,
+      );
+
   static ReagentRarityTheme get light => const ReagentRarityTheme(
-    commonColor: AppColors.lightRarityCommon,
-    uncommonColor: AppColors.lightRarityUncommon,
-    rareColor: AppColors.lightRarityRare,
-    epicColor: AppColors.lightRarityEpic,
-    legendaryColor: AppColors.lightRarityLegendary,
-  );
+        commonColor: AppColors.lightRarityCommon,
+        uncommonColor: AppColors.lightRarityUncommon,
+        rareColor: AppColors.lightRarityRare,
+        epicColor: AppColors.lightRarityEpic,
+        legendaryColor: AppColors.lightRarityLegendary,
+      );
 }

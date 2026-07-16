@@ -20,10 +20,12 @@ class ScientificReferencesPage extends ConsumerStatefulWidget {
   const ScientificReferencesPage({super.key});
 
   @override
-  ConsumerState<ScientificReferencesPage> createState() => _ScientificReferencesPageState();
+  ConsumerState<ScientificReferencesPage> createState() =>
+      _ScientificReferencesPageState();
 }
 
-class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesPage> {
+class _ScientificReferencesPageState
+    extends ConsumerState<ScientificReferencesPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedCategory = 'All';
@@ -66,7 +68,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              LocalizationHelper.getBackChevronIcon(context), 
+              LocalizationHelper.getBackChevronIcon(context),
               color: theme.colorScheme.onSurface,
             ),
             onPressed: () => Navigator.of(context).pop(),
@@ -74,7 +76,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
         ),
         body: Center(
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            valueColor:
+                AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
           ),
         ),
       ),
@@ -82,14 +85,16 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
-            isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
+            isAr
+                ? 'فشل تحميل قاعدة البيانات العلمية'
+                : 'Failed to load scientific dataset',
             style: TextStyle(color: theme.colorScheme.error),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
             icon: Icon(
-              LocalizationHelper.getBackChevronIcon(context), 
+              LocalizationHelper.getBackChevronIcon(context),
               color: theme.colorScheme.onSurface,
             ),
             onPressed: () => Navigator.of(context).pop(),
@@ -97,14 +102,18 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
         ),
         body: Center(
           child: Text(
-            isAr ? 'فشل تحميل قاعدة البيانات العلمية' : 'Failed to load scientific dataset',
+            isAr
+                ? 'فشل تحميل قاعدة البيانات العلمية'
+                : 'Failed to load scientific dataset',
             style: TextStyle(color: theme.colorScheme.error),
           ),
         ),
       ),
       data: (reagents) {
         // Filter reagents that have references
-        var filteredList = reagents.where((r) => r.references.any((ref) => ref.trim().isNotEmpty)).toList();
+        var filteredList = reagents
+            .where((r) => r.references.any((ref) => ref.trim().isNotEmpty))
+            .toList();
 
         // Search filter
         if (_searchQuery.isNotEmpty) {
@@ -113,14 +122,21 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
             final name = r.reagentName.toLowerCase();
             final nameAr = r.reagentNameAr.toLowerCase();
             final desc = r.description.toLowerCase();
-            return name.contains(query) || nameAr.contains(query) || desc.contains(query);
+            return name.contains(query) ||
+                nameAr.contains(query) ||
+                desc.contains(query);
           }).toList();
         }
 
         // Category filter
-        final categories = {'All', ...reagents.map((r) => r.category).where((c) => c.isNotEmpty)};
+        final categories = {
+          'All',
+          ...reagents.map((r) => r.category).where((c) => c.isNotEmpty)
+        };
         if (_selectedCategory != 'All') {
-          filteredList = filteredList.where((r) => r.category == _selectedCategory).toList();
+          filteredList = filteredList
+              .where((r) => r.category == _selectedCategory)
+              .toList();
         }
 
         // Sort alphabetically
@@ -132,7 +148,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
 
         final totalReferencesCount = filteredList.fold<int>(
           0,
-          (sum, r) => sum + r.references.where((ref) => ref.trim().isNotEmpty).length,
+          (sum, r) =>
+              sum + r.references.where((ref) => ref.trim().isNotEmpty).length,
         );
 
         return Scaffold(
@@ -151,7 +168,7 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
             elevation: 0,
             leading: IconButton(
               icon: Icon(
-                LocalizationHelper.getBackChevronIcon(context), 
+                LocalizationHelper.getBackChevronIcon(context),
                 color: theme.colorScheme.onSurface,
               ),
               onPressed: () => Navigator.of(context).pop(),
@@ -159,7 +176,9 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
             actions: [
               IconButton(
                 icon: Icon(
-                  _sortByAlphabet ? HeroIcons.bars_arrow_down : HeroIcons.bars_arrow_up,
+                  _sortByAlphabet
+                      ? HeroIcons.bars_arrow_down
+                      : HeroIcons.bars_arrow_up,
                   color: theme.colorScheme.onSurface,
                 ),
                 onPressed: () {
@@ -184,17 +203,22 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                       controller: _searchController,
                       style: TextStyle(color: theme.colorScheme.onSurface),
                       decoration: InputDecoration(
-                        hintText: isAr ? 'ابحث عن كاشف علمي...' : 'Search reagents...',
-                        hintStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.38)),
+                        hintText: isAr
+                            ? 'ابحث عن كاشف علمي...'
+                            : 'Search reagents...',
+                        hintStyle: TextStyle(
+                            color:
+                                theme.colorScheme.onSurface.withOpacity(0.38)),
                         prefixIcon: Icon(
-                          HeroIcons.magnifying_glass, 
+                          HeroIcons.magnifying_glass,
                           color: theme.colorScheme.onSurface.withOpacity(0.38),
                         ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
                                 icon: Icon(
-                                  HeroIcons.x_mark, 
-                                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                  HeroIcons.x_mark,
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.7),
                                 ),
                                 onPressed: () => _searchController.clear(),
                               )
@@ -215,7 +239,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                          borderSide: BorderSide(
+                              color: theme.colorScheme.primary, width: 2),
                         ),
                       ),
                     ),
@@ -234,8 +259,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                               label: Text(
                                 cat == 'All' ? (isAr ? 'الكل' : 'All') : cat,
                                 style: TextStyle(
-                                  color: isSelected 
-                                      ? theme.colorScheme.onPrimary 
+                                  color: isSelected
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -254,8 +279,8 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
-                                  color: isSelected 
-                                      ? Colors.transparent 
+                                  color: isSelected
+                                      ? Colors.transparent
                                       : theme.dividerColor,
                                 ),
                               ),
@@ -273,11 +298,13 @@ class _ScientificReferencesPageState extends ConsumerState<ScientificReferencesP
                 child: filteredList.isEmpty
                     ? _buildEmptyState(context, isAr)
                     : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         itemCount: filteredList.length,
                         itemBuilder: (context, index) {
                           final reagent = filteredList[index];
-                          return _ReagentReferenceCard(reagent: reagent, isAr: isAr)
+                          return _ReagentReferenceCard(
+                                  reagent: reagent, isAr: isAr)
                               .animate()
                               .fadeIn(delay: (index * 50).ms, duration: 300.ms)
                               .moveY(begin: 15, end: 0, curve: Curves.easeOut);
@@ -378,7 +405,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                     color: theme.colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(HeroIcons.beaker, color: theme.colorScheme.primary, size: 20),
+                  child: Icon(HeroIcons.beaker,
+                      color: theme.colorScheme.primary, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -438,7 +466,8 @@ class _ReagentReferenceCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
@@ -454,9 +483,10 @@ class _ReagentReferenceCard extends StatelessWidget {
                           ),
                           IconButton(
                             icon: Icon(
-                              HeroIcons.clipboard, 
-                              size: 16, 
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              HeroIcons.clipboard,
+                              size: 16,
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
@@ -466,10 +496,14 @@ class _ReagentReferenceCard extends StatelessWidget {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    isAr ? 'تم نسخ المرجع بنجاح!' : 'Reference copied successfully!',
-                                    style: TextStyle(color: theme.colorScheme.onSurface),
+                                    isAr
+                                        ? 'تم نسخ المرجع بنجاح!'
+                                        : 'Reference copied successfully!',
+                                    style: TextStyle(
+                                        color: theme.colorScheme.onSurface),
                                   ),
-                                  backgroundColor: theme.colorScheme.surfaceContainer,
+                                  backgroundColor:
+                                      theme.colorScheme.surfaceContainer,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),

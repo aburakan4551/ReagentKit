@@ -130,9 +130,9 @@ class _ReactionTimerSectionState extends ConsumerState<ReactionTimerSection>
                 Text(
                   l10n.reactionTimer,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo.shade800,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.indigo.shade800,
+                      ),
                 ),
               ],
             ),
@@ -178,7 +178,7 @@ class _ReactionTimerSectionState extends ConsumerState<ReactionTimerSection>
                   child: CircularProgressIndicator(
                     value: _testDurationSeconds > 0
                         ? (_testDurationSeconds - _remainingSeconds) /
-                              _testDurationSeconds
+                            _testDurationSeconds
                         : 0.0,
                     strokeWidth: 6,
                     backgroundColor: Colors.grey.shade200,
@@ -186,8 +186,8 @@ class _ReactionTimerSectionState extends ConsumerState<ReactionTimerSection>
                       _isTimerComplete
                           ? Colors.green.shade400
                           : _isTimerActive
-                          ? Colors.indigo.shade400
-                          : Colors.grey.shade400,
+                              ? Colors.indigo.shade400
+                              : Colors.grey.shade400,
                     ),
                   ),
                 ),
@@ -211,8 +211,8 @@ class _ReactionTimerSectionState extends ConsumerState<ReactionTimerSection>
                               color: _isTimerComplete
                                   ? Colors.green.shade600
                                   : _isTimerActive
-                                  ? Colors.indigo.shade700
-                                  : Colors.grey.shade600,
+                                      ? Colors.indigo.shade700
+                                      : Colors.grey.shade600,
                               letterSpacing: 1.5,
                             ),
                           ),

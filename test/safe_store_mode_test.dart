@@ -59,33 +59,53 @@ void main() {
 
     test('Sanitizes English terms when safeStoreMode is true', () {
       SafeStoreSanitizer.safeStoreMode = true;
-      expect(SafeStoreSanitizer.sanitize('cocaine'), equals('controlled compounds'));
-      expect(SafeStoreSanitizer.sanitize('heroin'), equals('alkaloid compounds'));
-      expect(SafeStoreSanitizer.sanitize('Lsd'), equals('Chemical reagents')); // Casing preserved (first letter uppercase)
-      expect(SafeStoreSanitizer.sanitize('LSD'), equals('CHEMICAL REAGENTS')); // Casing preserved (all uppercase)
-      expect(SafeStoreSanitizer.sanitize('Ecstasy'), equals('Forensic chemistry compounds'));
-      expect(SafeStoreSanitizer.sanitize('narcotics'), equals('educational chemistry analysis'));
-      expect(SafeStoreSanitizer.sanitize('drugs of abuse'), equals('educational chemistry references'));
-      expect(SafeStoreSanitizer.sanitize('cannabis'), equals('botanical compounds'));
-      expect(SafeStoreSanitizer.sanitize('khat'), equals('botanical specimens'));
-      expect(SafeStoreSanitizer.sanitize('This is cocaine and heroin testing'), 
-             equals('This is controlled compounds and alkaloid compounds testing'));
+      expect(SafeStoreSanitizer.sanitize('cocaine'),
+          equals('controlled compounds'));
+      expect(
+          SafeStoreSanitizer.sanitize('heroin'), equals('alkaloid compounds'));
+      expect(
+          SafeStoreSanitizer.sanitize('Lsd'),
+          equals(
+              'Chemical reagents')); // Casing preserved (first letter uppercase)
+      expect(SafeStoreSanitizer.sanitize('LSD'),
+          equals('CHEMICAL REAGENTS')); // Casing preserved (all uppercase)
+      expect(SafeStoreSanitizer.sanitize('Ecstasy'),
+          equals('Forensic chemistry compounds'));
+      expect(SafeStoreSanitizer.sanitize('narcotics'),
+          equals('educational chemistry analysis'));
+      expect(SafeStoreSanitizer.sanitize('drugs of abuse'),
+          equals('educational chemistry references'));
+      expect(SafeStoreSanitizer.sanitize('cannabis'),
+          equals('botanical compounds'));
+      expect(
+          SafeStoreSanitizer.sanitize('khat'), equals('botanical specimens'));
+      expect(
+          SafeStoreSanitizer.sanitize('This is cocaine and heroin testing'),
+          equals(
+              'This is controlled compounds and alkaloid compounds testing'));
     });
 
     test('Sanitizes Arabic terms when safeStoreMode is true', () {
       SafeStoreSanitizer.safeStoreMode = true;
       expect(SafeStoreSanitizer.sanitize('كوكايين'), equals('مركب مرجعي'));
       expect(SafeStoreSanitizer.sanitize('هيروين'), equals('مركب قلوي'));
-      expect(SafeStoreSanitizer.sanitize('كشف المخدرات'), equals('التحليل الكيميائي'));
-      expect(SafeStoreSanitizer.sanitize('مواد مخدرة'), equals('مركبات تحليلية تعليمية'));
-      expect(SafeStoreSanitizer.sanitize('حشيش'), equals('مركبات تحليلية تعليمية'));
+      expect(SafeStoreSanitizer.sanitize('كشف المخدرات'),
+          equals('التحليل الكيميائي'));
+      expect(SafeStoreSanitizer.sanitize('مواد مخدرة'),
+          equals('مركبات تحليلية تعليمية'));
+      expect(SafeStoreSanitizer.sanitize('حشيش'),
+          equals('مركبات تحليلية تعليمية'));
       expect(SafeStoreSanitizer.sanitize('قات'), equals('مركب نباتي'));
-      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة'), equals('تحليل كيميائي تعليمي في العينة'));
+      expect(SafeStoreSanitizer.sanitize('كشف السموم في العينة'),
+          equals('تحليل كيميائي تعليمي في العينة'));
     });
 
-    test('Sanitizes mixed language strings and does not contain sensitive terms', () {
+    test(
+        'Sanitizes mixed language strings and does not contain sensitive terms',
+        () {
       SafeStoreSanitizer.safeStoreMode = true;
-      final mixedText = 'Testing cocaine, heroin, cannabis, khat, LSD, حشيش, قات, هيروين, أمفيتامين';
+      final mixedText =
+          'Testing cocaine, heroin, cannabis, khat, LSD, حشيش, قات, هيروين, أمفيتامين';
       final sanitized = SafeStoreSanitizer.sanitize(mixedText);
 
       expect(sanitized.toLowerCase().contains('heroin'), isFalse);
@@ -123,7 +143,8 @@ void main() {
 
       final restored = await SafeStoreBackupManager.restoreLatestBackup();
       expect(restored, isNotNull);
-      expect(restored!['reagents_data'], equals('{"test_reagent": "original"}'));
+      expect(
+          restored!['reagents_data'], equals('{"test_reagent": "original"}'));
       expect(restored['version'], equals('2.0.0'));
     });
   });
@@ -137,7 +158,8 @@ void main() {
       rcService = RemoteConfigService(remoteConfig: fakeRC);
     });
 
-    test('Default values return correctly (Review Mode defaults to true)', () async {
+    test('Default values return correctly (Review Mode defaults to true)',
+        () async {
       await rcService.initialize();
       expect(rcService.appStoreReviewMode, isTrue);
       expect(rcService.safeStoreMode, isTrue);

@@ -50,7 +50,7 @@ class DebugFirebasePanel extends ConsumerWidget {
                     const Text(
                       '🛠 Firebase & RC Debug Panel',
                       style: TextStyle(
-                        color: Colors.white, 
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -60,14 +60,17 @@ class DebugFirebasePanel extends ConsumerWidget {
                       tooltip: 'Force Refresh Remote Config',
                       onPressed: () async {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Forcing Remote Config Fetch...')),
+                          const SnackBar(
+                              content: Text('Forcing Remote Config Fetch...')),
                         );
                         try {
                           await unifiedService.refresh();
                         } catch (e) {
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to fetch: $e'), backgroundColor: Colors.red),
+                            SnackBar(
+                                content: Text('Failed to fetch: $e'),
+                                backgroundColor: Colors.red),
                           );
                         }
                       },
@@ -76,28 +79,28 @@ class DebugFirebasePanel extends ConsumerWidget {
                 ),
                 const Divider(color: Colors.white24),
                 _buildRow(
-                  'Connected to Project ID:', 
-                  projectId, 
+                  'Connected to Project ID:',
+                  projectId,
                   Colors.lightBlueAccent,
                 ),
                 _buildRow(
-                  'Firebase Connected:', 
-                  data.isFirebase ? 'YES (Online)' : 'NO (Offline)', 
+                  'Firebase Connected:',
+                  data.isFirebase ? 'YES (Online)' : 'NO (Offline)',
                   data.isFirebase ? Colors.greenAccent : Colors.redAccent,
                 ),
                 _buildRow(
-                  'Data Source Status:', 
-                  data.source.name.toUpperCase(), 
+                  'Data Source Status:',
+                  data.source.name.toUpperCase(),
                   Colors.amberAccent,
                 ),
                 _buildRow(
-                  'Number of Tests Loaded:', 
-                  '${data.reagents.length} tests', 
+                  'Number of Tests Loaded:',
+                  '${data.reagents.length} tests',
                   Colors.white,
                 ),
                 _buildRow(
-                  'Last RC Fetch Time:', 
-                  _formatTime(data.loadedAt), 
+                  'Last RC Fetch Time:',
+                  _formatTime(data.loadedAt),
                   Colors.white,
                 ),
               ],
@@ -123,8 +126,8 @@ class DebugFirebasePanel extends ConsumerWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: valueColor, 
-                fontSize: 13, 
+                color: valueColor,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
               ),
             ),

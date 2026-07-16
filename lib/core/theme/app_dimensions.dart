@@ -24,12 +24,14 @@ class AppDimensions {
   static const double bottomNavHeight = 72.0;
   static const double buttonHeight = 56.0;
   static const double inputHeight = 56.0;
-  static const double cardElevation = 0.0; // Use colors/borders instead of shadows for modern feel
-  
+  static const double cardElevation =
+      0.0; // Use colors/borders instead of shadows for modern feel
+
   // Icon Sizes
   static const double iconSmall = 16.0;
   static const double iconMedium = 24.0;
   static const double iconLarge = 32.0;
-  
-  static EdgeInsets get screenPadding => const EdgeInsets.symmetric(horizontal: spacingLarge);
+
+  static EdgeInsets get screenPadding =>
+      const EdgeInsets.symmetric(horizontal: spacingLarge);
 }

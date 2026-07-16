@@ -12,7 +12,7 @@ class SafetyInstructionsService {
   Map<String, SafetyInstructionsModel>? _cachedSafetyInstructions;
 
   SafetyInstructionsService({RemoteConfigService? remoteConfigService})
-    : _remoteConfigService = remoteConfigService ?? RemoteConfigService();
+      : _remoteConfigService = remoteConfigService ?? RemoteConfigService();
 
   /// Initialize the service (sets up Remote Config)
   Future<void> initialize() async {
@@ -103,7 +103,7 @@ class SafetyInstructionsService {
 
   /// Load all safety instructions (Remote Config first, then local fallback)
   Future<Map<String, SafetyInstructionsModel>>
-  loadAllSafetyInstructions() async {
+      loadAllSafetyInstructions() async {
     try {
       // Try Remote Config first via getSafetyJsonMap()
       if (_remoteConfigService.hasSafetyInstructions()) {
@@ -207,7 +207,8 @@ class SafetyInstructionsService {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
     final rawList = safety != null
         ? safety.getHandlingProcedures(isArabic)
-        : _createDefaultSafetyInstructions(reagentName).getHandlingProcedures(isArabic);
+        : _createDefaultSafetyInstructions(reagentName)
+            .getHandlingProcedures(isArabic);
     return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
@@ -219,7 +220,8 @@ class SafetyInstructionsService {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
     final rawList = safety != null
         ? safety.getSpecificHazards(isArabic)
-        : _createDefaultSafetyInstructions(reagentName).getSpecificHazards(isArabic);
+        : _createDefaultSafetyInstructions(reagentName)
+            .getSpecificHazards(isArabic);
     return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
@@ -243,13 +245,14 @@ class SafetyInstructionsService {
     final safety = await loadSafetyInstructionsByReagent(reagentName);
     final rawList = safety != null
         ? safety.getInstructions(isArabic)
-        : _createDefaultSafetyInstructions(reagentName).getInstructions(isArabic);
+        : _createDefaultSafetyInstructions(reagentName)
+            .getInstructions(isArabic);
     return rawList.map((e) => SafeStoreSanitizer.sanitize(e)).toList();
   }
 
   /// Load safety instructions from [assets/data/safety.json] (local fallback).
   Future<Map<String, SafetyInstructionsModel>>
-  _loadSafetyInstructionsFromAssets() async {
+      _loadSafetyInstructionsFromAssets() async {
     try {
       final raw = await rootBundle.loadString(_kSafetyAsset);
       final Map<String, dynamic> decoded = json.decode(raw);
@@ -259,24 +262,27 @@ class SafetyInstructionsService {
         try {
           final m = value as Map<String, dynamic>;
           result[key] = SafetyInstructionsModel(
-            reagentName:          key,
-            equipment:            List<String>.from(m['requiredEquipment'] as List? ?? []),
-            equipmentAr:          const [],
-            handlingProcedures:   List<String>.from(m['handlingProcedures'] as List? ?? []),
+            reagentName: key,
+            equipment: List<String>.from(m['requiredEquipment'] as List? ?? []),
+            equipmentAr: const [],
+            handlingProcedures:
+                List<String>.from(m['handlingProcedures'] as List? ?? []),
             handlingProceduresAr: const [],
-            specificHazards:      List<String>.from(m['specificHazards'] as List? ?? []),
-            specificHazardsAr:    const [],
-            storage:              List<String>.from(m['storageRequirements'] as List? ?? []),
-            storageAr:            const [],
-            instructions:         const [],
-            instructionsAr:       const [],
+            specificHazards:
+                List<String>.from(m['specificHazards'] as List? ?? []),
+            specificHazardsAr: const [],
+            storage: List<String>.from(m['storageRequirements'] as List? ?? []),
+            storageAr: const [],
+            instructions: const [],
+            instructionsAr: const [],
           );
         } catch (e) {
           Logger.error('❌ [Safety] Parse error for "$key": $e');
         }
       });
 
-      Logger.info('✅ [Safety] Loaded ${result.length} entries from $_kSafetyAsset');
+      Logger.info(
+          '✅ [Safety] Loaded ${result.length} entries from $_kSafetyAsset');
       return result;
     } catch (e, st) {
       Logger.error('❌ [Safety] Could not load $_kSafetyAsset: $e',

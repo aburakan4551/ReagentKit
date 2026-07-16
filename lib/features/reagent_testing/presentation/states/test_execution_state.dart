@@ -12,8 +12,7 @@ abstract class TestExecutionState {
       TestExecutionEntity testExecution,
       GeminiReagentTestResult? aiAnalysisResult,
       String notes,
-    )
-    loaded,
+    ) loaded,
     required T Function(String message) error,
   }) {
     if (this is TestExecutionInitial) {
@@ -37,8 +36,7 @@ abstract class TestExecutionState {
       TestExecutionEntity testExecution,
       GeminiReagentTestResult? aiAnalysisResult,
       String notes,
-    )?
-    loaded,
+    )? loaded,
     T Function(String message)? error,
     required T Function() orElse,
   }) {

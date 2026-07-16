@@ -6,7 +6,8 @@ class NetworkGuardService {
   /// Resolves billing states offline, preventing network blockages.
   static bool resolvePremiumAccessOffline() {
     if (isPremiumReviewMode) {
-      Logger.info('🛡️ [Network Guard] Active. Automatically granting premium status (Offline-Safe).');
+      Logger.info(
+          '🛡️ [Network Guard] Active. Automatically granting premium status (Offline-Safe).');
       return true;
     }
     return false;

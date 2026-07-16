@@ -38,7 +38,9 @@ class DatasetMigrator {
     for (final migration in migrations) {
       if (migration.canMigrate(version)) {
         final migrationName = migration.runtimeType.toString();
-        developer.log('Applying dataset migration: $migrationName from version $version', name: 'DatasetMigrator');
+        developer.log(
+            'Applying dataset migration: $migrationName from version $version',
+            name: 'DatasetMigrator');
         currentJson = migration.migrate(currentJson);
         applied.add(migrationName);
         version = _getVersion(currentJson);
@@ -62,7 +64,10 @@ class LegacyToV1Migration implements DatasetMigration {
 
   @override
   bool canMigrate(String version) =>
-      version == 'unknown' || version.isEmpty || version == '0.0.1' || version == '0.1.0';
+      version == 'unknown' ||
+      version.isEmpty ||
+      version == '0.0.1' ||
+      version == '0.1.0';
 
   @override
   Map<String, dynamic> migrate(Map<String, dynamic> json) {
@@ -70,7 +75,7 @@ class LegacyToV1Migration implements DatasetMigration {
     // Standardize version tags to 'version'
     copy['version'] = '1.0.0';
     copy['dataset_version'] = '1.0.0';
-    
+
     // Perform safety structural standardizations if any keys are missing
     if (!copy.containsKey('reagents')) {
       copy['reagents'] = <String, dynamic>{};

@@ -10,7 +10,7 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
   static const int _maxRetries = 3;
 
   ReagentTestingController(this._repository)
-    : super(const ReagentTestingInitial()) {
+      : super(const ReagentTestingInitial()) {
     loadAllReagents();
   }
 
@@ -37,9 +37,11 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
   }
 
   // Force reload reagents, clear cache, recalculate diagnostics
-  Future<void> forceReload({bool clearCache = false, bool forceAssetReload = true}) async {
+  Future<void> forceReload(
+      {bool clearCache = false, bool forceAssetReload = true}) async {
     if (_retryCount >= _maxRetries) {
-      state = const ReagentTestingError('Maximum retry limit reached. Please reset or contact support.');
+      state = const ReagentTestingError(
+          'Maximum retry limit reached. Please reset or contact support.');
       return;
     }
     state = const ReagentTestingLoading();
@@ -63,7 +65,8 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
         );
       }
     } catch (e) {
-      state = ReagentTestingError('Failed to reload reagents (Attempt $_retryCount/$_maxRetries): $e');
+      state = ReagentTestingError(
+          'Failed to reload reagents (Attempt $_retryCount/$_maxRetries): $e');
     }
   }
 

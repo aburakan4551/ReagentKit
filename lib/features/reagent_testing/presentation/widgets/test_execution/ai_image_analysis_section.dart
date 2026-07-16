@@ -113,9 +113,8 @@ class _AIImageAnalysisSectionState
                   ),
                   child: Icon(
                     HeroIcons.sparkles,
-                    color: isDarkMode
-                        ? theme.colorScheme.onPrimary
-                        : Colors.white,
+                    color:
+                        isDarkMode ? theme.colorScheme.onPrimary : Colors.white,
                     size: 20,
                   ),
                 ),
@@ -199,18 +198,23 @@ class _AIImageAnalysisSectionState
                     else
                       Consumer(
                         builder: (context, ref, child) {
-                          final geminiServiceAsync = ref.watch(geminiAnalysisServiceProvider);
-                          final enableAi = ref.watch(remoteConfigServiceProvider).enableAiAnalysis;
+                          final geminiServiceAsync =
+                              ref.watch(geminiAnalysisServiceProvider);
+                          final enableAi = ref
+                              .watch(remoteConfigServiceProvider)
+                              .enableAiAnalysis;
 
                           return geminiServiceAsync.when(
                             data: (service) => !enableAi
                                 ? ElevatedButton.icon(
                                     onPressed: null,
                                     icon: Icon(HeroIcons.clock),
-                                    label: const Text('AI Analysis will be available soon'),
+                                    label: const Text(
+                                        'AI Analysis will be available soon'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isDarkMode
-                                          ? theme.colorScheme.surfaceContainerHigh
+                                          ? theme
+                                              .colorScheme.surfaceContainerHigh
                                           : Colors.grey.shade400,
                                       foregroundColor: isDarkMode
                                           ? theme.colorScheme.onSurfaceVariant
@@ -223,7 +227,8 @@ class _AIImageAnalysisSectionState
                                 : Column(
                                     children: [
                                       ElevatedButton.icon(
-                                        onPressed: enableAi ? _analyzeImage : null,
+                                        onPressed:
+                                            enableAi ? _analyzeImage : null,
                                         icon: Icon(HeroIcons.sparkles),
                                         label: Text(l10n.analyzeWithAI),
                                         style: ElevatedButton.styleFrom(
@@ -232,20 +237,26 @@ class _AIImageAnalysisSectionState
                                               : Colors.green.shade500,
                                           foregroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                         ),
                                       ),
                                       Consumer(builder: (context, ref, child) {
-                                        final premium = ref.watch(premiumServiceProvider);
-                                        if (premium.isPremium) return const SizedBox.shrink();
+                                        final premium =
+                                            ref.watch(premiumServiceProvider);
+                                        if (premium.isPremium)
+                                          return const SizedBox.shrink();
                                         return Padding(
-                                          padding: const EdgeInsets.only(top: 8.0),
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
                                           child: Text(
                                             '${premium.freeScansLeft} free scans remaining',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: isDarkMode ? Colors.white54 : Colors.black54,
+                                              color: isDarkMode
+                                                  ? Colors.white54
+                                                  : Colors.black54,
                                             ),
                                           ),
                                         );
@@ -493,7 +504,7 @@ class _AIImageAnalysisSectionState
     final enableAi = ref.read(remoteConfigServiceProvider).enableAiAnalysis;
     if (!enableAi) return;
     if (_capturedImage == null) return;
-    
+
     final premiumService = ref.read(premiumServiceProvider);
     if (!premiumService.canAnalyze) {
       Navigator.of(context).push(
@@ -512,14 +523,15 @@ class _AIImageAnalysisSectionState
 
       await geminiServiceAsync.when(
         data: (geminiService) async {
-          final resultString = await geminiService.analyzeImage(_capturedImage!);
+          final resultString =
+              await geminiService.analyzeImage(_capturedImage!);
           final resultJson = jsonDecode(resultString);
           final aiResult = GeminiReagentTestResult.fromJson(resultJson);
 
           ref
               .read(testExecutionControllerProvider.notifier)
               .updateAIAnalysisResult(aiResult);
-              
+
           // Consume free scan upon success
           await premiumService.consumeFreeScan();
         },
@@ -536,17 +548,23 @@ class _AIImageAnalysisSectionState
         setState(() {
           String errorMessage = 'Unable to analyze image.';
           final eStr = e.toString();
-          
-          if (eStr.contains('NETWORK_TIMEOUT') || eStr.contains('SocketException')) {
-            errorMessage = 'Network connection lost. Please check your internet.';
+
+          if (eStr.contains('NETWORK_TIMEOUT') ||
+              eStr.contains('SocketException')) {
+            errorMessage =
+                'Network connection lost. Please check your internet.';
           } else if (eStr.contains('QUOTA_EXCEEDED')) {
-            errorMessage = 'AI service temporarily unavailable (Quota Exceeded).';
-          } else if (eStr.contains('PERMISSION_DENIED') || eStr.contains('API_KEY_INVALID')) {
-            errorMessage = 'AI service configuration error. Please contact support.';
+            errorMessage =
+                'AI service temporarily unavailable (Quota Exceeded).';
+          } else if (eStr.contains('PERMISSION_DENIED') ||
+              eStr.contains('API_KEY_INVALID')) {
+            errorMessage =
+                'AI service configuration error. Please contact support.';
           } else if (eStr.contains('FREE_SCANS_LIMIT_REACHED')) {
-            errorMessage = 'Free scans limit reached. Purchase required to continue.';
+            errorMessage =
+                'Free scans limit reached. Purchase required to continue.';
           }
-          
+
           _error = errorMessage;
         });
       }

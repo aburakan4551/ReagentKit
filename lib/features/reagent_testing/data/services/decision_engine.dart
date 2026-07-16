@@ -67,10 +67,10 @@ class DecisionEngineResult {
 ///
 class DecisionEngine {
   // Conflict boundary constants
-  static const double _aiHighThreshold        = 0.80;
-  static const double _aiLowThreshold         = 0.50;
-  static const double _spectralHighThreshold  = 0.70;
-  static const double _agreeWindow            = 0.20;
+  static const double _aiHighThreshold = 0.80;
+  static const double _aiLowThreshold = 0.50;
+  static const double _spectralHighThreshold = 0.70;
+  static const double _agreeWindow = 0.20;
 
   /// Core fusion method.
   ///
@@ -88,7 +88,7 @@ class DecisionEngine {
     required String? spectralColorName,
     required List<String> spectralSubstances,
   }) {
-    final sAi    = _aiScoreFromLevel(aiRawLevel);
+    final sAi = _aiScoreFromLevel(aiRawLevel);
     final sMatch = spectralScore.clamp(0.0, 1.0);
     final geminiAvailable = aiRawLevel != null;
 
@@ -97,16 +97,21 @@ class DecisionEngine {
 
     if (!geminiAvailable) {
       // No Gemini → pure spectral
-      wAi = 0.0; wMatch = 1.0;
+      wAi = 0.0;
+      wMatch = 1.0;
     } else if (sMatch < 0.30) {
       // Noisy / low-quality image → trust AI more
-      wAi = 0.85; wMatch = 0.15;
+      wAi = 0.85;
+      wMatch = 0.15;
     } else if (sAi >= _aiHighThreshold) {
-      wAi = 0.65; wMatch = 0.35;
+      wAi = 0.65;
+      wMatch = 0.35;
     } else if (sAi >= _aiLowThreshold) {
-      wAi = 0.50; wMatch = 0.50;
+      wAi = 0.50;
+      wMatch = 0.50;
     } else {
-      wAi = 0.35; wMatch = 0.65;
+      wAi = 0.35;
+      wMatch = 0.65;
     }
 
     // Enforce wAi + wMatch == 1.0
@@ -123,45 +128,46 @@ class DecisionEngine {
       // Branch A: AI strongly confident, spectral disagrees
       //  → trust AI, but penalise confidence
       hadConflict = true;
-      resolutionPath = 'BRANCH_A: AI_high + Spectral_low → trust AI (−10% confidence)';
-      resolvedSubstances = aiSubstances.isNotEmpty ? aiSubstances : spectralSubstances;
-      resolvedColor      = aiColorDesc ?? spectralColorName ?? 'Unknown';
+      resolutionPath =
+          'BRANCH_A: AI_high + Spectral_low → trust AI (−10% confidence)';
+      resolvedSubstances =
+          aiSubstances.isNotEmpty ? aiSubstances : spectralSubstances;
+      resolvedColor = aiColorDesc ?? spectralColorName ?? 'Unknown';
 
       // Penalise confidence for conflict
       final rawConf = wAi * sAi + wMatch * sMatch;
       final penalised = (rawConf - 0.10).clamp(0.0, 1.0);
       return DecisionEngineResult(
-        spectralMatchScore:  sMatch,
-        aiScore:             sAi,
-        weightAI:            wAi,
-        weightMatch:         wMatch,
-        confidence:          penalised,
-        resolvedSubstances:  resolvedSubstances,
+        spectralMatchScore: sMatch,
+        aiScore: sAi,
+        weightAI: wAi,
+        weightMatch: wMatch,
+        confidence: penalised,
+        resolvedSubstances: resolvedSubstances,
         resolvedColorDescription: resolvedColor,
-        hadConflict:         hadConflict,
-        resolutionPath:      resolutionPath,
+        hadConflict: hadConflict,
+        resolutionPath: resolutionPath,
       );
-
     } else if (sAi < _aiLowThreshold && sMatch > _spectralHighThreshold) {
       // Branch B: AI uncertain, spectral is confident
       //  → trust spectral
       hadConflict = true;
       resolutionPath = 'BRANCH_B: AI_low + Spectral_high → trust Spectral';
-      resolvedSubstances = spectralSubstances.isNotEmpty ? spectralSubstances : aiSubstances;
-      resolvedColor      = spectralColorName ?? aiColorDesc ?? 'Unknown';
-
+      resolvedSubstances =
+          spectralSubstances.isNotEmpty ? spectralSubstances : aiSubstances;
+      resolvedColor = spectralColorName ?? aiColorDesc ?? 'Unknown';
     } else if (diff < _agreeWindow) {
       // Branch C: Both agree within ±0.20
       resolutionPath = 'BRANCH_C: Agreement → weighted merge';
       resolvedSubstances = _mergeSubstances(aiSubstances, spectralSubstances);
-      resolvedColor      = aiColorDesc ?? spectralColorName ?? 'Unknown';
-
+      resolvedColor = aiColorDesc ?? spectralColorName ?? 'Unknown';
     } else {
       // Branch D: Moderate conflict → weighted merge, reduced confidence
       hadConflict = true;
-      resolutionPath = 'BRANCH_D: Moderate conflict → weighted merge (−5% confidence)';
+      resolutionPath =
+          'BRANCH_D: Moderate conflict → weighted merge (−5% confidence)';
       resolvedSubstances = _mergeSubstances(aiSubstances, spectralSubstances);
-      resolvedColor      = aiColorDesc ?? spectralColorName ?? 'Unknown';
+      resolvedColor = aiColorDesc ?? spectralColorName ?? 'Unknown';
     }
 
     // ── Confidence formula ─────────────────────────────────────────────────
@@ -172,15 +178,15 @@ class DecisionEngine {
     }
 
     return DecisionEngineResult(
-      spectralMatchScore:  sMatch,
-      aiScore:             sAi,
-      weightAI:            wAi,
-      weightMatch:         wMatch,
-      confidence:          confidence,
-      resolvedSubstances:  resolvedSubstances,
+      spectralMatchScore: sMatch,
+      aiScore: sAi,
+      weightAI: wAi,
+      weightMatch: wMatch,
+      confidence: confidence,
+      resolvedSubstances: resolvedSubstances,
       resolvedColorDescription: resolvedColor,
-      hadConflict:         hadConflict,
-      resolutionPath:      resolutionPath,
+      hadConflict: hadConflict,
+      resolutionPath: resolutionPath,
     );
   }
 
@@ -191,11 +197,15 @@ class DecisionEngine {
     if (level == null) return 0.0;
     switch (level.toLowerCase().trim()) {
       case 'high':
-      case 'very high': return 0.92;
+      case 'very high':
+        return 0.92;
       case 'medium':
-      case 'moderate':  return 0.68;
-      case 'low':       return 0.38;
-      default:          return 0.50;
+      case 'moderate':
+        return 0.68;
+      case 'low':
+        return 0.38;
+      default:
+        return 0.50;
     }
   }
 

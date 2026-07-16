@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -58,7 +60,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pushNotifications => 'Push Notifications';
 
   @override
-  String get pushNotificationsSubtitle => 'Receive notifications about test results';
+  String get pushNotificationsSubtitle =>
+      'Receive notifications about test results';
 
   @override
   String get vibration => 'Vibration';
@@ -108,7 +111,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTheApp => '🧪 About the App:';
 
   @override
-  String get aboutTheAppContent => 'This app helps users safely test substances using chemical reagents.';
+  String get aboutTheAppContent =>
+      'This app helps users safely test substances using chemical reagents.';
 
   @override
   String get contact => '📧 Contact:testscolors@gmail.com';
@@ -138,7 +142,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noReagentsAvailable => 'No Reagents Available';
 
   @override
-  String get unableToLoadReagentData => 'Unable to load reagent data from assets.\nPlease check your internet connection and try again.';
+  String get unableToLoadReagentData =>
+      'Unable to load reagent data from assets.\nPlease check your internet connection and try again.';
 
   @override
   String get retryLoading => 'Retry Loading';
@@ -160,7 +165,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readyToStart => 'Ready to Start Testing';
 
   @override
-  String get readyToStartDescription => 'Please ensure you have read and understood all safety instructions before proceeding with the test.';
+  String get readyToStartDescription =>
+      'Please ensure you have read and understood all safety instructions before proceeding with the test.';
 
   @override
   String get testProcedure => 'Test Procedure';
@@ -189,22 +195,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get observedColor => 'Observed Color';
 
   @override
-  String get observedColorDescription => 'Select the color you observed after adding the reagent';
+  String get observedColorDescription =>
+      'Select the color you observed after adding the reagent';
 
   @override
-  String get tapColorInstruction => 'Tap the color that best matches what you observed';
+  String get tapColorInstruction =>
+      'Tap the color that best matches what you observed';
 
   @override
   String get testNotes => 'Test Notes';
 
   @override
-  String get testNotesPlaceholder => 'Add any additional observations or notes about the test...';
+  String get testNotesPlaceholder =>
+      'Add any additional observations or notes about the test...';
 
   @override
   String get completeTest => 'Complete Test';
 
   @override
-  String get completeTestDescription => 'Review your observations and complete the test';
+  String get completeTestDescription =>
+      'Review your observations and complete the test';
 
   @override
   String get goBack => 'Go Back';
@@ -228,7 +238,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safetyAcknowledgment => 'Safety Acknowledgment';
 
   @override
-  String get safetyAcknowledgmentText => 'I have read and understand all safety instructions and will follow proper safety procedures during testing.';
+  String get safetyAcknowledgmentText =>
+      'I have read and understand all safety instructions and will follow proper safety procedures during testing.';
 
   @override
   String get startTest => 'Start Test';
@@ -269,7 +280,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTestResultsYet => 'No test results yet';
 
   @override
-  String get completeTestsToSeeHistory => 'Complete some tests to see your history here';
+  String get completeTestsToSeeHistory =>
+      'Complete some tests to see your history here';
 
   @override
   String get searchBySubstanceOrNotes => 'Search by substance or notes...';
@@ -336,19 +348,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTestHistory => 'No test results yet';
 
   @override
-  String get noTestHistoryDescription => 'Complete some tests to see your history here';
+  String get noTestHistoryDescription =>
+      'Complete some tests to see your history here';
 
   @override
   String get deleteTest => 'Delete Test Result';
 
   @override
-  String get deleteTestConfirmation => 'Are you sure you want to delete this test result?';
+  String get deleteTestConfirmation =>
+      'Are you sure you want to delete this test result?';
 
   @override
   String get confirmExit => 'Confirm Exit';
 
   @override
-  String get testProgressWillBeLost => 'Your test progress will be lost. Are you sure you want to exit?';
+  String get testProgressWillBeLost =>
+      'Your test progress will be lost. Are you sure you want to exit?';
 
   @override
   String get exit => 'Exit';
@@ -390,7 +405,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncingToCloud => 'Syncing to cloud...';
 
   @override
-  String get clearAllConfirmation => 'Are you sure you want to clear all test results? This action cannot be undone.';
+  String get clearAllConfirmation =>
+      'Are you sure you want to clear all test results? This action cannot be undone.';
 
   @override
   String get clearAll => 'Clear All';
@@ -399,7 +415,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get captureImage => 'Capture Image';
 
   @override
-  String get captureImageDescription => 'Take a photo of your test result for AI analysis';
+  String get captureImageDescription =>
+      'Take a photo of your test result for AI analysis';
 
   @override
   String get analyzeWithAI => 'Analyze with AI';
@@ -435,7 +452,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analysisIntelligenceTitle => 'Analysis intelligence';
 
   @override
-  String get analysisIntelligenceDescription => 'The AI verified the reaction color against thousands of reference samples to ensure maximum accuracy.';
+  String get analysisIntelligenceDescription =>
+      'The AI verified the reaction color against thousands of reference samples to ensure maximum accuracy.';
 
   @override
   String get switchLanguage => 'Switch language';
@@ -468,7 +486,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fromGallery => 'From Gallery';
 
   @override
-  String get uploadImageDescription => 'Upload an image of your test result for AI analysis';
+  String get uploadImageDescription =>
+      'Upload an image of your test result for AI analysis';
 
   @override
   String get red => 'Red';
@@ -609,7 +628,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safetyReminder => 'Safety Reminder';
 
   @override
-  String get safetyReminderText => 'Always wear protective equipment when handling reagents. Ensure proper ventilation and follow safety protocols.';
+  String get safetyReminderText =>
+      'Always wear protective equipment when handling reagents. Ensure proper ventilation and follow safety protocols.';
 
   @override
   String get accountInformation => 'Account Information';
@@ -630,7 +650,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiResultsApplied => 'AI color selection applied successfully!';
 
   @override
-  String get noReferencesAvailable => 'No scientific references available for this substance.';
+  String get noReferencesAvailable =>
+      'No scientific references available for this substance.';
 
   @override
   String freeTestsRemaining(int remaining) {
@@ -670,25 +691,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get researchMode => 'Scientific Research Mode';
 
   @override
-  String get researchModeSubtitle => 'Enable raw analytical results (Delta E, HEX/RGB values)';
+  String get researchModeSubtitle =>
+      'Enable raw analytical results (Delta E, HEX/RGB values)';
 
   @override
   String get referencesLibrary => 'References Library';
 
   @override
-  String get referencesLibrarySubtitle => 'Browse references for reagent color chemistry';
+  String get referencesLibrarySubtitle =>
+      'Browse references for reagent color chemistry';
 
   @override
   String get aboutReferences => 'About references';
 
   @override
-  String get noCompatibleReferences => 'No compatible scientific references found for this reagent dataset.';
+  String get noCompatibleReferences =>
+      'No compatible scientific references found for this reagent dataset.';
 
   @override
-  String get legalConsentDisclaimer => 'Interpretations generated by this application are probabilistic analytical observations and not certified scientific conclusions. This application is intended solely for educational, analytical, and research-support workflows.';
+  String get legalConsentDisclaimer =>
+      'Interpretations generated by this application are probabilistic analytical observations and not certified scientific conclusions. This application is intended solely for educational, analytical, and research-support workflows.';
 
   @override
-  String get understandLimitations => 'I understand the application limitations';
+  String get understandLimitations =>
+      'I understand the application limitations';
 
   @override
   String get reagentResponse => 'Reagent response';

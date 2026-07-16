@@ -9,7 +9,7 @@ class SettingsController extends StateNotifier<SettingsState> {
   final SettingsRepository _settingsRepository;
 
   SettingsController(this._settingsRepository)
-    : super(const SettingsLoading()) {
+      : super(const SettingsLoading()) {
     _loadSettings();
   }
 

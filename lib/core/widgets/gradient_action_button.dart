@@ -66,7 +66,7 @@ class _GradientActionButtonState extends State<GradientActionButton>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // Determine button gradient
     final buttonGradient = widget.gradient ??
         LinearGradient(

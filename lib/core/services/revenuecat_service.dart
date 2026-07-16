@@ -11,7 +11,8 @@ class RevenueCatService {
       return;
     }
     try {
-      final configuration = PurchasesConfiguration(apiKey)..appUserID = appUserID;
+      final configuration = PurchasesConfiguration(apiKey)
+        ..appUserID = appUserID;
       await Purchases.configure(configuration);
       Logger.info('✅ [RevenueCat] SDK configured successfully.');
     } catch (e) {
@@ -22,7 +23,8 @@ class RevenueCatService {
   /// Fetches available packages, returning an empty list in review mode.
   static Future<List<Package>> getOfferings() async {
     if (isPremiumReviewMode) {
-      Logger.info('🛡️ [RevenueCat Isolation] Offerings query bypassed. Returning empty list.');
+      Logger.info(
+          '🛡️ [RevenueCat Isolation] Offerings query bypassed. Returning empty list.');
       return const [];
     }
     try {

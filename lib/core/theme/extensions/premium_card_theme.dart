@@ -30,9 +30,10 @@ class PremiumCardTheme extends ThemeExtension<PremiumCardTheme> {
   }
 
   @override
-  ThemeExtension<PremiumCardTheme> lerp(ThemeExtension<PremiumCardTheme>? other, double t) {
+  ThemeExtension<PremiumCardTheme> lerp(
+      ThemeExtension<PremiumCardTheme>? other, double t) {
     if (other is! PremiumCardTheme) return this;
-    
+
     // For lists we just take the nearest if not matching size, but here we assume fixed sizes.
     final gColors = <Color>[];
     for (int i = 0; i < gradientColors.length; i++) {
@@ -52,22 +53,22 @@ class PremiumCardTheme extends ThemeExtension<PremiumCardTheme> {
   }
 
   static PremiumCardTheme get dark => PremiumCardTheme(
-    background: AppColors.surfaceElevated,
-    iconColor: AppColors.primaryAccent,
-    textColor: Colors.white,
-    gradientColors: [
-      AppColors.primaryAccent.withOpacity(0.15),
-      AppColors.secondaryAccent.withOpacity(0.15),
-    ],
-  );
-  
+        background: AppColors.surfaceElevated,
+        iconColor: AppColors.primaryAccent,
+        textColor: Colors.white,
+        gradientColors: [
+          AppColors.primaryAccent.withOpacity(0.15),
+          AppColors.secondaryAccent.withOpacity(0.15),
+        ],
+      );
+
   static PremiumCardTheme get light => PremiumCardTheme(
-    background: AppColors.lightSurfaceBase,
-    iconColor: AppColors.lightPrimaryAccent,
-    textColor: AppColors.lightTextPrimary,
-    gradientColors: [
-      AppColors.lightPrimaryAccent.withOpacity(0.08),
-      AppColors.lightSecondaryAccent.withOpacity(0.08),
-    ],
-  );
+        background: AppColors.lightSurfaceBase,
+        iconColor: AppColors.lightPrimaryAccent,
+        textColor: AppColors.lightTextPrimary,
+        gradientColors: [
+          AppColors.lightPrimaryAccent.withOpacity(0.08),
+          AppColors.lightSecondaryAccent.withOpacity(0.08),
+        ],
+      );
 }

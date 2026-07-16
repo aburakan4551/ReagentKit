@@ -17,7 +17,8 @@ class AppRouter {
       if (settings.name == subscriptionPage ||
           settings.name == premiumPage ||
           settings.name == paywallPage) {
-        Logger.info('🛡️ [Router Guard] Intercepted navigation attempt to: "${settings.name}". Redirecting to Home.');
+        Logger.info(
+            '🛡️ [Router Guard] Intercepted navigation attempt to: "${settings.name}". Redirecting to Home.');
         return MaterialPageRoute(
           builder: (context) => const MainNavigationPage(),
           settings: const RouteSettings(name: home),

@@ -31,8 +31,8 @@ Future<void> main() async {
   try {
     // Read all data files
     final reagentDataContent = await reagentDataFile.readAsString();
-    final safetyInstructionsContent = await safetyInstructionsFile
-        .readAsString();
+    final safetyInstructionsContent =
+        await safetyInstructionsFile.readAsString();
 
     final reagentData = jsonDecode(reagentDataContent) as Map<String, dynamic>;
     final safetyInstructions =
@@ -41,8 +41,8 @@ Future<void> main() async {
     // Read available reagents
     List<String> availableReagents = [];
     if (await availableReagentsFile.exists()) {
-      final availableReagentsContent = await availableReagentsFile
-          .readAsString();
+      final availableReagentsContent =
+          await availableReagentsFile.readAsString();
       availableReagents = List<String>.from(
         jsonDecode(availableReagentsContent),
       );

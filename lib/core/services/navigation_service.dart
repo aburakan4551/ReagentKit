@@ -15,11 +15,13 @@ class NavigationService {
       if (routeName == AppRouter.subscriptionPage ||
           routeName == AppRouter.premiumPage ||
           routeName == AppRouter.paywallPage) {
-        Logger.info('🛡️ [Navigation Guard] Programmatic push blocked for: "$routeName". Redirecting to Home.');
+        Logger.info(
+            '🛡️ [Navigation Guard] Programmatic push blocked for: "$routeName". Redirecting to Home.');
         return _navigatorKey.currentState?.pushReplacementNamed(AppRouter.home);
       }
     }
-    return _navigatorKey.currentState?.pushNamed(routeName, arguments: arguments);
+    return _navigatorKey.currentState
+        ?.pushNamed(routeName, arguments: arguments);
   }
 
   /// Pops the current route from the navigation stack.

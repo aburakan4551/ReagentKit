@@ -4,7 +4,8 @@ import 'scientific_constants.dart';
 enum ScientificLogLevel { debug, info, warning, error }
 
 class ScientificLogger {
-  static void _log(ScientificLogLevel level, String category, String message, {Object? error, StackTrace? stackTrace}) {
+  static void _log(ScientificLogLevel level, String category, String message,
+      {Object? error, StackTrace? stackTrace}) {
     final logMap = {
       'timestamp': DateTime.now().toUtc().toIso8601String(),
       'level': level.name.toUpperCase(),
@@ -39,7 +40,9 @@ class ScientificLogger {
     _log(ScientificLogLevel.warning, category, message);
   }
 
-  static void error(String category, String message, {Object? error, StackTrace? stackTrace}) {
-    _log(ScientificLogLevel.error, category, message, error: error, stackTrace: stackTrace);
+  static void error(String category, String message,
+      {Object? error, StackTrace? stackTrace}) {
+    _log(ScientificLogLevel.error, category, message,
+        error: error, stackTrace: stackTrace);
   }
 }

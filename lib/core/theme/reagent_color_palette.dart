@@ -57,16 +57,22 @@ class ReagentColorPalette {
 
     // Fallback fuzzy checks
     if (lowerColor.contains('black')) return obsidianBlack;
-    if (lowerColor.contains('blue') && lowerColor.contains('dark')) return deepBlue;
-    if (lowerColor.contains('blue') && lowerColor.contains('bright')) return skyBlue;
+    if (lowerColor.contains('blue') && lowerColor.contains('dark'))
+      return deepBlue;
+    if (lowerColor.contains('blue') && lowerColor.contains('bright'))
+      return skyBlue;
     if (lowerColor.contains('blue')) return electricBlue;
-    if (lowerColor.contains('green') && lowerColor.contains('bright')) return emeraldGreen;
+    if (lowerColor.contains('green') && lowerColor.contains('bright'))
+      return emeraldGreen;
     if (lowerColor.contains('green')) return forestGreen;
-    if (lowerColor.contains('red') && lowerColor.contains('dark')) return deepRed;
+    if (lowerColor.contains('red') && lowerColor.contains('dark'))
+      return deepRed;
     if (lowerColor.contains('red')) return roseRed;
-    if (lowerColor.contains('orange') && lowerColor.contains('light')) return lightOrange;
+    if (lowerColor.contains('orange') && lowerColor.contains('light'))
+      return lightOrange;
     if (lowerColor.contains('orange')) return amberOrange;
-    if (lowerColor.contains('yellow') && lowerColor.contains('light')) return lightYellow;
+    if (lowerColor.contains('yellow') && lowerColor.contains('light'))
+      return lightYellow;
     if (lowerColor.contains('yellow')) return brightYellow;
     if (lowerColor.contains('purple')) return royalPurple;
     if (lowerColor.contains('pink')) return hotPink;

@@ -6,7 +6,7 @@ class TestResultEntity {
   final int confidencePercentage;
   final String? notes;
   final DateTime testCompletedAt;
-  
+
   // Scientific Engine Extensions
   final double? colorMatchConfidence;
   final double? aiInterpretationConfidence;
@@ -61,12 +61,14 @@ class TestResultEntity {
       notes: notes ?? this.notes,
       testCompletedAt: testCompletedAt ?? this.testCompletedAt,
       colorMatchConfidence: colorMatchConfidence ?? this.colorMatchConfidence,
-      aiInterpretationConfidence: aiInterpretationConfidence ?? this.aiInterpretationConfidence,
+      aiInterpretationConfidence:
+          aiInterpretationConfidence ?? this.aiInterpretationConfidence,
       stabilityIndex: stabilityIndex ?? this.stabilityIndex,
       deltaE: deltaE ?? this.deltaE,
       observedHex: observedHex ?? this.observedHex,
       observedRgb: observedRgb ?? this.observedRgb,
-      interpretationCategory: interpretationCategory ?? this.interpretationCategory,
+      interpretationCategory:
+          interpretationCategory ?? this.interpretationCategory,
       algorithmVersion: algorithmVersion ?? this.algorithmVersion,
     );
   }
@@ -101,7 +103,8 @@ class TestResultEntity {
       notes: json['notes'] as String?,
       testCompletedAt: DateTime.parse(json['testCompletedAt'] as String),
       colorMatchConfidence: (json['colorMatchConfidence'] as num?)?.toDouble(),
-      aiInterpretationConfidence: (json['aiInterpretationConfidence'] as num?)?.toDouble(),
+      aiInterpretationConfidence:
+          (json['aiInterpretationConfidence'] as num?)?.toDouble(),
       stabilityIndex: (json['stabilityIndex'] as num?)?.toDouble(),
       deltaE: (json['deltaE'] as num?)?.toDouble(),
       observedHex: json['observedHex'] as String?,

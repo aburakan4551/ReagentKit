@@ -18,11 +18,11 @@ class AcademicReference {
   /// Formats the reference according to APA-like academic standards
   String toAPAFormat() {
     final buffer = StringBuffer();
-    
+
     if (authors.isNotEmpty) {
       buffer.write('$authors ');
     }
-    
+
     if (year.isNotEmpty) {
       buffer.write('($year).');
     } else {
@@ -62,21 +62,21 @@ class AcademicReference {
   /// Formats a short citation tag, e.g., "Auterhoff et al. (1973)"
   String toShortCitation() {
     if (authors.isEmpty) return 'Anon. (${year.isNotEmpty ? year : "n.d."})';
-    
+
     // Extract first author last name
     // Authors usually format like "Auterhoff, H., Braun, D." or "Kovar, K.-A."
     final parts = authors.split(',');
     String primaryAuthor = parts[0].trim();
-    
+
     // Check if there are other authors
-    final hasEtAl = parts.length > 2 || 
-                    authors.toLowerCase().contains('et al') || 
-                    authors.toLowerCase().contains('et. al') || 
-                    authors.contains('&') || 
-                    authors.contains(' and ');
-    
+    final hasEtAl = parts.length > 2 ||
+        authors.toLowerCase().contains('et al') ||
+        authors.toLowerCase().contains('et. al') ||
+        authors.contains('&') ||
+        authors.contains(' and ');
+
     final formattedYear = year.isNotEmpty ? year : 'n.d.';
-    
+
     if (hasEtAl) {
       return '$primaryAuthor et al. ($formattedYear)';
     } else {
@@ -84,7 +84,6 @@ class AcademicReference {
     }
   }
 }
-
 
 class ReferenceParser {
   /// Parses a raw bibliographic string into an [AcademicReference]
@@ -147,7 +146,10 @@ class ReferenceParser {
 
       // 4. Identify Publisher or Journal
       // Let's check common publishers/journals
-      if (clean.contains('Verlag') || clean.contains('Press') || clean.contains('Sons') || clean.contains('University')) {
+      if (clean.contains('Verlag') ||
+          clean.contains('Press') ||
+          clean.contains('Sons') ||
+          clean.contains('University')) {
         final parts = clean.split('.');
         if (parts.length >= 2) {
           journalOrBook = parts[0].trim();

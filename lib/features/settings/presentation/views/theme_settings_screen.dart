@@ -184,7 +184,9 @@ class _ThemeSettingsScreenState extends ConsumerState<ThemeSettingsScreen>
   }) {
     final isSelected = currentMode == mode;
     final cardColor = theme.colorScheme.surfaceContainerHighest;
-    final borderColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant;
+    final borderColor = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outlineVariant;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),

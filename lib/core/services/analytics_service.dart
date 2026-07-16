@@ -16,7 +16,8 @@ class AnalyticsService {
           name == 'paywall_opened' ||
           name == 'premium_purchase_success' ||
           name == 'free_scan_consumed') {
-        Logger.info('🛡️ [Analytics Isolation] Suppressed logging premium event: "$name"');
+        Logger.info(
+            '🛡️ [Analytics Isolation] Suppressed logging premium event: "$name"');
         return;
       }
     }

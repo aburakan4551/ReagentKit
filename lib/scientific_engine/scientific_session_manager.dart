@@ -8,9 +8,9 @@ class ScientificSessionManager {
   final ScientificStateMachine stateMachine = ScientificStateMachine();
   final List<RGBColor> _colorHistory = [];
   final List<double> _brightnessHistory = [];
-  
+
   static const int maxHistorySize = 10;
-  
+
   double _currentStabilityIndex = 1.0;
   double _currentAmbientBrightness = 0.8;
   double _currentExposure = 0.5;
@@ -90,9 +90,8 @@ class ScientificSessionManager {
       _currentStabilityIndex = 1.0 - ((avgDistance - 2.0) / 13.0);
     }
 
-    ScientificLogger.debug('Session', 
-      'Stability recalculated: stabilityIndex=${_currentStabilityIndex.toStringAsFixed(3)}, avgDistance=${avgDistance.toStringAsFixed(2)}'
-    );
+    ScientificLogger.debug('Session',
+        'Stability recalculated: stabilityIndex=${_currentStabilityIndex.toStringAsFixed(3)}, avgDistance=${avgDistance.toStringAsFixed(2)}');
   }
 
   /// Runs the reagent test interpretation with the collected session data
@@ -101,7 +100,7 @@ class ScientificSessionManager {
     double? customAiConfidence,
   }) {
     stateMachine.transitionToAnalyzing();
-    
+
     if (_colorHistory.isEmpty) {
       final errResult = InterpretationResult(
         deltaE: 99.0,

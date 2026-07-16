@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final reagentDetailControllerProvider =
     StateNotifierProvider.autoDispose<ReagentDetailController, bool>((ref) {
-      return ReagentDetailController();
-    });
+  return ReagentDetailController();
+});
 
 class ReagentDetailController extends StateNotifier<bool> {
   ReagentDetailController() : super(false);

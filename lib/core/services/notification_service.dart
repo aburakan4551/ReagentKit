@@ -28,13 +28,15 @@ class NotificationService {
           titleLower.contains('trial') ||
           titleLower.contains('offer') ||
           titleLower.contains('discount')) {
-        Logger.info('🛡️ [Review Mode] Suppressed push notification/snackbar: "$message"');
+        Logger.info(
+            '🛡️ [Review Mode] Suppressed push notification/snackbar: "$message"');
         return;
       }
     }
     final scaffoldMessenger = scaffoldMessengerKey.currentState;
     if (scaffoldMessenger == null) {
-      Logger.error('❌ NotificationService: scaffoldMessengerKey.currentState is null');
+      Logger.error(
+          '❌ NotificationService: scaffoldMessengerKey.currentState is null');
       return;
     }
 
@@ -52,7 +54,8 @@ class NotificationService {
         duration: duration,
         padding: EdgeInsets.zero,
         action: onTap != null
-            ? SnackBarAction(label: 'View', onPressed: onTap, textColor: _getTextColor(type))
+            ? SnackBarAction(
+                label: 'View', onPressed: onTap, textColor: _getTextColor(type))
             : null,
       ),
     );
@@ -258,7 +261,8 @@ class _NotificationContent extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () => scaffoldMessengerKey.currentState?.hideCurrentSnackBar(),
+            onTap: () =>
+                scaffoldMessengerKey.currentState?.hideCurrentSnackBar(),
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(

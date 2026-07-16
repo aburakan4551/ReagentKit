@@ -9,7 +9,7 @@ class TestResultHistoryController
   final TestResultHistoryRepository _repository;
 
   TestResultHistoryController(this._repository)
-    : super(const TestResultHistoryInitial());
+      : super(const TestResultHistoryInitial());
 
   // Load all test results
   Future<void> loadTestResults() async {

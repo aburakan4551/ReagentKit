@@ -73,11 +73,11 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
 
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOutBack,
-          ),
-        );
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutBack,
+      ),
+    );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
@@ -141,7 +141,8 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isError
-                      ? const Color(0xFFFCA5A5).withOpacity(0.3) // Light red border
+                      ? const Color(0xFFFCA5A5)
+                          .withOpacity(0.3) // Light red border
                       : const Color(
                           0xFF86EFAC,
                         ).withOpacity(0.3), // Light green border
@@ -149,11 +150,10 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color:
-                        (isError
-                                ? const Color(0xFFEF4444)
-                                : const Color(0xFF10B981))
-                            .withOpacity(0.1),
+                    color: (isError
+                            ? const Color(0xFFEF4444)
+                            : const Color(0xFF10B981))
+                        .withOpacity(0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -164,11 +164,10 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color:
-                          (isError
-                                  ? const Color(0xFFEF4444)
-                                  : const Color(0xFF10B981))
-                              .withOpacity(0.1),
+                      color: (isError
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF10B981))
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -201,11 +200,10 @@ class _TopNotificationWidgetState extends State<TopNotificationWidget>
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color:
-                            (isError
-                                    ? const Color(0xFFEF4444)
-                                    : const Color(0xFF10B981))
-                                .withOpacity(0.1),
+                        color: (isError
+                                ? const Color(0xFFEF4444)
+                                : const Color(0xFF10B981))
+                            .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -251,7 +249,8 @@ class TopNotificationOverlay {
     if (overlayState != null) {
       overlayState.insert(_currentOverlay!);
     } else {
-      debugPrint('❌ TopNotificationOverlay: navigatorKey.currentState?.overlay is null');
+      debugPrint(
+          '❌ TopNotificationOverlay: navigatorKey.currentState?.overlay is null');
     }
   }
 

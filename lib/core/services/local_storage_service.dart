@@ -9,7 +9,8 @@ class LocalStorageService {
   /// Saves the premium status only when not running in review mode.
   static Future<void> savePremiumStatus(bool isPremium) async {
     if (isPremiumReviewMode) {
-      Logger.info('🛡️ [Storage Security] Blocked writing temporary premium status to local preferences.');
+      Logger.info(
+          '🛡️ [Storage Security] Blocked writing temporary premium status to local preferences.');
       return;
     }
     try {

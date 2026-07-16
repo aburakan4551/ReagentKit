@@ -86,14 +86,17 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       for (final package in offerings) {
         final product = package.storeProduct;
         final cleanTitle = product.title.split('(').first.trim();
-        final isLifetime = package.packageType == PackageType.lifetime || cleanTitle.toLowerCase().contains('lifetime');
-        final isAnnual = package.packageType == PackageType.annual || cleanTitle.toLowerCase().contains('annual');
+        final isLifetime = package.packageType == PackageType.lifetime ||
+            cleanTitle.toLowerCase().contains('lifetime');
+        final isAnnual = package.packageType == PackageType.annual ||
+            cleanTitle.toLowerCase().contains('annual');
         tiers.add(PaywallTier(
           identifier: package.identifier,
           title: cleanTitle,
           description: product.description,
           priceString: product.priceString,
-          periodSuffix: isLifetime ? 'one-time' : (isAnnual ? '/year' : '/month'),
+          periodSuffix:
+              isLifetime ? 'one-time' : (isAnnual ? '/year' : '/month'),
           badge: isLifetime ? 'BEST VALUE' : (isAnnual ? 'SAVE 50%' : ''),
           package: package,
         ));
@@ -112,7 +115,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         const PaywallTier(
           identifier: 'annual',
           title: 'Annual Subscription',
-          description: 'Get unlimited reagent scans for a full year. Includes 3-day free trial.',
+          description:
+              'Get unlimited reagent scans for a full year. Includes 3-day free trial.',
           priceString: '\$29.99',
           periodSuffix: '/year',
           badge: 'SAVE 50%',
@@ -120,7 +124,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         const PaywallTier(
           identifier: 'lifetime',
           title: 'Lifetime Access',
-          description: 'One-time payment for perpetual unlimited reagent scans.',
+          description:
+              'One-time payment for perpetual unlimited reagent scans.',
           priceString: '\$59.99',
           periodSuffix: 'one-time',
           badge: 'BEST VALUE',
@@ -131,7 +136,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     // Auto-select preferred tier if none is selected
     if (_selectedTier == null && tiers.isNotEmpty) {
       _selectedTier = tiers.firstWhere(
-        (t) => t.identifier == 'annual' || t.title.toLowerCase().contains('annual'),
+        (t) =>
+            t.identifier == 'annual' ||
+            t.title.toLowerCase().contains('annual'),
         orElse: () => tiers.first,
       );
     }
@@ -144,7 +151,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             end: Alignment.bottomCenter,
           )
         : LinearGradient(
-            colors: [theme.scaffoldBackgroundColor, theme.colorScheme.surfaceContainerHighest.withOpacity(0.5)],
+            colors: [
+              theme.scaffoldBackgroundColor,
+              theme.colorScheme.surfaceContainerHighest.withOpacity(0.5)
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           );
@@ -160,7 +170,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             children: [
               // Custom Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -173,7 +184,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     ),
                     if (offerings.isEmpty || kDebugMode)
                       TextButton.icon(
-                        icon: const Icon(HeroIcons.cpu_chip, size: 16, color: Color(0xFF7C5CFF)),
+                        icon: const Icon(HeroIcons.cpu_chip,
+                            size: 16, color: Color(0xFF7C5CFF)),
                         label: Text(
                           isAr ? 'تخطي التطوير' : 'Dev Bypass',
                           style: TextStyle(
@@ -226,7 +238,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
                       // Headlines
                       Text(
-                        isAr ? 'الترقية إلى النسخة المدفوعة' : 'Upgrade to Premium',
+                        isAr
+                            ? 'الترقية إلى النسخة المدفوعة'
+                            : 'Upgrade to Premium',
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: isDarkMode ? Colors.white : Colors.black87,
@@ -250,27 +264,42 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       _buildFeatureItem(
                         context,
                         icon: Icons.all_inclusive,
-                        title: isAr ? 'عمليات فحص كواشف غير محدودة' : 'Unlimited Reagent Scans',
-                        subtitle: isAr ? 'بدون حدود أو انقطاعات للفحوصات اليومية.' : 'No daily scan limits or interruptions.',
+                        title: isAr
+                            ? 'عمليات فحص كواشف غير محدودة'
+                            : 'Unlimited Reagent Scans',
+                        subtitle: isAr
+                            ? 'بدون حدود أو انقطاعات للفحوصات اليومية.'
+                            : 'No daily scan limits or interruptions.',
                       ),
                       const SizedBox(height: 16),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.bolt,
-                        title: isAr ? 'معالجة كيميائية فورية بالذكاء الاصطناعي' : 'Priority AI Chemical Processing',
-                        subtitle: isAr ? 'نتائج فورية ودقيقة باستخدام تحليل الرؤية الحاسوبية.' : 'Instant, precise results using computer vision analysis.',
+                        title: isAr
+                            ? 'معالجة كيميائية فورية بالذكاء الاصطناعي'
+                            : 'Priority AI Chemical Processing',
+                        subtitle: isAr
+                            ? 'نتائج فورية ودقيقة باستخدام تحليل الرؤية الحاسوبية.'
+                            : 'Instant, precise results using computer vision analysis.',
                       ),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.shield_check,
-                        title: isAr ? 'تقارير سلامة شاملة' : 'Comprehensive Safety Reports',
-                        subtitle: isAr ? 'تحذيرات كاملة وبروتوكولات التعامل الآمن وطرق التخزين.' : 'Full chemical hazard warnings, handling info & lab protocols.',
+                        title: isAr
+                            ? 'تقارير سلامة شاملة'
+                            : 'Comprehensive Safety Reports',
+                        subtitle: isAr
+                            ? 'تحذيرات كاملة وبروتوكولات التعامل الآمن وطرق التخزين.'
+                            : 'Full chemical hazard warnings, handling info & lab protocols.',
                       ),
                       _buildFeatureItem(
                         context,
                         icon: HeroIcons.cloud_arrow_up,
-                        title: isAr ? 'مزامنة سحابية آمنة' : 'Secure Cloud Sync',
-                        subtitle: isAr ? 'تزامن سجل الفحوصات والإعدادات بين جميع أجهزتك.' : 'Sync scan history and configurations across all devices.',
+                        title:
+                            isAr ? 'مزامنة سحابية آمنة' : 'Secure Cloud Sync',
+                        subtitle: isAr
+                            ? 'تزامن سجل الفحوصات والإعدادات بين جميع أجهزتك.'
+                            : 'Sync scan history and configurations across all devices.',
                       ),
 
                       const SizedBox(height: 36),
@@ -281,7 +310,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           padding: EdgeInsets.symmetric(vertical: 24.0),
                           child: Center(
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF7C5CFF)),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF7C5CFF)),
                             ),
                           ),
                         )
@@ -290,10 +320,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: tiers.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final tier = tiers[index];
-                            final isSelected = _selectedTier?.identifier == tier.identifier;
+                            final isSelected =
+                                _selectedTier?.identifier == tier.identifier;
                             return _buildTierCard(context, tier, isSelected);
                           },
                         ),
@@ -305,7 +337,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF87171).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
@@ -345,7 +378,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             if (_selectedTier != null) {
                               HapticFeedback.mediumImpact();
                               if (_selectedTier!.package != null) {
-                                premiumService.buyPremium(_selectedTier!.package!);
+                                premiumService
+                                    .buyPremium(_selectedTier!.package!);
                               } else {
                                 premiumService.simulatePremiumUnlock();
                               }
@@ -363,7 +397,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF7C5CFF).withOpacity(0.3),
+                                  color:
+                                      const Color(0xFF7C5CFF).withOpacity(0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -371,7 +406,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                isAr ? 'شراء وتفعيل الاشتراك' : 'Purchase Subscription',
+                                isAr
+                                    ? 'شراء وتفعيل الاشتراك'
+                                    : 'Purchase Subscription',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -394,7 +431,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                 premiumService.restorePurchases();
                               },
                         child: Text(
-                          isAr ? 'استعادة المشتريات السابقة' : 'Restore Purchases',
+                          isAr
+                              ? 'استعادة المشتريات السابقة'
+                              : 'Restore Purchases',
                           style: TextStyle(
                             color: isDarkMode ? Colors.white70 : Colors.black87,
                             fontWeight: FontWeight.w600,
@@ -405,7 +444,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       const SizedBox(height: 24),
 
                       // Auto-renewal Terms info (Required by Apple guidelines)
-                      if (_selectedTier != null && _selectedTier!.identifier != 'lifetime')
+                      if (_selectedTier != null &&
+                          _selectedTier!.identifier != 'lifetime')
                         Padding(
                           padding: const EdgeInsets.only(bottom: 24.0),
                           child: Text(
@@ -414,7 +454,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                 : 'Payment will be charged to your iTunes Account at confirmation of purchase. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period. Account will be charged for renewal within 24 hours prior to the end of the current period. Subscriptions may be managed and auto-renewal may be turned off by going to your iTunes Account Settings after purchase.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isDarkMode ? Colors.white38 : Colors.black45,
+                              color:
+                                  isDarkMode ? Colors.white38 : Colors.black45,
                               fontSize: 11,
                               height: 1.4,
                             ),
@@ -427,9 +468,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                         spacing: 16,
                         runSpacing: 8,
                         children: [
-                          _buildLink(isAr ? 'شروط الخدمة' : 'Terms of Service', 'hhttps://aburakan4551.github.io/reagent-kit-privacy/'),
-                          _buildLink(isAr ? 'سياسة الخصوصية' : 'Privacy Policy', 'https://aburakan4551.github.io/reagent-kit-privacy/'),
-                          _buildLink(isAr ? 'شروط استخدام أبل (EULA)' : 'Apple Terms (EULA)', 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
+                          _buildLink(isAr ? 'شروط الخدمة' : 'Terms of Service',
+                              'hhttps://aburakan4551.github.io/reagent-kit-privacy/'),
+                          _buildLink(isAr ? 'سياسة الخصوصية' : 'Privacy Policy',
+                              'https://aburakan4551.github.io/reagent-kit-privacy/'),
+                          _buildLink(
+                              isAr
+                                  ? 'شروط استخدام أبل (EULA)'
+                                  : 'Apple Terms (EULA)',
+                              'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -438,7 +485,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withOpacity(0.5),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: theme.dividerColor,
@@ -450,7 +498,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                             Icon(
                               HeroIcons.information_circle,
                               size: 20,
-                              color: isDarkMode ? Colors.white38 : Colors.black45,
+                              color:
+                                  isDarkMode ? Colors.white38 : Colors.black45,
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -459,7 +508,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                                     ? 'تنبيه علمي: يمثل تحليل الذكاء الاصطناعي لكشف الألوان أداة تعليمية مساعدة. لا يغني عن الفحوصات المختبرية المعتمدة وبروتوكولات السلامة الكيميائية. تحقق من النتائج يدوياً دائماً.'
                                     : 'Scientific Disclaimer: Reagent ColorTest AI analysis is an educational aid. It does not replace certified laboratory testing or chemical safety protocols. Verify results manually.',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isDarkMode ? Colors.white38 : Colors.black45,
+                                  color: isDarkMode
+                                      ? Colors.white38
+                                      : Colors.black45,
                                   height: 1.4,
                                 ),
                               ),
@@ -494,7 +545,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+              color: isDarkMode
+                  ? Colors.white.withOpacity(0.04)
+                  : Colors.black.withOpacity(0.03),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -532,7 +585,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
-  Widget _buildTierCard(BuildContext context, PaywallTier tier, bool isSelected) {
+  Widget _buildTierCard(
+      BuildContext context, PaywallTier tier, bool isSelected) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -552,9 +606,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.dividerColor,
+            color: isSelected ? theme.colorScheme.primary : theme.dividerColor,
             width: isSelected ? 2.5 : 1.0,
           ),
           boxShadow: isSelected
@@ -586,7 +638,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       if (tier.badge.isNotEmpty) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFF7C5CFF), Color(0xFF50E3C2)],

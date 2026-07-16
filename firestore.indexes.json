@@ -1,7 +1,35 @@
-{
+﻿{
   "indexes": [
     {
-      "collectionGroup": "tests",
+      "collectionGroup": "reagents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "category",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "reagentName",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reagents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "safetyLevel",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "reagentName",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reaction_results",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -9,11 +37,31 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "testCompletedAt",
-          "order": "DESCENDING"
+          "fieldPath": "substanceName",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "scientific_references",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "substanceName",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "safety_notes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "reagentName",
+          "order": "ASCENDING"
         }
       ]
     }
   ],
   "fieldOverrides": []
-} 
+}

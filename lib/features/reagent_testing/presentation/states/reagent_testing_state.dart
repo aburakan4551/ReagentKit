@@ -90,4 +90,3 @@ class ReagentTestingEmpty extends ReagentTestingState {
   @override
   int get hashCode => message.hashCode;
 }
-

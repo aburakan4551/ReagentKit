@@ -353,7 +353,8 @@ class SettingsPage extends ConsumerWidget {
                     : l10n.freeTrialStatus,
                 leadingIcon: HeroIcons.credit_card,
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: premiumService.isPremium
                         ? Colors.green.withOpacity(0.12)
@@ -379,7 +380,8 @@ class SettingsPage extends ConsumerWidget {
               if (!premiumService.isPremium) ...[
                 SettingsTile(
                   title: l10n.freeTestsRemaining(premiumService.freeScansLeft),
-                  subtitle: l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
+                  subtitle:
+                      l10n.freeTestsUsed(3 - premiumService.freeScansLeft),
                   leadingIcon: HeroIcons.chart_bar,
                 ),
                 SettingsTile(
@@ -407,7 +409,9 @@ class SettingsPage extends ConsumerWidget {
 
         // Research & References Section
         _buildEnhancedSection(
-          title: l10n.localeName == 'ar' ? 'البحث العلمي والمراجع' : 'Research & References',
+          title: l10n.localeName == 'ar'
+              ? 'البحث العلمي والمراجع'
+              : 'Research & References',
           icon: HeroIcons.academic_cap,
           gradient: [
             const Color(0xFF7C5CFF).withOpacity(0.1),
@@ -479,7 +483,8 @@ class SettingsPage extends ConsumerWidget {
                 color: theme.colorScheme.onSurfaceVariant,
               ),
               onTap: () async {
-                final uri = Uri.parse('https://aburakan4551.github.io/reagent-kit-privacy/');
+                final uri = Uri.parse(
+                    'https://aburakan4551.github.io/reagent-kit-privacy/');
                 try {
                   final launched = await launchUrl(
                     uri,

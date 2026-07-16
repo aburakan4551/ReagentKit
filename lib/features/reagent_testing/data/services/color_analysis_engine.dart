@@ -36,8 +36,7 @@ class ColorAnalysisResult {
   });
 
   @override
-  String toString() =>
-      'ColorAnalysisResult(match=$matchedColorName, '
+  String toString() => 'ColorAnalysisResult(match=$matchedColorName, '
       'S_Match=${spectralMatchScore.toStringAsFixed(3)}, '
       'd_norm=${normalizedDistance.toStringAsFixed(3)}, '
       'threshold=$adaptiveThreshold)';
@@ -104,7 +103,8 @@ class ColorAnalysisEngine {
       // Step 2 — Compute weighted centroid (population-weighted RGB average)
       //          This is equivalent to a K-means centroid for k=1.
       final centroid = _computeWeightedCentroid(filtered);
-      Logger.info('🎨 Reaction centroid: rgb(${centroid.red},${centroid.green},${centroid.blue})');
+      Logger.info(
+          '🎨 Reaction centroid: rgb(${centroid.red},${centroid.green},${centroid.blue})');
 
       return centroid;
     } catch (e) {
@@ -191,8 +191,8 @@ class ColorAnalysisEngine {
     final dg = (c1.green - c2.green).toDouble();
     final db = (c1.blue - c2.blue).toDouble();
 
-    final rW = 2.0 + rMean / 256.0;   // [2.0, 2.996]
-    final gW = 4.0;                    // green is most perceptually significant
+    final rW = 2.0 + rMean / 256.0; // [2.0, 2.996]
+    final gW = 4.0; // green is most perceptually significant
     final bW = 2.0 + (255.0 - rMean) / 256.0; // [2.0, 2.996]
 
     final d2 = rW * dr * dr + gW * dg * dg + bW * db * db;
@@ -238,8 +238,9 @@ class ColorAnalysisEngine {
   /// So threshold ∈ [0.35, 0.40] — keeps it conservative.
   double _adaptiveThreshold(double variance) {
     const varianceFactor = 0.20; // how much variance inflates threshold
-    const maxVariance = 0.25;    // saturation variance ceiling
-    final correction = (variance / maxVariance).clamp(0.0, 1.0) * varianceFactor;
+    const maxVariance = 0.25; // saturation variance ceiling
+    final correction =
+        (variance / maxVariance).clamp(0.0, 1.0) * varianceFactor;
     final result = (_baseThreshold + correction).clamp(0.0, 0.65);
     Logger.info('📊 Variance=$variance → adaptiveThreshold=$result');
     return result;
@@ -291,7 +292,9 @@ class ColorAnalysisEngine {
   }
 
   Color _singleColorFromName(String n) {
-    if (n.contains('dark red') || n.contains('darkred') || n.contains('maroon')) {
+    if (n.contains('dark red') ||
+        n.contains('darkred') ||
+        n.contains('maroon')) {
       return const Color(0xFF8B0000);
     }
     if (n.contains('red orange') || n.contains('redorange')) {
@@ -300,7 +303,9 @@ class ColorAnalysisEngine {
     if (n.contains('dark brown') || n.contains('darkbrown')) {
       return const Color(0xFF3E1F00);
     }
-    if (n.contains('dark blue') || n.contains('darkblue') || n.contains('navy')) {
+    if (n.contains('dark blue') ||
+        n.contains('darkblue') ||
+        n.contains('navy')) {
       return const Color(0xFF00008B);
     }
     if (n.contains('bright blue') || n.contains('light blue')) {

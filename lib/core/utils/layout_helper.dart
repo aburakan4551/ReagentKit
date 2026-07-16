@@ -10,10 +10,10 @@ class LayoutHelper {
     const double navBarHeight = 72.0;
     final double bottomMargin = bottomInset > 0 ? bottomInset : 24.0;
     const double breathingRoom = 16.0;
-    
+
     return navBarHeight + bottomMargin + breathingRoom;
   }
-  
+
   /// Helper to get a dynamic bottom padding EdgeInsets
   static EdgeInsets getBottomPaddingEdgeInsets(BuildContext context) {
     return EdgeInsets.only(bottom: getBottomNavPadding(context));

@@ -73,7 +73,8 @@ class AppTypography {
     );
   }
 
-  static TextStyle getMetadataLabel(BuildContext context, {Color? color, bool isBold = false}) {
+  static TextStyle getMetadataLabel(BuildContext context,
+      {Color? color, bool isBold = false}) {
     final textScaler = MediaQuery.textScalerOf(context);
     return _baseStyle(
       fontSize: textScaler.scale(sizeMetadataLabel),

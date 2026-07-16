@@ -76,9 +76,8 @@ class _SettingsTileState extends State<SettingsTile>
                     : theme.colorScheme.surface,
                 borderRadius: BorderRadius.vertical(
                   top: widget.isFirst ? const Radius.circular(16) : Radius.zero,
-                  bottom: widget.isLast
-                      ? const Radius.circular(16)
-                      : Radius.zero,
+                  bottom:
+                      widget.isLast ? const Radius.circular(16) : Radius.zero,
                 ),
                 border: !widget.isLast
                     ? Border(

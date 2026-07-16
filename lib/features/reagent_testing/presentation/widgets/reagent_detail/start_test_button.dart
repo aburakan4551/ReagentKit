@@ -55,7 +55,8 @@ class StartTestButton extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: isAcknowledged
                   ? theme.colorScheme.primary // Primary action color
-                  : theme.colorScheme.onSurface.withOpacity(0.12), // Disabled color
+                  : theme.colorScheme.onSurface
+                      .withOpacity(0.12), // Disabled color
               foregroundColor: isAcknowledged
                   ? theme.colorScheme.onPrimary
                   : theme.colorScheme.onSurface.withOpacity(0.38),
