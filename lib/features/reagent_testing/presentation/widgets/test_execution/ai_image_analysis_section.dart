@@ -245,8 +245,7 @@ class _AIImageAnalysisSectionState
                                       Consumer(builder: (context, ref, child) {
                                         final premium =
                                             ref.watch(premiumServiceProvider);
-                                        if (premium.isPremium)
-                                          return const SizedBox.shrink();
+                                        if (premium.isPremium) { return const SizedBox.shrink(); }
                                         return Padding(
                                           padding:
                                               const EdgeInsets.only(top: 8.0),
