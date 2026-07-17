@@ -644,22 +644,21 @@ class UnifiedDataService {
     // ── Remote Config Sync Check ─────────────────────────────────────────────
     // Check if we need to refresh from Firestore based on Remote Config
     bool shouldForceRefresh = false;
-    String? remoteDatabaseVersion;
-    String? remoteDatabaseHash;
+    String remoteDatabaseVersion = '';
+    String remoteDatabaseHash = '';
     
     if (_remoteConfig != null) {
-      final rc = _remoteConfig as RemoteConfigService;
-      shouldForceRefresh = rc.forceDatabaseRefresh;
-      remoteDatabaseVersion = rc.databaseVersion;
-      remoteDatabaseHash = rc.scientificDatabaseHash;
+      shouldForceRefresh = _remoteConfig.forceDatabaseRefresh;
+      remoteDatabaseVersion = _remoteConfig.databaseVersion;
+      remoteDatabaseHash = _remoteConfig.scientificDatabaseHash;
       
       if (shouldForceRefresh) {
         developer.log('🔄 [UnifiedDataService] Remote Config force_database_refresh=true - forcing Firestore refresh', name: 'ScientificParser');
       }
-      if (remoteDatabaseVersion != null && remoteDatabaseVersion.isNotEmpty) {
+      if (remoteDatabaseVersion.isNotEmpty) {
         developer.log('📦 [UnifiedDataService] Remote Config database_version: $remoteDatabaseVersion', name: 'ScientificParser');
       }
-      if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+      if (remoteDatabaseHash.isNotEmpty) {
         developer.log('🔐 [UnifiedDataService] Remote Config scientific_database_hash: $remoteDatabaseHash', name: 'ScientificParser');
       }
     }
@@ -680,7 +679,7 @@ class UnifiedDataService {
 
     // Check if cached hash matches Remote Config hash (skip Firestore if matches)
     bool skipFirestore = false;
-    if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+    if (remoteDatabaseHash.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       final cachedHash = prefs.getString('scientific_dataset_hash');
       if (cachedHash == remoteDatabaseHash) {
@@ -743,7 +742,7 @@ class UnifiedDataService {
           await _atomicWriteCache('scientific_dataset_cache', firestoreJson);
 
           // Store the Remote Config hash for future sync checks
-          if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+          if (remoteDatabaseHash.isNotEmpty) {
             await prefs.setString('scientific_dataset_hash', remoteDatabaseHash);
             developer.log('💾 [UnifiedDataService] Stored scientific_dataset_hash for sync validation', name: 'ScientificParser');
           }
