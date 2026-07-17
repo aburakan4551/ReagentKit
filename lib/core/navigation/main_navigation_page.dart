@@ -46,11 +46,11 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
   }
 
   List<Widget> get _pages => [
-        const ReagentTestingPage(),
-        const TestResultHistoryPage(),
-        const SettingsPage(),
-        const ProfilePage(),
-      ];
+    const ReagentTestingPage(),
+    const TestResultHistoryPage(),
+    const SettingsPage(),
+    const ProfilePage(),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -62,7 +62,7 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bottomInset = MediaQuery.of(context).padding.bottom;
-
+    
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -114,7 +114,7 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
   Widget _buildNavItem(int index, IconData icon) {
     final isSelected = _selectedIndex == index;
     final theme = Theme.of(context);
-
+    
     return GestureDetector(
       onTap: () => _onItemTapped(index),
       behavior: HitTestBehavior.opaque,
@@ -127,16 +127,16 @@ class _MainNavigationPageState extends ConsumerState<MainNavigationPage> {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.15)
+            color: isSelected 
+                ? theme.colorScheme.primary.withOpacity(0.15) 
                 : Colors.transparent,
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
             size: isSelected ? 28 : 24,
-            color: isSelected
-                ? theme.colorScheme.primary
+            color: isSelected 
+                ? theme.colorScheme.primary 
                 : theme.colorScheme.onSurface.withOpacity(0.5),
           ),
         ),
@@ -164,8 +164,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
     return PopScope(
       canPop: false,
       child: Dialog(
-        backgroundColor:
-            theme.dialogTheme.backgroundColor ?? theme.colorScheme.surface,
+        backgroundColor: theme.dialogTheme.backgroundColor ?? theme.colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -190,9 +189,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      isAr
-                          ? 'إقرار وموافقة قانونية'
-                          : 'Legal Consent & Disclaimer',
+                      isAr ? 'إقرار وموافقة قانونية' : 'Legal Consent & Disclaimer',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -281,8 +278,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    disabledBackgroundColor:
-                        theme.dividerColor.withOpacity(0.12),
+                    disabledBackgroundColor: theme.dividerColor.withOpacity(0.12),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -293,9 +289,7 @@ class _ConsentDialogState extends State<_ConsentDialog> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: _isChecked
-                          ? Colors.white
-                          : theme.colorScheme.onSurface.withOpacity(0.38),
+                      color: _isChecked ? Colors.white : theme.colorScheme.onSurface.withOpacity(0.38),
                     ),
                   ),
                 ),

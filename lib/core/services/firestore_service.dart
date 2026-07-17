@@ -7,8 +7,7 @@ class FirestoreService {
   /// Get scans left for an anonymous device (default is 3)
   Future<int> getDeviceScansLeft(String deviceId) async {
     try {
-      final doc =
-          await _firestore.collection('anonymous_devices').doc(deviceId).get();
+      final doc = await _firestore.collection('anonymous_devices').doc(deviceId).get();
       if (doc.exists) {
         final data = doc.data();
         if (data != null && data.containsKey('scansLeft')) {
@@ -31,8 +30,7 @@ class FirestoreService {
         'scansLeft': scansLeft,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-      Logger.info(
-          '✅ FirestoreService: Updated scansLeft to $scansLeft for device $deviceId');
+      Logger.info('✅ FirestoreService: Updated scansLeft to $scansLeft for device $deviceId');
     } catch (e) {
       Logger.error('Error updating device scans left: $e');
       throw Exception('Failed to update scans left: $e');
@@ -55,13 +53,14 @@ class FirestoreService {
       Logger.info('✅ FirestoreService: Test write successful');
 
       // Test read
-      final doc =
-          await _firestore.collection('test').doc('connection_test').get();
+      final doc = await _firestore
+          .collection('test')
+          .doc('connection_test')
+          .get();
       if (doc.exists) {
         Logger.info('✅ FirestoreService: Test read successful: ${doc.data()}');
       } else {
-        Logger.info(
-            '❌ FirestoreService: Test read failed - document not found');
+        Logger.info('❌ FirestoreService: Test read failed - document not found');
       }
 
       // Clean up test document

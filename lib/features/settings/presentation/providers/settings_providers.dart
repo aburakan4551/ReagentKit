@@ -23,9 +23,9 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 // Controller Providers
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, SettingsState>((ref) {
-  final settingsRepository = ref.watch(settingsRepositoryProvider);
-  return SettingsController(settingsRepository);
-});
+      final settingsRepository = ref.watch(settingsRepositoryProvider);
+      return SettingsController(settingsRepository);
+    });
 
 // Convenience providers for specific settings values
 final currentThemeModeProvider = Provider<String>((ref) {

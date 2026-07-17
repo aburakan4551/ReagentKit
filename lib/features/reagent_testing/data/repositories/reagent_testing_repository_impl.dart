@@ -20,8 +20,7 @@ class ReagentTestingRepositoryImpl implements ReagentTestingRepository {
   DatasetLifecycleState get lifecycleState => _lifecycleState;
 
   @override
-  Future<void> forceReload(
-      {bool clearCache = false, bool forceAssetReload = true}) async {
+  Future<void> forceReload({bool clearCache = false, bool forceAssetReload = true}) async {
     try {
       final snapshot = await _dataService.loadPipeline(
         clearCache: clearCache,

@@ -9,6 +9,5 @@ abstract class ReagentTestingRepository {
   String? get warningMessage;
   WarningSeverity get warningSeverity;
   DatasetLifecycleState get lifecycleState;
-  Future<void> forceReload(
-      {bool clearCache = false, bool forceAssetReload = true});
+  Future<void> forceReload({bool clearCache = false, bool forceAssetReload = true});
 }

@@ -79,8 +79,7 @@ class ProfilePage extends ConsumerWidget {
                 width: 1,
               ),
             ),
-            child: Icon(HeroIcons.user,
-                color: theme.colorScheme.primary, size: 24),
+            child: Icon(HeroIcons.user, color: theme.colorScheme.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Text(
@@ -123,8 +122,7 @@ class _AppHeaderCard extends StatelessWidget {
         color: isDarkMode ? AppColors.surfaceBase : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color:
-              isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
+          color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
         ),
         boxShadow: [
           BoxShadow(
@@ -142,14 +140,10 @@ class _AppHeaderCard extends StatelessWidget {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? AppColors.surfaceElevated
-                      : AppColors.lightBackgroundBase,
+                  color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isDarkMode
-                        ? AppColors.borderHighlight
-                        : AppColors.lightBorderSubtle,
+                    color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
                     width: 1,
                   ),
                 ),
@@ -175,15 +169,12 @@ class _AppHeaderCard extends StatelessWidget {
                       'ReagentKit',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isDarkMode
-                            ? Colors.white
-                            : AppColors.lightTextPrimary,
+                        color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -208,8 +199,7 @@ class _AppHeaderCard extends StatelessWidget {
             const SizedBox(height: 20),
             if (isPremium)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [AppColors.primaryAccent, AppColors.tertiaryAccent],
@@ -227,8 +217,7 @@ class _AppHeaderCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(HeroIcons.sparkles,
-                        color: Colors.white, size: 20),
+                    const Icon(HeroIcons.sparkles, color: Colors.white, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -259,14 +248,10 @@ class _AppHeaderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? AppColors.surfaceElevated
-                      : AppColors.lightBackgroundBase,
+                  color: isDarkMode ? AppColors.surfaceElevated : AppColors.lightBackgroundBase,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isDarkMode
-                        ? AppColors.borderHighlight
-                        : AppColors.lightBorderSubtle,
+                    color: isDarkMode ? AppColors.borderHighlight : AppColors.lightBorderSubtle,
                   ),
                 ),
                 child: Column(
@@ -280,9 +265,7 @@ class _AppHeaderCard extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
-                            color: isDarkMode
-                                ? Colors.white
-                                : AppColors.lightTextPrimary,
+                            color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                           ),
                         ),
                         Text(
@@ -300,13 +283,9 @@ class _AppHeaderCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       child: LinearProgressIndicator(
                         value: freeScansLeft / 3.0,
-                        backgroundColor: isDarkMode
-                            ? AppColors.borderSubtle
-                            : AppColors.lightBorderHighlight,
+                        backgroundColor: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderHighlight,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          freeScansLeft > 0
-                              ? theme.colorScheme.primary
-                              : AppColors.statusError,
+                          freeScansLeft > 0 ? theme.colorScheme.primary : AppColors.statusError,
                         ),
                         minHeight: 8,
                       ),
@@ -320,31 +299,24 @@ class _AppHeaderCard extends StatelessWidget {
                             'Need unlimited analysis?',
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDarkMode
-                                  ? AppColors.textMuted
-                                  : AppColors.lightTextMuted,
+                              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                             ),
                           ),
                         ),
                         GestureDetector(
                           onTap: onUpgradePressed,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [
-                                  AppColors.primaryAccent,
-                                  AppColors.secondaryAccent
-                                ],
+                                colors: [AppColors.primaryAccent, AppColors.secondaryAccent],
                               ),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(HeroIcons.sparkles,
-                                    color: Colors.white, size: 13),
+                                Icon(HeroIcons.sparkles, color: Colors.white, size: 13),
                                 SizedBox(width: 6),
                                 Text(
                                   'Upgrade',
@@ -409,9 +381,7 @@ class ActivityCard extends StatelessWidget {
             color: isDarkMode ? AppColors.surfaceBase : Colors.white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDarkMode
-                  ? AppColors.borderSubtle
-                  : AppColors.lightBorderSubtle,
+              color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
             ),
             boxShadow: [
               BoxShadow(
@@ -430,17 +400,13 @@ class ActivityCard extends StatelessWidget {
                         Icon(
                           HeroIcons.beaker,
                           size: 32,
-                          color: isDarkMode
-                              ? AppColors.textMuted
-                              : AppColors.lightTextMuted,
+                          color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                         ),
                         const SizedBox(height: 12),
                         Text(
                           l10n.noRecentActivity,
                           style: TextStyle(
-                            color: isDarkMode
-                                ? AppColors.textMuted
-                                : AppColors.lightTextMuted,
+                            color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -453,15 +419,12 @@ class ActivityCard extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: results.take(3).length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, indent: 44, endIndent: 16),
+                  separatorBuilder: (_, __) => const Divider(height: 1, indent: 44, endIndent: 16),
                   itemBuilder: (context, index) {
                     final result = results[index];
-                    final color =
-                        _getConfidenceColor(result.confidencePercentage, theme);
+                    final color = _getConfidenceColor(result.confidencePercentage, theme);
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 14.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                       child: Row(
                         children: [
                           Container(
@@ -488,18 +451,14 @@ class ActivityCard extends StatelessWidget {
                                   result.reagentName,
                                   style: theme.textTheme.bodyLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : AppColors.lightTextPrimary,
+                                    color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   result.possibleSubstances.join(', '),
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: isDarkMode
-                                        ? AppColors.textSecondary
-                                        : AppColors.lightTextSecondary,
+                                    color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
                                   ),
                                 ),
                               ],
@@ -509,9 +468,7 @@ class ActivityCard extends StatelessWidget {
                           Text(
                             _formatTimeAgo(result.testCompletedAt),
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: isDarkMode
-                                  ? AppColors.textMuted
-                                  : AppColors.lightTextMuted,
+                              color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -536,8 +493,7 @@ class SafetyReminderCard extends StatelessWidget {
     final isDarkMode = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
 
-    final warningColor =
-        isDarkMode ? AppColors.statusWarning : AppColors.lightStatusWarning;
+    final warningColor = isDarkMode ? AppColors.statusWarning : AppColors.lightStatusWarning;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -580,9 +536,7 @@ class SafetyReminderCard extends StatelessWidget {
           Text(
             l10n.safetyReminderText,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: isDarkMode
-                  ? AppColors.textSecondary
-                  : AppColors.lightTextSecondary,
+              color: isDarkMode ? AppColors.textSecondary : AppColors.lightTextSecondary,
               height: 1.5,
             ),
           ),
@@ -616,9 +570,7 @@ class _AboutCard extends StatelessWidget {
             color: isDarkMode ? AppColors.surfaceBase : Colors.white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDarkMode
-                  ? AppColors.borderSubtle
-                  : AppColors.lightBorderSubtle,
+              color: isDarkMode ? AppColors.borderSubtle : AppColors.lightBorderSubtle,
             ),
             boxShadow: [
               BoxShadow(
@@ -679,9 +631,7 @@ class _AboutCard extends StatelessWidget {
                 Text(
                   label,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDarkMode
-                        ? AppColors.textMuted
-                        : AppColors.lightTextMuted,
+                    color: isDarkMode ? AppColors.textMuted : AppColors.lightTextMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -689,8 +639,7 @@ class _AboutCard extends StatelessWidget {
                 Text(
                   value,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color:
-                        isDarkMode ? Colors.white : AppColors.lightTextPrimary,
+                    color: isDarkMode ? Colors.white : AppColors.lightTextPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

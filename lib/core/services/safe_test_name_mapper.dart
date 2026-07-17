@@ -50,13 +50,12 @@ class SafeTestNameMapper {
     return mappedText;
   }
 
-  static String _replaceIgnoreCase(
-      String text, String target, String replacement) {
+  static String _replaceIgnoreCase(String text, String target, String replacement) {
     if (text.isEmpty || target.isEmpty) return text;
 
     final lowerText = text.toLowerCase();
     final lowerTarget = target.toLowerCase();
-
+    
     int index = lowerText.indexOf(lowerTarget);
     if (index == -1) return text;
 
@@ -65,15 +64,12 @@ class SafeTestNameMapper {
 
     while (index != -1) {
       buffer.write(text.substring(lastIndex, index));
-
+      
       final originalSnippet = text.substring(index, index + target.length);
-      final isAllUpper = originalSnippet == originalSnippet.toUpperCase() &&
-          originalSnippet != originalSnippet.toLowerCase();
-      final isFirstUpper = originalSnippet.isNotEmpty &&
-          originalSnippet[0] == originalSnippet[0].toUpperCase() &&
-          (originalSnippet.length == 1 ||
-              originalSnippet.substring(1) ==
-                  originalSnippet.substring(1).toLowerCase());
+      final isAllUpper = originalSnippet == originalSnippet.toUpperCase() && originalSnippet != originalSnippet.toLowerCase();
+      final isFirstUpper = originalSnippet.isNotEmpty && 
+                           originalSnippet[0] == originalSnippet[0].toUpperCase() && 
+                           (originalSnippet.length == 1 || originalSnippet.substring(1) == originalSnippet.substring(1).toLowerCase());
 
       if (isAllUpper) {
         buffer.write(replacement.toUpperCase());

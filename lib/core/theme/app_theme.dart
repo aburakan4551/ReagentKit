@@ -79,8 +79,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceElevated,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -91,8 +90,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.primaryAccent, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryAccent, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -100,7 +98,7 @@ class AppTheme {
         ),
         hintStyle: const TextStyle(color: AppColors.textMuted),
       ),
-
+      
       // Dialog Theme
       dialogTheme: DialogTheme(
         backgroundColor: AppColors.surfaceElevated,
@@ -110,14 +108,14 @@ class AppTheme {
           side: const BorderSide(color: AppColors.borderHighlight, width: 1),
         ),
       ),
-
+      
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.borderSubtle,
         thickness: 1,
         space: 1,
       ),
-
+      
       // Bottom Sheet Theme
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceElevated,
@@ -160,7 +158,7 @@ class AppTheme {
         ReagentRarityTheme.light,
         PremiumCardTheme.light,
       ],
-
+      
       // Page Transitions - iOS Smooth Feel
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
@@ -203,48 +201,43 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightSurfaceElevated,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.lightBorderSubtle, width: 1),
+          borderSide: const BorderSide(color: AppColors.lightBorderSubtle, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.lightPrimaryAccent, width: 2),
+          borderSide: const BorderSide(color: AppColors.lightPrimaryAccent, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.lightStatusError, width: 1),
+          borderSide: const BorderSide(color: AppColors.lightStatusError, width: 1),
         ),
         hintStyle: const TextStyle(color: AppColors.lightTextMuted),
       ),
-
+      
       // Dialog Theme
       dialogTheme: DialogTheme(
         backgroundColor: AppColors.lightSurfaceElevated,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
-          side:
-              const BorderSide(color: AppColors.lightBorderHighlight, width: 1),
+          side: const BorderSide(color: AppColors.lightBorderHighlight, width: 1),
         ),
       ),
-
+      
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.lightBorderSubtle,
         thickness: 1,
         space: 1,
       ),
-
+      
       // Bottom Sheet Theme
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.lightSurfaceElevated,

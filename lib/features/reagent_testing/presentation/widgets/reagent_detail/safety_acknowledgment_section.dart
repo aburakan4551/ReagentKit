@@ -47,8 +47,7 @@ class SafetyAcknowledgmentSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-      BuildContext context, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(

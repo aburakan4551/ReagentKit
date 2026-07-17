@@ -1,25 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Anonymous devices collection rules - secure tracking of guest device limits.
-    // Kept because the app uses device-scoped rate limiting without authentication.
+    // Anonymous devices collection rules - secure tracking of guest device limits
     match /anonymous_devices/{deviceId} {
       // Access requires knowing the specific generated deviceId
       allow read: if true;
       allow create: if request.resource.data.scansLeft <= 3;
       allow update: if (
-                      // Only allow decreasing or keeping the scansLeft count (prevent bypass)
-                      (!('scansLeft' in request.resource.data)) ||
-                      (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
-                      (request.resource.data.scansLeft <= resource.data.scansLeft)
-                    );
+                        // Only allow decreasing or keeping the scansLeft count (prevent bypass)
+                        (!('scansLeft' in request.resource.data)) ||
+                        (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
+                        (request.resource.data.scansLeft <= resource.data.scansLeft)
+                      );
       allow delete: if false; // Guests cannot delete tracking records
     }
 
     // ═════════════════════════════════════════════════════════════════════════
-    // Scientific Collections — Public Read-Only, No Authentication Required.
-    // The App Store approved build runs without any user accounts; these
-    // collections are the scientific backbone downloaded and cached locally.
+    // Scientific Collections — Public Read-Only, No Authentication Required
     // ═════════════════════════════════════════════════════════════════════════
 
     // Reagents collection — reagent definitions and test data

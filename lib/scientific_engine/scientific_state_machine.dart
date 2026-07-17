@@ -44,9 +44,7 @@ class ScientificStateMachine {
   }
 
   void transitionToCalibrating() {
-    if (_state == ScientificAnalysisState.idle ||
-        _state == ScientificAnalysisState.failed ||
-        _state == ScientificAnalysisState.completed) {
+    if (_state == ScientificAnalysisState.idle || _state == ScientificAnalysisState.failed || _state == ScientificAnalysisState.completed) {
       _state = ScientificAnalysisState.calibrating;
       _result = null;
       _errorMessage = null;

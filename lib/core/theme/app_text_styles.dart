@@ -6,10 +6,8 @@ class AppTextStyles {
   // Utilizing GoogleFonts (e.g., Inter or standard San Francisco style)
   static TextTheme getTextTheme([Brightness brightness = Brightness.dark]) {
     final isDark = brightness == Brightness.dark;
-    final primaryColor =
-        isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
-    final secondaryColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
+    final primaryColor = isDark ? AppColors.textPrimary : AppColors.lightTextPrimary;
+    final secondaryColor = isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
     final mutedColor = isDark ? AppColors.textMuted : AppColors.lightTextMuted;
 
     final baseTextTheme = ThemeData(brightness: brightness).textTheme;

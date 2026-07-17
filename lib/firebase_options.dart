@@ -67,8 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
     storageBucket: 'flutter-reagent-test.firebasestorage.app',
-    iosClientId:
-        '76342007759-mon4usabeh4a93i12i48eq6maj5qcdm5.apps.googleusercontent.com',
+    iosClientId: '76342007759-mon4usabeh4a93i12i48eq6maj5qcdm5.apps.googleusercontent.com',
     iosBundleId: 'com.yousef.ctds',
   );
 
@@ -78,8 +77,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '76342007759',
     projectId: 'flutter-reagent-test',
     storageBucket: 'flutter-reagent-test.firebasestorage.app',
-    iosClientId:
-        '76342007759-mon4usabeh4a93i12i48eq6maj5qcdm5.apps.googleusercontent.com',
+    iosClientId: '76342007759-mon4usabeh4a93i12i48eq6maj5qcdm5.apps.googleusercontent.com',
     iosBundleId: 'com.yousef.ctds',
   );
 
@@ -92,4 +90,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'flutter-reagent-test.firebasestorage.app',
     measurementId: 'G-VHXK936Q4Z',
   );
+
 }

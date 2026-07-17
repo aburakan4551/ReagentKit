@@ -20,8 +20,7 @@ class InterpretationResult {
   final String? matchedColorTextAr;
   final double deltaE;
   final ConfidenceResult confidence;
-  final String
-      interpretationCategory; // Preliminary Observation, Analytical Suggestion, Reference Match, Low Reliability, High Reliability
+  final String interpretationCategory; // Preliminary Observation, Analytical Suggestion, Reference Match, Low Reliability, High Reliability
   final String message;
   final String messageAr;
 
@@ -93,8 +92,7 @@ class ReagentInterpreter {
         deltaE: bestDeltaE,
         confidence: conf,
         interpretationCategory: 'Low Reliability',
-        message:
-            'Insufficient confidence for reliable interpretation. Please calibrate lighting.',
+        message: 'Insufficient confidence for reliable interpretation. Please calibrate lighting.',
         messageAr: 'درجة الثقة غير كافية لتفسير موثوق. يرجى معايرة الإضاءة.',
       );
     }
@@ -108,20 +106,17 @@ class ReagentInterpreter {
       category = 'Reference Match';
       msg = 'Highly accurate matching with reference standards.';
       msgAr = 'مطابقة دقيقة للغاية مع المعايير المرجعية.';
-    } else if (conf.overallConfidence >=
-        ScientificConstants.confidenceThresholdHigh) {
+    } else if (conf.overallConfidence >= ScientificConstants.confidenceThresholdHigh) {
       category = 'High Reliability';
       msg = 'Significant response matching with strong confidence.';
       msgAr = 'مطابقة استجابة دالة بثقة قوية.';
-    } else if (conf.overallConfidence >=
-        ScientificConstants.confidenceThresholdModerate) {
+    } else if (conf.overallConfidence >= ScientificConstants.confidenceThresholdModerate) {
       category = 'Analytical Suggestion';
       msg = 'Moderate response match suggesting possible presence.';
       msgAr = 'مطابقة استجابة متوسطة تشير إلى احتمالية الوجود.';
     } else {
       category = 'Preliminary Observation';
-      msg =
-          'Preliminary color response observation with low-level correlation.';
+      msg = 'Preliminary color response observation with low-level correlation.';
       msgAr = 'ملاحظة لونية أولية مع ارتباط منخفض المستوى.';
     }
 

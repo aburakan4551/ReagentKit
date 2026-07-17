@@ -8,23 +8,23 @@ import '../utils/logger.dart';
 /// Service for image analysis using Gemini 2.0 Flash Vision API
 class GeminiImageAnalysisService {
   static const String _modelName = 'gemini-2.0-flash';
-
+  
   // Retrieve API Key securely from compile-time arguments (--dart-define) or .env file
   static String get _secureApiKey {
     const envKey = String.fromEnvironment('GEMINI_API_KEY');
     if (envKey.isNotEmpty) return envKey;
-
+    
     try {
       final dotEnvKey = dotenv.env['GEMINI_API_KEY'];
       if (dotEnvKey != null && dotEnvKey.isNotEmpty) return dotEnvKey;
     } catch (_) {
       // dotenv not loaded yet
     }
-
+    
     // Fallback provided by user for safety, though discouraged in production:
-    return 'AIzaSyCII5fZNX4u9R-hf5bzpIWXhD8vOXgQwV8';
+    return 'AIzaSyCII5fZNX4u9R-hf5bzpIWXhD8vOXgQwV8'; 
   }
-
+  
   late final GenerativeModel _model;
 
   GeminiImageAnalysisService({String? apiKey}) {
@@ -68,8 +68,7 @@ class GeminiImageAnalysisService {
     try {
       final imageBytes = await imageFile.readAsBytes();
       if (imageBytes.isEmpty) {
-        throw Exception(
-            'INVALID_IMAGE: The provided image is empty or corrupted.');
+        throw Exception('INVALID_IMAGE: The provided image is empty or corrupted.');
       }
 
       final prompt = '''
@@ -90,45 +89,43 @@ Required JSON format:
 Return ONLY the JSON object, nothing else.''';
 
       final content = [
-        Content.multi([TextPart(prompt), DataPart('image/jpeg', imageBytes)]),
+        Content.multi([
+          TextPart(prompt), 
+          DataPart('image/jpeg', imageBytes)
+        ]),
       ];
 
       Logger.info('📤 Sending request to Gemini Vision API...');
-
+      
       final response = await _model.generateContent(content).timeout(
-            const Duration(seconds: 30),
-            onTimeout: () => throw TimeoutException(
-                'NETWORK_TIMEOUT: The connection timed out.'),
-          );
+        const Duration(seconds: 30),
+        onTimeout: () => throw TimeoutException('NETWORK_TIMEOUT: The connection timed out.'),
+      );
 
       if (response.text == null || response.text!.isEmpty) {
-        throw Exception(
-            'EMPTY_RESPONSE: Received empty response from Gemini API.');
+        throw Exception('EMPTY_RESPONSE: Received empty response from Gemini API.');
       }
 
       final cleanedJson = _extractJsonFromResponse(response.text!);
       return cleanedJson;
+
     } on TimeoutException catch (e) {
       Logger.error('❌ Timeout Error: $e');
-      throw Exception(
-          'NETWORK_TIMEOUT: Please check your internet connection.');
+      throw Exception('NETWORK_TIMEOUT: Please check your internet connection.');
     } on GenerativeAIException catch (e) {
       Logger.error('❌ Generative AI Error: $e');
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('quota') || errorMsg.contains('429')) {
-        throw Exception(
-            'QUOTA_EXCEEDED: API quota exceeded. Please try again later.');
+        throw Exception('QUOTA_EXCEEDED: API quota exceeded. Please try again later.');
       } else if (errorMsg.contains('permission') || errorMsg.contains('403')) {
-        throw Exception(
-            'PERMISSION_DENIED: The API key does not have permission.');
+        throw Exception('PERMISSION_DENIED: The API key does not have permission.');
       } else if (errorMsg.contains('api key') || errorMsg.contains('invalid')) {
         throw Exception('API_KEY_INVALID: The provided API key is not valid.');
       }
       throw Exception('AI_ANALYSIS_FAILED: ${e.message}');
     } catch (e) {
       Logger.error('❌ General Error: $e');
-      throw Exception(
-          'AI_ANALYSIS_ERROR: Unable to analyze image. Please try again.');
+      throw Exception('AI_ANALYSIS_ERROR: Unable to analyze image. Please try again.');
     }
   }
 
@@ -167,9 +164,9 @@ Return ONLY the JSON object, nothing else.''';
       final jsonMatches = jsonObjectRegex.allMatches(rawResponse);
       for (final match in jsonMatches) {
         final potentialJson = match.group(0);
-        if (potentialJson != null &&
-            (potentialJson.contains('"observed_color_description"') ||
-                potentialJson.contains('"primary_substance"'))) {
+        if (potentialJson != null && 
+           (potentialJson.contains('"observed_color_description"') ||
+            potentialJson.contains('"primary_substance"'))) {
           return potentialJson;
         }
       }

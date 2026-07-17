@@ -31,8 +31,7 @@ final remoteConfigServiceProvider = Provider<RemoteConfigService>((ref) {
 });
 
 // Firestore Scientific Service Provider
-final firestoreScientificServiceProvider =
-    Provider<FirestoreScientificService>((ref) {
+final firestoreScientificServiceProvider = Provider<FirestoreScientificService>((ref) {
   return FirestoreScientificService();
 });
 
@@ -65,16 +64,16 @@ final reagentTestingRepositoryProvider = Provider<ReagentTestingRepository>((
 // Controller Provider with initialization
 final reagentTestingControllerProvider =
     StateNotifierProvider<ReagentTestingController, ReagentTestingState>((ref) {
-  final repository = ref.watch(reagentTestingRepositoryProvider);
-  final dataService = ref.watch(unifiedDataServiceProvider);
+      final repository = ref.watch(reagentTestingRepositoryProvider);
+      final dataService = ref.watch(unifiedDataServiceProvider);
 
-  final controller = ReagentTestingController(repository);
+      final controller = ReagentTestingController(repository);
 
-  // Initialize Remote Config when controller is created
-  _initializeRemoteConfig(ref, dataService, controller);
+      // Initialize Remote Config when controller is created
+      _initializeRemoteConfig(ref, dataService, controller);
 
-  return controller;
-});
+      return controller;
+    });
 
 // Helper function to initialize Remote Config
 Future<void> _initializeRemoteConfig(
@@ -119,32 +118,32 @@ Future<void> _initializeRemoteConfig(
 // Test Execution Controller Provider
 final testExecutionControllerProvider =
     StateNotifierProvider<TestExecutionController, TestExecutionState>((ref) {
-  return TestExecutionController();
-});
+      return TestExecutionController();
+    });
 
 // Test Result Controller Provider
 final testResultControllerProvider =
     StateNotifierProvider<TestResultController, TestResultState>((ref) {
-  final historyController = ref.watch(
-    testResultHistoryControllerProvider.notifier,
-  );
-  return TestResultController(historyController: historyController);
-});
+      final historyController = ref.watch(
+        testResultHistoryControllerProvider.notifier,
+      );
+      return TestResultController(historyController: historyController);
+    });
 
 // Test Result History Repository Provider
 final testResultHistoryRepositoryProvider =
     Provider<TestResultHistoryRepository>((ref) {
-  return TestResultHistoryRepository();
-});
+      return TestResultHistoryRepository();
+    });
 
 // Test Result History Controller Provider
 final testResultHistoryControllerProvider =
     StateNotifierProvider<TestResultHistoryController, TestResultHistoryState>((
-  ref,
-) {
-  final repository = ref.watch(testResultHistoryRepositoryProvider);
-  return TestResultHistoryController(repository);
-});
+      ref,
+    ) {
+      final repository = ref.watch(testResultHistoryRepositoryProvider);
+      return TestResultHistoryController(repository);
+    });
 
 // Data source info provider (for debugging/info display)
 final dataSourceInfoProvider = Provider<String>((ref) {
@@ -164,8 +163,7 @@ final remoteConfigRefreshProvider = FutureProvider<bool>((ref) async {
 });
 
 // Gemini Analysis Service Provider (async)
-final geminiAnalysisServiceProvider =
-    FutureProvider<GeminiImageAnalysisService>((
+final geminiAnalysisServiceProvider = FutureProvider<GeminiImageAnalysisService>((
   ref,
 ) async {
   try {

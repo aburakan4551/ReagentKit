@@ -242,8 +242,8 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
             Text(
               l10n.errorLoadingReagents,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -310,7 +310,7 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
   Widget _buildWarningBanner(ReagentTestingLoaded state) {
     Color color;
     IconData icon;
-
+    
     switch (state.warningSeverity) {
       case WarningSeverity.critical:
         color = Colors.red;

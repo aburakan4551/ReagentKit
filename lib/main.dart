@@ -28,7 +28,7 @@ void main() async {
   if (isPremiumReviewMode) {
     Logger.info('[Review Mode] Premium features unlocked.');
   }
-
+  
   // Load environment variables safely
   await dotenv.load(fileName: ".env").catchError((_) {
     // Ignore error if .env file is missing, we fallback to --dart-define or hardcoded
@@ -40,8 +40,7 @@ void main() async {
 
   try {
     if (Firebase.apps.isEmpty) {
-      await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform);
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     }
     firebaseReady = true;
   } catch (e, st) {
@@ -187,8 +186,7 @@ class _ReagentTestingAppState extends ConsumerState<ReagentTestingApp> {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       locale: locale,
-      localeResolutionCallback:
-          (Locale? deviceLocale, Iterable<Locale> supportedLocales) {
+      localeResolutionCallback: (Locale? deviceLocale, Iterable<Locale> supportedLocales) {
         if (deviceLocale == null) {
           return locale;
         }
@@ -203,6 +201,7 @@ class _ReagentTestingAppState extends ConsumerState<ReagentTestingApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       initialRoute: AppRouter.home,
       onGenerateRoute: AppRouter.generateRoute,
+
       debugShowCheckedModeBanner: false,
     );
   }

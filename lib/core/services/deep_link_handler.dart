@@ -9,12 +9,11 @@ class DeepLinkHandler {
   static void handleLink(BuildContext context, Uri deepLink) {
     final path = deepLink.path;
     if (isPremiumReviewMode) {
-      if (path.contains('paywall') ||
-          path.contains('subscription') ||
-          path.contains('premium') ||
+      if (path.contains('paywall') || 
+          path.contains('subscription') || 
+          path.contains('premium') || 
           path.contains('promo')) {
-        Logger.info(
-            '🛡️ [Deep Link Shield] Blocked promotional path: "$path". Redirecting to home.');
+        Logger.info('🛡️ [Deep Link Shield] Blocked promotional path: "$path". Redirecting to home.');
         Navigator.of(context).pushReplacementNamed(AppRouter.home);
         return;
       }

@@ -31,13 +31,11 @@ class TestResultHistoryRepository {
       }
 
       final List<dynamic> jsonList = json.decode(jsonString);
-      final list =
-          jsonList.map((json) => TestResultEntity.fromJson(json)).toList();
+      final list = jsonList.map((json) => TestResultEntity.fromJson(json)).toList();
       if (list.isEmpty && isPremiumReviewMode) {
         return ReviewerDemoSeed.getDemoResults();
       }
-      return list
-        ..sort((a, b) => b.testCompletedAt.compareTo(a.testCompletedAt));
+      return list..sort((a, b) => b.testCompletedAt.compareTo(a.testCompletedAt));
     } catch (e) {
       if (isPremiumReviewMode) {
         return ReviewerDemoSeed.getDemoResults();

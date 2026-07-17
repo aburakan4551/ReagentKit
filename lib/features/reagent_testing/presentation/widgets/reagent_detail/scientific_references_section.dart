@@ -13,8 +13,7 @@ class ScientificReferencesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validReferences =
-        reagent.references.where((r) => r.trim().isNotEmpty).toList();
+    final validReferences = reagent.references.where((r) => r.trim().isNotEmpty).toList();
     if (validReferences.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -23,8 +22,7 @@ class ScientificReferencesSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
-    final parsedRefs =
-        validReferences.map((r) => ReferenceParser.parse(r)).toList();
+    final parsedRefs = validReferences.map((r) => ReferenceParser.parse(r)).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,8 +81,7 @@ class ScientificReferencesSection extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(6),
@@ -115,13 +112,11 @@ class ScientificReferencesSection extends StatelessWidget {
                                   isAr
                                       ? 'تم نسخ المرجع بنجاح!'
                                       : 'Reference copied successfully!',
-                                  style: TextStyle(
-                                      color: theme.colorScheme.onSurface),
+                                  style: TextStyle(color: theme.colorScheme.onSurface),
                                 ),
-                                backgroundColor:
-                                    theme.brightness == Brightness.dark
-                                        ? const Color(0xFF161B22)
-                                        : theme.colorScheme.surfaceContainer,
+                                backgroundColor: theme.brightness == Brightness.dark
+                                    ? const Color(0xFF161B22)
+                                    : theme.colorScheme.surfaceContainer,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -136,8 +131,7 @@ class ScientificReferencesSection extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       apaString,
-                      style: AppTypography.getMetadataValue(
-                        context,
+                      style: AppTypography.getMetadataValue(context,
                         color: theme.colorScheme.onSurface,
                       ).copyWith(
                         fontSize: 13,
@@ -154,3 +148,4 @@ class ScientificReferencesSection extends StatelessWidget {
     );
   }
 }
+

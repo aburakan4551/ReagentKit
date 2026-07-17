@@ -11,11 +11,9 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies() async {
   // Core Services
   getIt.registerLazySingleton<FirestoreService>(() => FirestoreService());
-  getIt.registerLazySingleton<FirestoreScientificService>(
-      () => FirestoreScientificService());
+  getIt.registerLazySingleton<FirestoreScientificService>(() => FirestoreScientificService());
   getIt.registerLazySingleton<RemoteConfigService>(() => RemoteConfigService());
-  getIt.registerLazySingleton<NavigationService>(
-      () => NavigationService(navigatorKey));
+  getIt.registerLazySingleton<NavigationService>(() => NavigationService(navigatorKey));
 
   // AI Services - Gemini API with Remote Config support
   // Register as factory since we need async initialization

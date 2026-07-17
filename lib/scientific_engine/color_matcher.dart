@@ -27,8 +27,7 @@ class RGBColor {
   }
 
   String toHex() {
-    String pad(int value) =>
-        value.toRadixString(16).padLeft(2, '0').toUpperCase();
+    String pad(int value) => value.toRadixString(16).padLeft(2, '0').toUpperCase();
     return '#${pad(r)}${pad(g)}${pad(b)}';
   }
 
@@ -49,11 +48,7 @@ class ColorMatcher {
   static const Map<String, List<RGBColor>> _colorDictionary = {
     'purple': [RGBColor(128, 0, 128), RGBColor(106, 13, 173)],
     'violet': [RGBColor(148, 0, 211), RGBColor(138, 43, 226)],
-    'brown': [
-      RGBColor(139, 69, 19),
-      RGBColor(160, 82, 45),
-      RGBColor(165, 42, 42)
-    ],
+    'brown': [RGBColor(139, 69, 19), RGBColor(160, 82, 45), RGBColor(165, 42, 42)],
     'orange': [RGBColor(255, 140, 0), RGBColor(255, 165, 0)],
     'pink': [RGBColor(255, 192, 203), RGBColor(255, 105, 180)],
     'blue': [RGBColor(0, 0, 255), RGBColor(0, 0, 139), RGBColor(70, 130, 180)],
@@ -72,8 +67,7 @@ class ColorMatcher {
   /// Parses a textual color description (e.g. "purple to violet" or "red-brown")
   /// into a list of representative RGBColors.
   static List<RGBColor> parseColorDescription(String description) {
-    final cleanDesc =
-        description.toLowerCase().replaceAll('-', ' ').replaceAll(',', ' ');
+    final cleanDesc = description.toLowerCase().replaceAll('-', ' ').replaceAll(',', ' ');
     final matchedColors = <RGBColor>[];
 
     _colorDictionary.forEach((key, rgbList) {
@@ -114,9 +108,7 @@ class ColorMatcher {
     double zr = z / 108.883;
 
     double f(double t) {
-      return (t > 0.008856)
-          ? pow(t, 1.0 / 3.0).toDouble()
-          : (7.787 * t) + (16.0 / 116.0);
+      return (t > 0.008856) ? pow(t, 1.0 / 3.0).toDouble() : (7.787 * t) + (16.0 / 116.0);
     }
 
     double fx = f(xr);

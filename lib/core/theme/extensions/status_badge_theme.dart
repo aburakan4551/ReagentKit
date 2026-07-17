@@ -46,8 +46,7 @@ class StatusBadgeTheme extends ThemeExtension<StatusBadgeTheme> {
   }
 
   @override
-  ThemeExtension<StatusBadgeTheme> lerp(
-      ThemeExtension<StatusBadgeTheme>? other, double t) {
+  ThemeExtension<StatusBadgeTheme> lerp(ThemeExtension<StatusBadgeTheme>? other, double t) {
     if (other is! StatusBadgeTheme) return this;
     return StatusBadgeTheme(
       successBg: Color.lerp(successBg, other.successBg, t)!,
@@ -62,24 +61,24 @@ class StatusBadgeTheme extends ThemeExtension<StatusBadgeTheme> {
   }
 
   static StatusBadgeTheme get dark => StatusBadgeTheme(
-        successBg: AppColors.statusSuccess.withOpacity(0.15),
-        successText: AppColors.statusSuccess,
-        warningBg: AppColors.statusWarning.withOpacity(0.15),
-        warningText: AppColors.statusWarning,
-        errorBg: AppColors.statusError.withOpacity(0.15),
-        errorText: AppColors.statusError,
-        infoBg: AppColors.statusInfo.withOpacity(0.15),
-        infoText: AppColors.statusInfo,
-      );
-
+    successBg: AppColors.statusSuccess.withOpacity(0.15),
+    successText: AppColors.statusSuccess,
+    warningBg: AppColors.statusWarning.withOpacity(0.15),
+    warningText: AppColors.statusWarning,
+    errorBg: AppColors.statusError.withOpacity(0.15),
+    errorText: AppColors.statusError,
+    infoBg: AppColors.statusInfo.withOpacity(0.15),
+    infoText: AppColors.statusInfo,
+  );
+  
   static StatusBadgeTheme get light => StatusBadgeTheme(
-        successBg: AppColors.lightStatusSuccess.withOpacity(0.1),
-        successText: AppColors.lightStatusSuccess,
-        warningBg: AppColors.lightStatusWarning.withOpacity(0.1),
-        warningText: AppColors.lightStatusWarning,
-        errorBg: AppColors.lightStatusError.withOpacity(0.1),
-        errorText: AppColors.lightStatusError,
-        infoBg: AppColors.lightStatusInfo.withOpacity(0.1),
-        infoText: AppColors.lightStatusInfo,
-      );
+    successBg: AppColors.lightStatusSuccess.withOpacity(0.1),
+    successText: AppColors.lightStatusSuccess,
+    warningBg: AppColors.lightStatusWarning.withOpacity(0.1),
+    warningText: AppColors.lightStatusWarning,
+    errorBg: AppColors.lightStatusError.withOpacity(0.1),
+    errorText: AppColors.lightStatusError,
+    infoBg: AppColors.lightStatusInfo.withOpacity(0.1),
+    infoText: AppColors.lightStatusInfo,
+  );
 }

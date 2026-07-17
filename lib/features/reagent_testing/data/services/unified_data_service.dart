@@ -77,14 +77,14 @@ class DatasetDiagnostics {
   });
 
   Map<String, dynamic> toJson() => {
-        'rawItems': rawItems,
-        'parsedItems': parsedItems,
-        'skippedItems': skippedItems,
-        'invalidReferences': invalidReferences,
-        'invalidColors': invalidColors,
-        'usedFallback': usedFallback,
-        'datasetVersion': datasetVersion,
-      };
+    'rawItems': rawItems,
+    'parsedItems': parsedItems,
+    'skippedItems': skippedItems,
+    'invalidReferences': invalidReferences,
+    'invalidColors': invalidColors,
+    'usedFallback': usedFallback,
+    'datasetVersion': datasetVersion,
+  };
 
   @override
   String toString() {
@@ -114,11 +114,9 @@ class DatasetMetadata {
     return DatasetMetadata(
       source: json['source']?.toString() ?? 'unknown',
       author: json['author']?.toString() ?? 'unknown',
-      generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? '') ??
-          DateTime.now(),
+      generatedAt: DateTime.tryParse(json['generatedAt']?.toString() ?? '') ?? DateTime.now(),
       scientificRevision: json['scientificRevision']?.toString() ?? '1.0.0',
-      expiresAt: DateTime.tryParse(json['expiresAt']?.toString() ?? '') ??
-          DateTime.now().add(const Duration(days: 365)),
+      expiresAt: DateTime.tryParse(json['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
     );
   }
 }
@@ -161,8 +159,7 @@ class DatasetCircuitBreaker {
       isOpen = false;
       failureCount = 0;
       openedAt = null;
-      developer.log('🔄 Circuit breaker reset (cooldown expired)',
-          name: 'CircuitBreaker');
+      developer.log('🔄 Circuit breaker reset (cooldown expired)', name: 'CircuitBreaker');
       return false;
     }
     return true;
@@ -221,10 +218,9 @@ class DataSnapshot {
     this.lineage,
   });
 
-  bool get isFirebase => source == DataSource.firebase;
-  bool get isFallback =>
-      source == DataSource.local || source == DataSource.staleCache;
-  bool get hasWarning => warningMessage != null;
+  bool get isFirebase  => source == DataSource.firebase;
+  bool get isFallback  => source == DataSource.local || source == DataSource.staleCache;
+  bool get hasWarning  => warningMessage != null;
 }
 
 // ─── ReagentSafetyData ───────────────────────────────────────────────────────
@@ -254,11 +250,11 @@ class ReagentSafetyData {
         (jsonMap[key] as List? ?? []).map((e) => e.toString()).toList();
 
     return ReagentSafetyData(
-      reagentName: name,
-      safetyLevel: jsonMap['safetyLevel']?.toString() ?? 'MEDIUM',
-      requiredEquipment: asList('requiredEquipment'),
-      handlingProcedures: asList('handlingProcedures'),
-      specificHazards: asList('specificHazards'),
+      reagentName:         name,
+      safetyLevel:         jsonMap['safetyLevel']?.toString() ?? 'MEDIUM',
+      requiredEquipment:   asList('requiredEquipment'),
+      handlingProcedures:  asList('handlingProcedures'),
+      specificHazards:     asList('specificHazards'),
       storageRequirements: asList('storageRequirements'),
     );
   }
@@ -361,7 +357,7 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
         .toString();
 
     final reagentsData = decoded['reagents'];
-
+    
     // Enforce reagent count budget (500 limit)
     int rawItems = 0;
     if (reagentsData is Map) {
@@ -392,12 +388,10 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
       if (val['id'] == null || val['id'].toString().trim().isEmpty) {
         val['id'] = key.toLowerCase().replaceAll(' ', '_');
       }
-      if (val['reagentName'] == null ||
-          val['reagentName'].toString().trim().isEmpty) {
+      if (val['reagentName'] == null || val['reagentName'].toString().trim().isEmpty) {
         val['reagentName'] = key;
       }
-      if (val['category'] == null ||
-          val['category'].toString().trim().isEmpty) {
+      if (val['category'] == null || val['category'].toString().trim().isEmpty) {
         val['category'] = 'Primary Tests';
       }
 
@@ -411,17 +405,14 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
         }
       }
 
-      final results =
-          val['reactionResults'] ?? val['drugResults'] ?? val['results'];
+      final results = val['reactionResults'] ?? val['drugResults'] ?? val['results'];
       if (results is List) {
         for (final res in results) {
           if (res is Map<String, dynamic>) {
             final colorStr = res['color']?.toString() ?? '';
             if (colorStr.isNotEmpty) {
               final parsedColor = SafeColorParser.parseRobustColor(colorStr);
-              if (parsedColor.r == 128 &&
-                  parsedColor.g == 128 &&
-                  parsedColor.b == 128) {
+              if (parsedColor.r == 128 && parsedColor.g == 128 && parsedColor.b == 128) {
                 invalidColors++;
               }
             }
@@ -475,8 +466,7 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
       if (decoded.containsKey('reagents') == false) {
         var hasReagentLikeStructure = false;
         decoded.forEach((key, val) {
-          if (val is Map<String, dynamic> &&
-              (val.containsKey('reagentName') || val.containsKey('name'))) {
+          if (val is Map<String, dynamic> && (val.containsKey('reagentName') || val.containsKey('name'))) {
             hasReagentLikeStructure = true;
           }
         });
@@ -554,11 +544,8 @@ class UnifiedDataService {
 
   String get _datasetAsset {
     final rc = _remoteConfig;
-    final isReview =
-        rc?.appStoreReviewMode ?? SafeStoreSanitizer.appStoreReviewMode;
-    return isReview
-        ? 'assets/data/reagents_safe_store.json'
-        : 'assets/data/reagents.json';
+    final isReview = rc?.appStoreReviewMode ?? SafeStoreSanitizer.appStoreReviewMode;
+    return isReview ? 'assets/data/reagents_safe_store.json' : 'assets/data/reagents.json';
   }
 
   final _snapshotController = StreamController<DataSnapshot>.broadcast();
@@ -593,8 +580,7 @@ class UnifiedDataService {
   static const int _telemetryBatchSize = 10;
 
   // Migrator
-  final DatasetMigrator _migrator =
-      const DatasetMigrator([LegacyToV1Migration()]);
+  final DatasetMigrator _migrator = const DatasetMigrator([LegacyToV1Migration()]);
 
   UnifiedDataService({
     dynamic remoteConfig,
@@ -607,25 +593,19 @@ class UnifiedDataService {
   /// Initialises the dataset and validates integrity in the background
   Future<void> initialize() async {
     if (_initialized) return;
-    developer.log(
-        '🚀 [UnifiedDataService] Initializing local scientific dataset...',
-        name: 'ScientificParser');
+    developer.log('🚀 [UnifiedDataService] Initializing local scientific dataset...', name: 'ScientificParser');
     try {
       await loadPipeline();
       _initialized = true;
-      developer.log('✅ [UnifiedDataService] Initialization complete',
-          name: 'ScientificParser');
+      developer.log('✅ [UnifiedDataService] Initialization complete', name: 'ScientificParser');
     } catch (e, st) {
-      developer.log('❌ [UnifiedDataService] Initialization failed: $e',
-          error: e, stackTrace: st, name: 'ScientificParser');
+      developer.log('❌ [UnifiedDataService] Initialization failed: $e', error: e, stackTrace: st, name: 'ScientificParser');
     }
   }
 
   /// Compatibility method: loads local assets since Remote Config is removed
   Future<DataSnapshot> fetchFromRemoteConfig() async {
-    developer.log(
-        '☁️ [UnifiedDataService] Remote config bypass: loading from assets...',
-        name: 'ScientificParser');
+    developer.log('☁️ [UnifiedDataService] Remote config bypass: loading from assets...', name: 'ScientificParser');
     return loadPipeline();
   }
 
@@ -659,31 +639,59 @@ class UnifiedDataService {
     bool clearCache = false,
     ValidationProfile profile = ValidationProfile.balanced,
   }) async {
-    developer.log(
-        'Starting loadPipelineImpl (forceAssetReload: $forceAssetReload, clearCache: $clearCache)',
-        name: 'ScientificParser');
+    developer.log('Starting loadPipelineImpl (forceAssetReload: $forceAssetReload, clearCache: $clearCache)', name: 'ScientificParser');
 
-    final isSafeStore =
-        _remoteConfig?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
-    if (clearCache || isSafeStore) {
+    // ── Remote Config Sync Check ─────────────────────────────────────────────
+    // Check if we need to refresh from Firestore based on Remote Config
+    bool shouldForceRefresh = false;
+    String? remoteDatabaseVersion;
+    String? remoteDatabaseHash;
+    
+    if (_remoteConfig != null) {
+      final rc = _remoteConfig as RemoteConfigService;
+      shouldForceRefresh = rc.forceDatabaseRefresh;
+      remoteDatabaseVersion = rc.databaseVersion;
+      remoteDatabaseHash = rc.scientificDatabaseHash;
+      
+      if (shouldForceRefresh) {
+        developer.log('🔄 [UnifiedDataService] Remote Config force_database_refresh=true - forcing Firestore refresh', name: 'ScientificParser');
+      }
+      if (remoteDatabaseVersion != null && remoteDatabaseVersion.isNotEmpty) {
+        developer.log('📦 [UnifiedDataService] Remote Config database_version: $remoteDatabaseVersion', name: 'ScientificParser');
+      }
+      if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+        developer.log('🔐 [UnifiedDataService] Remote Config scientific_database_hash: $remoteDatabaseHash', name: 'ScientificParser');
+      }
+    }
+
+    final isSafeStore = _remoteConfig?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
+    if (clearCache || isSafeStore || shouldForceRefresh) {
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('scientific_dataset_cache');
         await prefs.remove('scientific_dataset_cache_prev');
         await prefs.remove('scientific_dataset_snapshot');
-        developer.log(
-            'Local caches cleared due to Safe Store Mode or force clear.',
-            name: 'ScientificParser');
+        await prefs.remove('scientific_dataset_hash'); // Remove stored hash
+        developer.log('Local caches cleared due to Safe Store Mode, force clear, or Remote Config force refresh.', name: 'ScientificParser');
       } catch (e) {
         developer.log('Failed to clear cache: $e', name: 'ScientificParser');
       }
     }
 
+    // Check if cached hash matches Remote Config hash (skip Firestore if matches)
+    bool skipFirestore = false;
+    if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedHash = prefs.getString('scientific_dataset_hash');
+      if (cachedHash == remoteDatabaseHash) {
+        skipFirestore = true;
+        developer.log('✅ [UnifiedDataService] Local cache hash matches Remote Config - skipping Firestore fetch', name: 'ScientificParser');
+      }
+    }
+
     // Circuit Breaker Check
     if (_circuitBreaker.isBlocked) {
-      developer.log(
-          '⚠️ Circuit breaker is active. Skipping load pipeline and using fallback.',
-          name: 'CircuitBreaker');
+      developer.log('⚠️ Circuit breaker is active. Skipping load pipeline and using fallback.', name: 'CircuitBreaker');
       _currentLifecycleState = DatasetLifecycleState.fallback;
       _currentWarningSeverity = WarningSeverity.critical;
       return _createFallbackSnapshot(
@@ -701,18 +709,14 @@ class UnifiedDataService {
     // ─────────────────────────────────────────────────────────────────────────
     // Layer 0: Firestore Scientific Source
     // ─────────────────────────────────────────────────────────────────────────
-    if (_firestoreScientific != null) {
+    if (_firestoreScientific != null && !skipFirestore) {
       try {
-        developer.log(
-            '☁️ [UnifiedDataService] Attempting Firestore data fetch...',
-            name: 'ScientificParser');
-        final firestoreJson = await _firestoreScientific
-            .fetchReagentsJson()
-            .timeout(const Duration(seconds: 15));
-
+        developer.log('☁️ [UnifiedDataService] Attempting Firestore data fetch...', name: 'ScientificParser');
+        final firestoreJson = await _firestoreScientific.fetchReagentsJson().timeout(const Duration(seconds: 15));
+        
         if (firestoreJson.isNotEmpty && firestoreJson != '{}') {
           final parseOutput = await _verifyAndParse(firestoreJson, profile);
-
+          
           await SafeStoreBackupManager.createBackup(
             reagentsData: firestoreJson,
             safetyData: '{}',
@@ -733,11 +737,16 @@ class UnifiedDataService {
 
           final currentCache = prefs.getString('scientific_dataset_cache');
           if (currentCache != null && currentCache != firestoreJson) {
-            await prefs.setString(
-                'scientific_dataset_cache_prev', currentCache);
+            await prefs.setString('scientific_dataset_cache_prev', currentCache);
           }
 
           await _atomicWriteCache('scientific_dataset_cache', firestoreJson);
+
+          // Store the Remote Config hash for future sync checks
+          if (remoteDatabaseHash != null && remoteDatabaseHash.isNotEmpty) {
+            await prefs.setString('scientific_dataset_hash', remoteDatabaseHash);
+            developer.log('💾 [UnifiedDataService] Stored scientific_dataset_hash for sync validation', name: 'ScientificParser');
+          }
 
           final snapshotMap = {
             'version': parseOutput.version,
@@ -765,9 +774,7 @@ class UnifiedDataService {
           final snapshot = _makeSnapshot(
             reagents: reagentsList,
             source: DataSource.firebase,
-            health: parseOutput.skippedItemsCount > 0
-                ? DataHealthStatus.degraded
-                : DataHealthStatus.healthy,
+            health: parseOutput.skippedItemsCount > 0 ? DataHealthStatus.degraded : DataHealthStatus.healthy,
             version: parseOutput.version,
             diagnostics: diagnostics,
             lifecycleState: _currentLifecycleState,
@@ -777,25 +784,15 @@ class UnifiedDataService {
 
           _snapshotController.add(snapshot);
           stopRecoveryWatchdog();
-          _logTelemetry('dataset_load_success',
-              {'source': 'firestore', 'version': parseOutput.version});
-          developer.log(
-              '✅ [UnifiedDataService] Loaded ${reagentsList.length} reagents from Firestore',
-              name: 'ScientificParser');
+          _logTelemetry('dataset_load_success', {'source': 'firestore', 'version': parseOutput.version});
+          developer.log('✅ [UnifiedDataService] Loaded ${reagentsList.length} reagents from Firestore', name: 'ScientificParser');
           return snapshot;
         }
       } catch (e, st) {
-        developer.log(
-            '⚠️ [UnifiedDataService] Firestore fetch failed, falling back to assets: $e',
-            error: e,
-            stackTrace: st,
-            name: 'ScientificParser');
-        _logTelemetry('dataset_load_warning',
-            {'error': e.toString(), 'layer': 'firestore'},
-            isWarning: true);
+        developer.log('⚠️ [UnifiedDataService] Firestore fetch failed, falling back to assets: $e', error: e, stackTrace: st, name: 'ScientificParser');
+        _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'firestore'}, isWarning: true);
         _circuitBreaker.recordFailure();
-        CrashAnalytics.recordError(e, st,
-            reason: 'Firestore scientific data fetch failed');
+        CrashAnalytics.recordError(e, st, reason: 'Firestore scientific data fetch failed');
       }
     }
 
@@ -803,17 +800,15 @@ class UnifiedDataService {
     // Layer 1: Primary Asset Source
     // ─────────────────────────────────────────────────────────────────────────
     try {
-      final raw = await rootBundle
-          .loadString(_datasetAsset)
-          .timeout(const Duration(seconds: 10));
-
+      final raw = await rootBundle.loadString(_datasetAsset).timeout(const Duration(seconds: 10));
+      
       // JSON Decode & Migrate
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       final (migratedJson, appliedMigrations) = _migrator.migrate(decoded);
       final migratedRaw = jsonEncode(migratedJson);
 
       final parseOutput = await _verifyAndParse(migratedRaw, profile);
-
+      
       // Trigger backup of the original dataset before any review modes or modifications
       await SafeStoreBackupManager.createBackup(
         reagentsData: migratedRaw,
@@ -855,13 +850,9 @@ class UnifiedDataService {
       final metadata = DatasetMetadata(
         source: 'asset',
         author: decoded['author']?.toString() ?? 'System',
-        generatedAt:
-            DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ??
-                DateTime.now(),
-        scientificRevision:
-            decoded['scientificRevision']?.toString() ?? parseOutput.version,
-        expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ??
-            DateTime.now().add(const Duration(days: 365)),
+        generatedAt: DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ?? DateTime.now(),
+        scientificRevision: decoded['scientificRevision']?.toString() ?? parseOutput.version,
+        expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
       );
 
       final lineage = DatasetLineage(
@@ -909,9 +900,7 @@ class UnifiedDataService {
       final snapshot = _makeSnapshot(
         reagents: reagentsList,
         source: DataSource.local,
-        health: parseOutput.skippedItemsCount > 0
-            ? DataHealthStatus.degraded
-            : DataHealthStatus.healthy,
+        health: parseOutput.skippedItemsCount > 0 ? DataHealthStatus.degraded : DataHealthStatus.healthy,
         version: parseOutput.version,
         diagnostics: diagnostics,
         lifecycleState: _currentLifecycleState,
@@ -924,21 +913,14 @@ class UnifiedDataService {
 
       _snapshotController.add(snapshot);
       stopRecoveryWatchdog();
-      _logTelemetry('dataset_load_success',
-          {'source': 'asset', 'version': parseOutput.version});
+      _logTelemetry('dataset_load_success', {'source': 'asset', 'version': parseOutput.version});
       return snapshot;
+
     } catch (e, st) {
-      developer.log(
-          'Primary asset load failed, trying cached dataset recovery...',
-          error: e,
-          stackTrace: st,
-          name: 'ScientificParser');
-      _logTelemetry(
-          'dataset_load_warning', {'error': e.toString(), 'layer': 'asset'},
-          isWarning: true);
+      developer.log('Primary asset load failed, trying cached dataset recovery...', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'asset'}, isWarning: true);
       _circuitBreaker.recordFailure();
-      CrashAnalytics.recordError(e, st,
-          reason: 'Primary scientific dataset load failed');
+      CrashAnalytics.recordError(e, st, reason: 'Primary scientific dataset load failed');
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -977,14 +959,9 @@ class UnifiedDataService {
         final metadata = DatasetMetadata(
           source: 'cache',
           author: decoded['author']?.toString() ?? 'System',
-          generatedAt:
-              DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ??
-                  DateTime.now(),
-          scientificRevision:
-              decoded['scientificRevision']?.toString() ?? parseOutput.version,
-          expiresAt:
-              DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ??
-                  DateTime.now().add(const Duration(days: 365)),
+          generatedAt: DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ?? DateTime.now(),
+          scientificRevision: decoded['scientificRevision']?.toString() ?? parseOutput.version,
+          expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
         );
 
         final snapshot = _makeSnapshot(
@@ -996,26 +973,20 @@ class UnifiedDataService {
           lifecycleState: DatasetLifecycleState.fallback,
           integrity: ScientificIntegrity.fallback,
           warningSeverity: WarningSeverity.warning,
-          warningMessage:
-              'Primary asset failed. Loaded from local recovery cache.',
+          warningMessage: 'Primary asset failed. Loaded from local recovery cache.',
           metadata: metadata,
         );
 
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
-        _logTelemetry('dataset_load_success',
-            {'source': 'cache', 'version': parseOutput.version});
+        _logTelemetry('dataset_load_success', {'source': 'cache', 'version': parseOutput.version});
         return snapshot;
       }
     } catch (e, st) {
-      developer.log('Cache recovery failed, attempting Previous Cache...',
-          error: e, stackTrace: st, name: 'ScientificParser');
-      _logTelemetry(
-          'dataset_load_warning', {'error': e.toString(), 'layer': 'cache'},
-          isWarning: true);
+      developer.log('Cache recovery failed, attempting Previous Cache...', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'cache'}, isWarning: true);
       _circuitBreaker.recordFailure();
-      CrashAnalytics.recordError(e, st,
-          reason: 'Cache recovery of scientific dataset failed');
+      CrashAnalytics.recordError(e, st, reason: 'Cache recovery of scientific dataset failed');
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -1060,22 +1031,17 @@ class UnifiedDataService {
           lifecycleState: DatasetLifecycleState.fallback,
           integrity: ScientificIntegrity.fallback,
           warningSeverity: WarningSeverity.warning,
-          warningMessage:
-              'Primary & current cache failed. Loaded from previous cache.',
+          warningMessage: 'Primary & current cache failed. Loaded from previous cache.',
         );
 
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
-        _logTelemetry('dataset_load_success',
-            {'source': 'prev_cache', 'version': parseOutput.version});
+        _logTelemetry('dataset_load_success', {'source': 'prev_cache', 'version': parseOutput.version});
         return snapshot;
       }
     } catch (e, st) {
-      developer.log('Previous cache failed, attempting Gzip Snapshot...',
-          error: e, stackTrace: st, name: 'ScientificParser');
-      _logTelemetry('dataset_load_warning',
-          {'error': e.toString(), 'layer': 'prev_cache'},
-          isWarning: true);
+      developer.log('Previous cache failed, attempting Gzip Snapshot...', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'prev_cache'}, isWarning: true);
       _circuitBreaker.recordFailure();
     }
 
@@ -1092,8 +1058,7 @@ class UnifiedDataService {
 
         final List<ReagentTestModel> reagentsList = [];
         for (final r in rawReagents) {
-          reagentsList.add(ReagentTestModel.fromJson(r as Map<String, dynamic>,
-              profile: profile));
+          reagentsList.add(ReagentTestModel.fromJson(r as Map<String, dynamic>, profile: profile));
         }
 
         reagentsList.sort((a, b) => a.id.compareTo(b.id));
@@ -1128,44 +1093,29 @@ class UnifiedDataService {
 
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
-        _logTelemetry('dataset_load_success',
-            {'source': 'gzip_snapshot', 'version': version});
+        _logTelemetry('dataset_load_success', {'source': 'gzip_snapshot', 'version': version});
         return snapshot;
       }
     } catch (e, st) {
-      developer.log(
-          'Snapshot recovery failed, falling back to emergency dataset...',
-          error: e,
-          stackTrace: st,
-          name: 'ScientificParser');
-      _logTelemetry(
-          'dataset_load_warning', {'error': e.toString(), 'layer': 'snapshot'},
-          isWarning: true);
+      developer.log('Snapshot recovery failed, falling back to emergency dataset...', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'snapshot'}, isWarning: true);
       _circuitBreaker.recordFailure();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Layer 5: Emergency In-Memory Fallback Source
     // ─────────────────────────────────────────────────────────────────────────
-    developer.log('Running emergency recovery to in-memory dataset',
-        name: 'ScientificParser');
+    developer.log('Running emergency recovery to in-memory dataset', name: 'ScientificParser');
     _currentLifecycleState = DatasetLifecycleState.corrupted;
     _currentWarningSeverity = WarningSeverity.critical;
-    _logTelemetry(
-        'dataset_load_fatal',
-        {
-          'reason':
-              'All loading layers failed, falling back to emergency in-memory'
-        },
-        isFatal: true);
-
+    _logTelemetry('dataset_load_fatal', {'reason': 'All loading layers failed, falling back to emergency in-memory'}, isFatal: true);
+    
     final snapshot = _createFallbackSnapshot(
       source: DataSource.local,
       lifecycleState: DatasetLifecycleState.corrupted,
       integrity: ScientificIntegrity.fallback,
       warningSeverity: WarningSeverity.critical,
-      warningMsg:
-          'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
+      warningMsg: 'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
     );
 
     _snapshotController.add(snapshot);
@@ -1174,11 +1124,9 @@ class UnifiedDataService {
   }
 
   /// Runs JSON parsing in a separate isolate. Falls back to synchronous parsing in tests or on unsupported platforms.
-  Future<ParseOutput> _runParse(
-      String rawJson, ValidationProfile profile) async {
+  Future<ParseOutput> _runParse(String rawJson, ValidationProfile profile) async {
     try {
-      return await compute(
-          parseScientificDatasetIsolate, ParseParams(rawJson, profile));
+      return await compute(parseScientificDatasetIsolate, ParseParams(rawJson, profile));
     } catch (e, st) {
       developer.log(
         'Isolate parsing not supported or failed. Running synchronously.',
@@ -1190,8 +1138,7 @@ class UnifiedDataService {
     }
   }
 
-  Future<ParseOutput> _verifyAndParse(
-      String rawJson, ValidationProfile profile) async {
+  Future<ParseOutput> _verifyAndParse(String rawJson, ValidationProfile profile) async {
     if (rawJson.length > 5 * 1024 * 1024) {
       throw FormatException('Payload size exceeds budget (5MB limit)');
     }
@@ -1230,13 +1177,11 @@ class UnifiedDataService {
         await prefs.remove(tmpHashKey);
         return true;
       } else {
-        developer.log('❌ Atomic write integrity check failed!',
-            name: 'ScientificParser');
+        developer.log('❌ Atomic write integrity check failed!', name: 'ScientificParser');
         return false;
       }
     } catch (e) {
-      developer.log('❌ Error during atomic cache write: $e',
-          name: 'ScientificParser');
+      developer.log('❌ Error during atomic cache write: $e', name: 'ScientificParser');
       return false;
     }
   }
@@ -1287,8 +1232,7 @@ class UnifiedDataService {
 
   /// Refreshes the local cache from JSON asset
   Future<DataSnapshot> refresh() async {
-    developer.log('🔄 [UnifiedDataService] Refreshing local dataset',
-        name: 'ScientificParser');
+    developer.log('🔄 [UnifiedDataService] Refreshing local dataset', name: 'ScientificParser');
     _cachedReagents = null;
     return loadPipeline();
   }
@@ -1298,10 +1242,9 @@ class UnifiedDataService {
     final snapshot = await getAllData();
     try {
       return snapshot.reagents.firstWhere(
-        (r) =>
-            r.reagentName.toLowerCase() == name.toLowerCase() ||
-            r.reagentNameAr.toLowerCase() == name.toLowerCase() ||
-            r.id.toLowerCase() == name.toLowerCase(),
+        (r) => r.reagentName.toLowerCase() == name.toLowerCase() ||
+               r.reagentNameAr.toLowerCase() == name.toLowerCase() ||
+               r.id.toLowerCase() == name.toLowerCase(),
       );
     } catch (_) {
       return null;
@@ -1312,14 +1255,13 @@ class UnifiedDataService {
   Future<List<ReagentTestModel>> searchReagents(String query) async {
     final snapshot = await getAllData();
     final q = query.toLowerCase();
-    return snapshot.reagents
-        .where((r) =>
-            r.reagentName.toLowerCase().contains(q) ||
-            r.reagentNameAr.contains(q) ||
-            r.description.toLowerCase().contains(q) ||
-            r.descriptionAr.contains(q) ||
-            r.chemicals.any((c) => c.toLowerCase().contains(q)))
-        .toList();
+    return snapshot.reagents.where((r) =>
+        r.reagentName.toLowerCase().contains(q) ||
+        r.reagentNameAr.contains(q) ||
+        r.description.toLowerCase().contains(q) ||
+        r.descriptionAr.contains(q) ||
+        r.chemicals.any((c) => c.toLowerCase().contains(q))
+    ).toList();
   }
 
   /// Compatibility method for loading safety instructions
@@ -1345,40 +1287,32 @@ class UnifiedDataService {
   /// Watchdog methods
   void startRecoveryWatchdog() {
     if (_recoveryTimer != null) return;
-    developer.log('Starting background recovery watchdog...',
-        name: 'RecoveryWatchdog');
+    developer.log('Starting background recovery watchdog...', name: 'RecoveryWatchdog');
     _recoveryTimer = Timer.periodic(recoveryInterval, (timer) async {
       if (_recoveryAttemptsInSession >= maxRecoveryAttemptsPerSession) {
-        developer.log(
-            'Max recovery attempts ($maxRecoveryAttemptsPerSession) reached. Stopping watchdog.',
-            name: 'RecoveryWatchdog');
+        developer.log('Max recovery attempts ($maxRecoveryAttemptsPerSession) reached. Stopping watchdog.', name: 'RecoveryWatchdog');
         timer.cancel();
         _recoveryTimer = null;
         return;
       }
-
+      
       if (_currentLifecycleState == DatasetLifecycleState.healthy) {
-        developer.log('Dataset is healthy. Tearing down recovery watchdog.',
-            name: 'RecoveryWatchdog');
+        developer.log('Dataset is healthy. Tearing down recovery watchdog.', name: 'RecoveryWatchdog');
         timer.cancel();
         _recoveryTimer = null;
         return;
       }
 
       _recoveryAttemptsInSession++;
-      developer.log(
-          'Recovery attempt $_recoveryAttemptsInSession/$maxRecoveryAttemptsPerSession...',
-          name: 'RecoveryWatchdog');
-
+      developer.log('Recovery attempt $_recoveryAttemptsInSession/$maxRecoveryAttemptsPerSession...', name: 'RecoveryWatchdog');
+      
       final prevLifecycleState = _currentLifecycleState;
       _currentLifecycleState = DatasetLifecycleState.recovering;
-
+      
       try {
         final snapshot = await loadPipeline(forceAssetReload: true);
         if (snapshot.lifecycleState == DatasetLifecycleState.healthy) {
-          developer.log(
-              'Watchdog successfully recovered dataset to healthy state!',
-              name: 'RecoveryWatchdog');
+          developer.log('Watchdog successfully recovered dataset to healthy state!', name: 'RecoveryWatchdog');
           timer.cancel();
           _recoveryTimer = null;
         } else {
@@ -1386,8 +1320,7 @@ class UnifiedDataService {
         }
       } catch (e) {
         _currentLifecycleState = prevLifecycleState;
-        developer.log('Watchdog recovery attempt failed: $e',
-            name: 'RecoveryWatchdog');
+        developer.log('Watchdog recovery attempt failed: $e', name: 'RecoveryWatchdog');
       }
     });
   }
@@ -1398,19 +1331,15 @@ class UnifiedDataService {
     _recoveryAttemptsInSession = 0;
   }
 
-  void _logTelemetry(String eventName, Map<String, dynamic> metadata,
-      {bool isWarning = false, bool isFatal = false}) {
+  void _logTelemetry(String eventName, Map<String, dynamic> metadata, {bool isWarning = false, bool isFatal = false}) {
     if (isWarning) {
-      final random = double.parse(
-          (DateTime.now().microsecondsSinceEpoch % 100 / 100.0)
-              .toStringAsFixed(2));
+      final random = double.parse((DateTime.now().microsecondsSinceEpoch % 100 / 100.0).toStringAsFixed(2));
       if (random > _warningSampleRate) {
         return; // sampled out
       }
     }
-
-    final event =
-        DatasetTelemetryEvent(eventName: eventName, metadata: metadata);
+    
+    final event = DatasetTelemetryEvent(eventName: eventName, metadata: metadata);
     _telemetryBatch.add(event);
 
     if (_telemetryBatch.length >= _telemetryBatchSize || isFatal) {
@@ -1422,9 +1351,7 @@ class UnifiedDataService {
     if (_telemetryBatch.isEmpty) return;
     final batchToSend = List<DatasetTelemetryEvent>.from(_telemetryBatch);
     _telemetryBatch.clear();
-    developer.log(
-        'Uploading deferred telemetry batch of ${batchToSend.length} events.',
-        name: 'ScientificTelemetry');
+    developer.log('Uploading deferred telemetry batch of ${batchToSend.length} events.', name: 'ScientificTelemetry');
   }
 
   DataSnapshot _createFallbackSnapshot({
@@ -1472,8 +1399,7 @@ class UnifiedDataService {
       id: 'marquis_test',
       reagentName: 'Marquis Test',
       reagentNameAr: 'كاشف ماركيز',
-      description:
-          'Primary screening reagent for presumptive identification of laboratory specimens.',
+      description: 'Primary screening reagent for presumptive identification of laboratory specimens.',
       descriptionAr: 'كاشف الفحص الأساسي لتحديد عينات المختبر المفترضة.',
       safetyLevel: 'HIGH',
       safetyLevelAr: 'مرتفع',
@@ -1481,32 +1407,13 @@ class UnifiedDataService {
       testDuration: 15,
       chemicals: const ['Concentrated Sulfuric Acid', 'Formaldehyde'],
       testInstructions: const [
-        ReagentTestInstructionStep(
-            step: 1,
-            instruction:
-                'Place a small specimen amount onto a clean white ceramic plate.',
-            instructionAr:
-                'ضع كمية صغيرة من العينة على طبق سيراميك أبيض نظيف.'),
-        ReagentTestInstructionStep(
-            step: 2,
-            instruction:
-                'Dispense one drop of Marquis reagent directly onto the specimen.',
-            instructionAr: 'ضع قطرة واحدة من كاشف ماركيز مباشرة على العينة.'),
-        ReagentTestInstructionStep(
-            step: 3,
-            instruction:
-                'Observe color reaction continuously for up to 60 seconds.',
-            instructionAr: 'راقب تفاعل اللون باستمرار لمدة تصل إلى 60 ثانية.'),
+        ReagentTestInstructionStep(step: 1, instruction: 'Place a small specimen amount onto a clean white ceramic plate.', instructionAr: 'ضع كمية صغيرة من العينة على طبق سيراميك أبيض نظيف.'),
+        ReagentTestInstructionStep(step: 2, instruction: 'Dispense one drop of Marquis reagent directly onto the specimen.', instructionAr: 'ضع قطرة واحدة من كاشف ماركيز مباشرة على العينة.'),
+        ReagentTestInstructionStep(step: 3, instruction: 'Observe color reaction continuously for up to 60 seconds.', instructionAr: 'راقب تفاعل اللون باستمرار لمدة تصل إلى 60 ثانية.'),
       ],
       reactionResults: const [
-        DrugResultModel(
-            drugName: 'Opiates',
-            color: 'Purple-Violet',
-            colorAr: 'أرجواني - بنفسجي'),
-        DrugResultModel(
-            drugName: 'Amphetamines',
-            color: 'Orange to Brown',
-            colorAr: 'برتقالي إلى بني'),
+        DrugResultModel(drugName: 'Opiates', color: 'Purple-Violet', colorAr: 'أرجواني - بنفسجي'),
+        DrugResultModel(drugName: 'Amphetamines', color: 'Orange to Brown', colorAr: 'برتقالي إلى بني'),
       ],
       references: const [
         'Auterhoff & Braun, Arch.Pharm. (1973)',
@@ -1514,71 +1421,38 @@ class UnifiedDataService {
       ],
       safety: const ReagentTestSafetyInfo(
         requiredEquipment: ['Nitrile Gloves', 'Safety Goggles', 'Fume Hood'],
-        handlingProcedures: [
-          'Always add acid to water, never water to acid.',
-          'Keep container tightly closed when not in use.'
-        ],
-        specificHazards: [
-          'Causes severe skin burns and eye damage.',
-          'Corrosive to metals.'
-        ],
-        storageRequirements: [
-          'Store in a cool, well-ventilated place.',
-          'Keep away from strong bases and organic materials.'
-        ],
+        handlingProcedures: ['Always add acid to water, never water to acid.', 'Keep container tightly closed when not in use.'],
+        specificHazards: ['Causes severe skin burns and eye damage.', 'Corrosive to metals.'],
+        storageRequirements: ['Store in a cool, well-ventilated place.', 'Keep away from strong bases and organic materials.'],
       ),
     ),
     ReagentTestModel(
       id: 'mecke_test',
       reagentName: 'Mecke Test',
       reagentNameAr: 'كاشف ميكي',
-      description:
-          'Secondary screening reagent containing selenious acid in sulfuric acid.',
-      descriptionAr:
-          'كاشف فحص ثانوي يحتوي على حمض السيلينيوز في حمض الكبريتيك.',
+      description: 'Secondary screening reagent containing selenious acid in sulfuric acid.',
+      descriptionAr: 'كاشف فحص ثانوي يحتوي على حمض السيلينيوز في حمض الكبريتيك.',
       safetyLevel: 'HIGH',
       safetyLevelAr: 'مرتفع',
       category: 'Secondary',
       testDuration: 15,
       chemicals: const ['Concentrated Sulfuric Acid', 'Selenious Acid'],
       testInstructions: const [
-        ReagentTestInstructionStep(
-            step: 1,
-            instruction:
-                'Place a small specimen amount onto a clean white ceramic plate.',
-            instructionAr:
-                'ضع كمية صغيرة من العينة على طبق سيراميك أبيض نظيف.'),
-        ReagentTestInstructionStep(
-            step: 2,
-            instruction:
-                'Dispense one drop of Mecke reagent directly onto the specimen.',
-            instructionAr: 'ضع قطرة واحدة من كاشف ميكي مباشرة على العينة.'),
-        ReagentTestInstructionStep(
-            step: 3,
-            instruction: 'Observe color reaction for up to 60 seconds.',
-            instructionAr: 'راقب تفاعل اللون لمدة تصل إلى 60 ثانية.'),
+        ReagentTestInstructionStep(step: 1, instruction: 'Place a small specimen amount onto a clean white ceramic plate.', instructionAr: 'ضع كمية صغيرة من العينة على طبق سيراميك أبيض نظيف.'),
+        ReagentTestInstructionStep(step: 2, instruction: 'Dispense one drop of Mecke reagent directly onto the specimen.', instructionAr: 'ضع قطرة واحدة من كاشف ميكي مباشرة على العينة.'),
+        ReagentTestInstructionStep(step: 3, instruction: 'Observe color reaction for up to 60 seconds.', instructionAr: 'راقب تفاعل اللون لمدة تصل إلى 60 ثانية.'),
       ],
       reactionResults: const [
-        DrugResultModel(
-            drugName: 'Opiates', color: 'Blue-Green', colorAr: 'أزرق - أخضر'),
+        DrugResultModel(drugName: 'Opiates', color: 'Blue-Green', colorAr: 'أزرق - أخضر'),
       ],
       references: const [
         'National Institute of Justice Standard 0601.02 (2001)',
       ],
       safety: const ReagentTestSafetyInfo(
         requiredEquipment: ['Nitrile Gloves', 'Safety Goggles', 'Fume Hood'],
-        handlingProcedures: [
-          'Handle with extreme caution.',
-          'Avoid skin and eye contact.'
-        ],
-        specificHazards: [
-          'Toxic if inhaled or swallowed.',
-          'Causes severe skin burns.'
-        ],
-        storageRequirements: [
-          'Store away from combustible materials.',
-          'Keep container locked up.'
-        ],
+        handlingProcedures: ['Handle with extreme caution.', 'Avoid skin and eye contact.'],
+        specificHazards: ['Toxic if inhaled or swallowed.', 'Causes severe skin burns.'],
+        storageRequirements: ['Store away from combustible materials.', 'Keep container locked up.'],
       ),
     ),
   ];
@@ -1599,7 +1473,7 @@ class UnifiedDataService {
     DatasetLineage? lineage,
   }) {
     final processed = _processAndSanitizeReagents(reagents);
-
+    
     final adjustedDiagnostics = DatasetDiagnostics(
       rawItems: processed.length,
       parsedItems: processed.length,
@@ -1626,41 +1500,30 @@ class UnifiedDataService {
     );
   }
 
-  List<ReagentTestModel> _processAndSanitizeReagents(
-      List<ReagentTestModel> originalList) {
+  List<ReagentTestModel> _processAndSanitizeReagents(List<ReagentTestModel> originalList) {
     final rc = _remoteConfig;
     final isSafeStore = rc?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
     final isScottEnabled = rc?.enableScottTest ?? true;
     final isHighRiskEnabled = rc?.enableHighRiskTests ?? true;
-    final isScientificReferencesEnabled =
-        rc?.enableScientificReferences ?? true;
+    final isScientificReferencesEnabled = rc?.enableScientificReferences ?? true;
 
     // Filter reagents
     List<ReagentTestModel> filtered = originalList.where((reagent) {
       final idLower = reagent.id.toLowerCase();
-
+      
       // 1. Filter out Scott Test if disabled
       if (!isScottEnabled && idLower.contains('scott')) {
         return false;
       }
-
+      
       // 2. Filter out High Risk Tests if disabled
       if (!isHighRiskEnabled) {
-        final highRiskKeywords = [
-          'scott',
-          'heroin',
-          'morphine',
-          'codeine',
-          'simon',
-          'ehrlich',
-          'liebermann',
-          'mandelin'
-        ];
+        final highRiskKeywords = ['scott', 'heroin', 'morphine', 'codeine', 'simon', 'ehrlich', 'liebermann', 'mandelin'];
         if (highRiskKeywords.any((kw) => idLower.contains(kw))) {
           return false;
         }
       }
-
+      
       return true;
     }).toList();
 
@@ -1675,13 +1538,10 @@ class UnifiedDataService {
     // Clone and sanitize visible UI strings
     return filtered.map((reagent) {
       final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName);
-      final sanitizedNameAr =
-          SafeStoreSanitizer.sanitize(reagent.reagentNameAr);
+      final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr);
       final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description);
-      final sanitizedDescAr =
-          SafeStoreSanitizer.sanitize(reagent.descriptionAr);
-      final sanitizedSafetyLevelAr =
-          SafeStoreSanitizer.sanitize(reagent.safetyLevelAr);
+      final sanitizedDescAr = SafeStoreSanitizer.sanitize(reagent.descriptionAr);
+      final sanitizedSafetyLevelAr = SafeStoreSanitizer.sanitize(reagent.safetyLevelAr);
 
       final sanitizedInstructions = reagent.testInstructions.map((step) {
         return ReagentTestInstructionStep(
@@ -1700,30 +1560,19 @@ class UnifiedDataService {
         );
       }).toList();
 
-      final sanitizedReferences = isScientificReferencesEnabled
-          ? reagent.references
-              .map((ref) => SafeStoreSanitizer.sanitize(ref))
-              .toList()
+      final sanitizedReferences = isScientificReferencesEnabled 
+          ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref)).toList()
           : <String>[];
 
       // Sanitize chemicals list
-      final sanitizedChemicals =
-          reagent.chemicals.map((c) => SafeStoreSanitizer.sanitize(c)).toList();
+      final sanitizedChemicals = reagent.chemicals.map((c) => SafeStoreSanitizer.sanitize(c)).toList();
 
       // Sanitize ReagentTestSafetyInfo
       final sanitizedSafety = ReagentTestSafetyInfo(
-        requiredEquipment: reagent.safety.requiredEquipment
-            .map((s) => SafeStoreSanitizer.sanitize(s))
-            .toList(),
-        handlingProcedures: reagent.safety.handlingProcedures
-            .map((s) => SafeStoreSanitizer.sanitize(s))
-            .toList(),
-        specificHazards: reagent.safety.specificHazards
-            .map((s) => SafeStoreSanitizer.sanitize(s))
-            .toList(),
-        storageRequirements: reagent.safety.storageRequirements
-            .map((s) => SafeStoreSanitizer.sanitize(s))
-            .toList(),
+        requiredEquipment: reagent.safety.requiredEquipment.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        handlingProcedures: reagent.safety.handlingProcedures.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        specificHazards: reagent.safety.specificHazards.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
+        storageRequirements: reagent.safety.storageRequirements.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
       );
 
       return ReagentTestModel(

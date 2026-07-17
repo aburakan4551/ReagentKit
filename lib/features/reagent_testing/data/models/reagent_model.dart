@@ -32,15 +32,18 @@ class ReagentModel {
   factory ReagentModel.fromJson(Map<String, dynamic> json) {
     return ReagentModel(
       reagentName: json['reagentName'] as String,
-      reagentNameAr: json['reagentName_ar'] as String? ??
+      reagentNameAr:
+          json['reagentName_ar'] as String? ??
           json['reagentNameAr'] as String? ??
           '',
       description: json['description'] as String,
-      descriptionAr: json['description_ar'] as String? ??
+      descriptionAr:
+          json['description_ar'] as String? ??
           json['descriptionAr'] as String? ??
           '',
       safetyLevel: json['safetyLevel'] as String,
-      safetyLevelAr: json['safetyLevel_ar'] as String? ??
+      safetyLevelAr:
+          json['safetyLevel_ar'] as String? ??
           json['safetyLevelAr'] as String? ??
           '',
       testDuration: json['testDuration'] as int,
@@ -67,8 +70,9 @@ class ReagentModel {
       'safetyLevel_ar': safetyLevelAr,
       'testDuration': testDuration,
       'chemicals': chemicals,
-      'drugResults':
-          drugResults.map((drugResult) => drugResult.toJson()).toList(),
+      'drugResults': drugResults
+          .map((drugResult) => drugResult.toJson())
+          .toList(),
       'category': category,
       'reference': references,
     };
@@ -89,17 +93,17 @@ class ReagentModel {
     List<String>? references,
   }) {
     return ReagentModel(
-      reagentName: reagentName ?? this.reagentName,
+      reagentName:   reagentName   ?? this.reagentName,
       reagentNameAr: reagentNameAr ?? this.reagentNameAr,
-      description: description ?? this.description,
+      description:   description   ?? this.description,
       descriptionAr: descriptionAr ?? this.descriptionAr,
-      safetyLevel: safetyLevel ?? this.safetyLevel,
+      safetyLevel:   safetyLevel   ?? this.safetyLevel,
       safetyLevelAr: safetyLevelAr ?? this.safetyLevelAr,
-      testDuration: testDuration ?? this.testDuration,
-      chemicals: chemicals ?? this.chemicals,
-      drugResults: drugResults ?? this.drugResults,
-      category: category ?? this.category,
-      references: references ?? this.references,
+      testDuration:  testDuration  ?? this.testDuration,
+      chemicals:     chemicals     ?? this.chemicals,
+      drugResults:   drugResults   ?? this.drugResults,
+      category:      category      ?? this.category,
+      references:    references    ?? this.references,
     );
   }
 
@@ -114,8 +118,9 @@ class ReagentModel {
       safetyLevelAr: safetyLevelAr,
       testDuration: testDuration,
       chemicals: chemicals,
-      drugResults:
-          drugResults.map((drugResult) => drugResult.toEntity()).toList(),
+      drugResults: drugResults
+          .map((drugResult) => drugResult.toEntity())
+          .toList(),
       category: category,
       references: references,
     );

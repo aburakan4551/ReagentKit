@@ -18,10 +18,8 @@ class SafeStoreRestoreManager {
       final backupId = 'sci_backup_${DateTime.now().millisecondsSinceEpoch}';
 
       // 1. Read files from assets
-      final reagentsJson =
-          await rootBundle.loadString('assets/data/reagents.json');
-      final referencesJson =
-          await rootBundle.loadString('assets/data/references.json');
+      final reagentsJson = await rootBundle.loadString('assets/data/reagents.json');
+      final referencesJson = await rootBundle.loadString('assets/data/references.json');
       final safetyJson = await rootBundle.loadString('assets/data/safety.json');
 
       // 2. Read current local scientific cache from SharedPreferences
@@ -35,15 +33,14 @@ class SafeStoreRestoreManager {
         'references': referencesJson,
         'safety': safetyJson,
         'scientific_data_cache': localCache,
-        'remote_config_snapshot':
-            prefs.getString('scientific_dataset_snapshot') ?? '',
+        'remote_config_snapshot': prefs.getString('scientific_dataset_snapshot') ?? '',
       };
 
       final payloadString = jsonEncode(payload);
 
       // 4. Generate integrity hash (SHA-256)
       final hash = sha256.convert(utf8.encode(payloadString)).toString();
-
+      
       final Map<String, dynamic> backupEnvelope = {
         'payload': payloadString,
         'hash': hash,
@@ -51,23 +48,18 @@ class SafeStoreRestoreManager {
       };
 
       // 5. Store locally
-      await prefs.setString(
-          'scientific_backup_$backupId', jsonEncode(backupEnvelope));
+      await prefs.setString('scientific_backup_$backupId', jsonEncode(backupEnvelope));
 
       // 6. Register backup ID in list
       List<String> backupsList = prefs.getStringList(_backupListKey) ?? [];
       backupsList.add(backupId);
       await prefs.setStringList(_backupListKey, backupsList);
 
-      Logger.info(
-          '💾 [SafeStoreRestoreManager] Created scientific backup: $backupId');
+      Logger.info('💾 [SafeStoreRestoreManager] Created scientific backup: $backupId');
 
       // 7. Optional Firestore backup
       try {
-        await FirebaseFirestore.instance
-            .collection('scientific_backups')
-            .doc(backupId)
-            .set({
+        await FirebaseFirestore.instance.collection('scientific_backups').doc(backupId).set({
           'timestamp': FieldValue.serverTimestamp(),
           'reagents': reagentsJson,
           'references': referencesJson,
@@ -76,28 +68,23 @@ class SafeStoreRestoreManager {
           'hash': hash,
           'source': 'iOS App Restore Manager',
         });
-        Logger.info(
-            '☁️ [SafeStoreRestoreManager] Uploaded backup to Cloud Firestore');
+        Logger.info('☁️ [SafeStoreRestoreManager] Uploaded backup to Cloud Firestore');
       } catch (firestoreError) {
-        Logger.warning(
-            '⚠️ [SafeStoreRestoreManager] Optional Cloud Firestore backup skipped: $firestoreError');
+        Logger.warning('⚠️ [SafeStoreRestoreManager] Optional Cloud Firestore backup skipped: $firestoreError');
       }
 
       return true;
     } catch (e, st) {
-      Logger.error('❌ [SafeStoreRestoreManager] Backup creation failed: $e',
-          error: e, stackTrace: st);
+      Logger.error('❌ [SafeStoreRestoreManager] Backup creation failed: $e', error: e, stackTrace: st);
       return false;
     }
   }
 
   /// Automatically restores the original scientific data, resets sanitizer flags,
   /// clears review caches, and reloads the pipeline to return to normal mode.
-  static Future<bool> restoreOriginalScientificMode(
-      UnifiedDataService dataService) async {
+  static Future<bool> restoreOriginalScientificMode(UnifiedDataService dataService) async {
     try {
-      Logger.info(
-          '🔄 [SafeStoreRestoreManager] Restoring original scientific mode...');
+      Logger.info('🔄 [SafeStoreRestoreManager] Restoring original scientific mode...');
 
       // 1. Reset all safe store mode flags
       SafeStoreSanitizer.safeStoreMode = false;
@@ -108,12 +95,11 @@ class SafeStoreRestoreManager {
       await prefs.remove('scientific_dataset_cache');
       await prefs.remove('scientific_dataset_cache_prev');
       await prefs.remove('scientific_dataset_snapshot');
-
+      
       // Also clear cached AI results or analysis cache if any are stored in prefs
       await prefs.remove('cached_ai_analysis_results');
-
-      Logger.info(
-          '🧹 [SafeStoreRestoreManager] Local caches and AI snapshots wiped');
+      
+      Logger.info('🧹 [SafeStoreRestoreManager] Local caches and AI snapshots wiped');
 
       // 3. Force reload pipeline in UnifiedDataService
       // This will load from assets/data/reagents.json because appStoreReviewMode is false
@@ -122,12 +108,10 @@ class SafeStoreRestoreManager {
         clearCache: true,
       );
 
-      Logger.info(
-          '✅ [SafeStoreRestoreManager] Scientific mode restored. Dataset version: ${snapshot.version}');
+      Logger.info('✅ [SafeStoreRestoreManager] Scientific mode restored. Dataset version: ${snapshot.version}');
       return true;
     } catch (e, st) {
-      Logger.error('❌ [SafeStoreRestoreManager] Restoration failed: $e',
-          error: e, stackTrace: st);
+      Logger.error('❌ [SafeStoreRestoreManager] Restoration failed: $e', error: e, stackTrace: st);
       return false;
     }
   }

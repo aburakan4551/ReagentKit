@@ -75,8 +75,8 @@ class _AdaptiveTextFieldState extends State<AdaptiveTextField> {
             child: Text(
               widget.labelText!,
               style: theme.textTheme.labelLarge?.copyWith(
-                color: _hasFocus
-                    ? theme.colorScheme.primary
+                color: _hasFocus 
+                    ? theme.colorScheme.primary 
                     : (isDark ? Colors.grey[400] : Colors.grey[700]),
                 fontWeight: FontWeight.w600,
               ),

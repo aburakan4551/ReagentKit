@@ -24,8 +24,7 @@ class ChemicalComponentsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-      BuildContext context, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildSectionHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
@@ -93,9 +92,7 @@ class _ChemicalItem extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 12),
-          Expanded(
-              child: Text(chemical,
-                  style: AppTypography.getMetadataValue(context))),
+          Expanded(child: Text(chemical, style: AppTypography.getMetadataValue(context))),
         ],
       ),
     );

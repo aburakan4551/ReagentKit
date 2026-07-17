@@ -38,8 +38,7 @@ class AIService {
     final imageProvider = FileImage(imageFile);
 
     // 1. Extract reaction color (centroid after HSV filtering)
-    final detectedColor =
-        await _colorEngine.extractReactionColor(imageProvider);
+    final detectedColor = await _colorEngine.extractReactionColor(imageProvider);
 
     if (detectedColor == null) {
       return const ColorAnalysisResult(
@@ -117,8 +116,7 @@ class AIService {
     required File imageFile,
     required ReagentModel reagent,
   }) async {
-    Logger.info(
-        '🚀 Starting full analysis pipeline for ${reagent.reagentName}');
+    Logger.info('🚀 Starting full analysis pipeline for ${reagent.reagentName}');
 
     final availableColors = reagent.drugResults.map((dr) => dr.color).toList();
 
@@ -128,11 +126,11 @@ class AIService {
     // 2. Map spectral color match → substance names
     final spectralSubstances = colorResult.matchedColorName != null
         ? reagent.drugResults
-            .where((dr) => dr.color
-                .toLowerCase()
-                .contains(colorResult.matchedColorName!.toLowerCase()))
-            .map((dr) => dr.drugName)
-            .toList()
+              .where((dr) => dr.color
+                  .toLowerCase()
+                  .contains(colorResult.matchedColorName!.toLowerCase()))
+              .map((dr) => dr.drugName)
+              .toList()
         : <String>[];
 
     // 3. Gemini AI (may fail — graceful degradation)
@@ -154,9 +152,11 @@ class AIService {
     );
 
     Logger.info('✅ Pipeline complete: ${decision.resolutionPath}');
-    Logger.info('   Confidence=${decision.confidencePercentage}% '
-        '| W_ai=${decision.weightAI.toStringAsFixed(2)} '
-        '| W_match=${decision.weightMatch.toStringAsFixed(2)}');
+    Logger.info(
+      '   Confidence=${decision.confidencePercentage}% '
+      '| W_ai=${decision.weightAI.toStringAsFixed(2)} '
+      '| W_match=${decision.weightMatch.toStringAsFixed(2)}'
+    );
 
     return decision;
   }

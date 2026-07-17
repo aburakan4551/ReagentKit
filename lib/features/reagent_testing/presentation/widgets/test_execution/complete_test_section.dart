@@ -45,10 +45,7 @@ class CompleteTestSection extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           backgroundColor: isReady
               ? const Color(0xFF10B981) // Vibrant green for enabled state
-              : Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withOpacity(0.12), // Disabled color
+              : Theme.of(context).colorScheme.onSurface.withOpacity(0.12), // Disabled color
           foregroundColor: isReady
               ? Colors.white
               : Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
@@ -99,8 +96,8 @@ class CompleteTestSection extends ConsumerWidget {
           if (notes.isNotEmpty) {
             final userNotesLabel =
                 Localizations.localeOf(context).languageCode == 'ar'
-                    ? 'ملاحظات المستخدم'
-                    : 'User Notes';
+                ? 'ملاحظات المستخدم'
+                : 'User Notes';
             allNotes.add('$userNotesLabel:\n$notes');
           }
           final finalNotes = allNotes.isEmpty ? null : allNotes.join('\n\n');
@@ -114,7 +111,9 @@ class CompleteTestSection extends ConsumerWidget {
               );
         } else if (execution.selectedColor != null) {
           ref.read(premiumServiceProvider).consumeFreeScan();
-          ref.read(testResultControllerProvider.notifier).analyzeTestResult(
+          ref
+              .read(testResultControllerProvider.notifier)
+              .analyzeTestResult(
                 reagent: reagent,
                 observedColor: execution.selectedColor!,
                 notes: notes,

@@ -87,8 +87,7 @@ class SafeJsonParser {
     }
   }
 
-  static Map<String, dynamic> safeMap(dynamic v,
-      [Map<String, dynamic> fallback = const {}]) {
+  static Map<String, dynamic> safeMap(dynamic v, [Map<String, dynamic> fallback = const {}]) {
     if (v == null || v is! Map) return fallback;
     try {
       return Map<String, dynamic>.from(v);
@@ -107,8 +106,7 @@ class SafeJsonParser {
 class SafeColorParser {
   /// Safely parse color hex or text into a hex string or RGBColor.
   /// Falls back to neutral grey if invalid.
-  static RGBColor safeColor(dynamic v,
-      [RGBColor fallback = const RGBColor(128, 128, 128)]) {
+  static RGBColor safeColor(dynamic v, [RGBColor fallback = const RGBColor(128, 128, 128)]) {
     if (v == null) return fallback;
     return parseRobustColor(v.toString(), fallback);
   }
@@ -119,8 +117,7 @@ class SafeColorParser {
     return parsed.toHex();
   }
 
-  static RGBColor parseRobustColor(String input,
-      [RGBColor fallback = const RGBColor(128, 128, 128)]) {
+  static RGBColor parseRobustColor(String input, [RGBColor fallback = const RGBColor(128, 128, 128)]) {
     var str = input.trim();
     if (str.isEmpty) return fallback;
 
@@ -198,8 +195,7 @@ class SafeColorParser {
 /// Resilient reference parsing helper methods.
 class SafeReferenceParser {
   /// Cleans and formats reference strings.
-  static String safeReference(dynamic v,
-      [String fallback = 'Unknown Reference']) {
+  static String safeReference(dynamic v, [String fallback = 'Unknown Reference']) {
     if (v == null) return fallback;
     final raw = v.toString().trim();
     if (raw.isEmpty) return fallback;
@@ -211,12 +207,8 @@ class SafeReferenceParser {
 class SafeReactionParser {
   /// Safely extracts the substance/analyte name, supporting both legacy 'drugName'
   /// and compliance-safe 'analyteName' keys.
-  static String safeAnalyteName(Map<String, dynamic> json,
-      [String fallback = 'Unknown Analyte']) {
-    final name = json['analyteName'] ??
-        json['drugName'] ??
-        json['substance'] ??
-        json['name'];
+  static String safeAnalyteName(Map<String, dynamic> json, [String fallback = 'Unknown Analyte']) {
+    final name = json['analyteName'] ?? json['drugName'] ?? json['substance'] ?? json['name'];
     return SafeJsonParser.safeString(name, fallback);
   }
 }

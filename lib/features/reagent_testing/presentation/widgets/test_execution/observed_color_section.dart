@@ -74,7 +74,7 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Card(
@@ -109,7 +109,9 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _isRtl(context) ? 'اللون المُلاحظ' : 'Observed Color',
+                          _isRtl(context)
+                              ? 'اللون المُلاحظ'
+                              : 'Observed Color',
                           style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onSurface,
@@ -169,11 +171,11 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          childAspectRatio: 4.5,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
+                              crossAxisCount: 1,
+                              childAspectRatio: 4.5,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                            ),
                         itemCount: _reagentColorOptions.length,
                         itemBuilder: (context, index) {
                           final colorOption = _reagentColorOptions[index];
@@ -192,8 +194,7 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                               duration: const Duration(milliseconds: 200),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? theme.colorScheme.primary
-                                        .withOpacity(0.15)
+                                    ? theme.colorScheme.primary.withOpacity(0.15)
                                     : theme.colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
@@ -226,16 +227,14 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                                     Expanded(
                                       child: Text(
                                         colorName,
-                                        style: theme.textTheme.bodyMedium
-                                            ?.copyWith(
+                                        style: theme.textTheme.bodyMedium?.copyWith(
                                           fontSize: 13,
                                           fontWeight: isSelected
                                               ? FontWeight.w600
                                               : FontWeight.w400,
                                           color: isSelected
                                               ? theme.colorScheme.onSurface
-                                              : theme
-                                                  .colorScheme.onSurfaceVariant,
+                                              : theme.colorScheme.onSurfaceVariant,
                                           height: 1.3,
                                         ),
                                         maxLines: 2,
@@ -277,8 +276,7 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: theme.colorScheme.primary.withOpacity(0.25)),
+                    border: Border.all(color: theme.colorScheme.primary.withOpacity(0.25)),
                   ),
                   child: Row(
                     children: [
@@ -294,9 +292,9 @@ class _ObservedColorSectionState extends ConsumerState<ObservedColorSection> {
                               ? 'اللون المُلاحظ: ${_getSelectedColorName()}'
                               : 'Observed Color: ${_getSelectedColorName()}',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                       ),
                     ],

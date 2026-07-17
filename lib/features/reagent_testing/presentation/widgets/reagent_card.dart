@@ -48,9 +48,9 @@ class ReagentCard extends StatelessWidget {
               AutoSizeText(
                 LocalizationHelper.getLocalizedReagentName(context, reagent),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      height: 1.15,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  height: 1.15,
+                ),
                 maxLines: 2,
                 minFontSize: 12,
                 stepGranularity: 0.5,
@@ -68,11 +68,11 @@ class ReagentCard extends StatelessWidget {
 
   Widget _buildIcon(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ??
+    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? 
         (isDarkMode ? StatusBadgeTheme.dark : StatusBadgeTheme.light);
     Color iconBackgroundColor;
     Color iconColor;
-
+    
     switch (reagent.safetyLevel.toUpperCase()) {
       case 'EXTREME':
         iconBackgroundColor = statusTheme.errorBg;
@@ -107,7 +107,7 @@ class ReagentCard extends StatelessWidget {
 
   Widget _buildSafetyBadge(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ??
+    final statusTheme = Theme.of(context).extension<StatusBadgeTheme>() ?? 
         (isDarkMode ? StatusBadgeTheme.dark : StatusBadgeTheme.light);
     Color badgeBgColor;
     Color badgeTextColor;

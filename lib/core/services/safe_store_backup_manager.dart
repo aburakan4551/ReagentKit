@@ -5,7 +5,7 @@ import 'package:reagentkit/core/utils/logger.dart';
 
 class SafeStoreBackupManager {
   static const String _backupListKey = 'safe_store_backups_list';
-
+  
   /// Creates a timestamped and versioned backup of the current scientific datasets
   /// and config cache, storing them locally in SharedPreferences, and optionally in Firestore.
   static Future<bool> createBackup({
@@ -29,7 +29,7 @@ class SafeStoreBackupManager {
       };
 
       final backupString = jsonEncode(backupPayload);
-
+      
       // Save the backup payload locally
       await prefs.setString('safe_store_backup_$backupId', backupString);
 
@@ -38,15 +38,11 @@ class SafeStoreBackupManager {
       backupsList.add(backupId);
       await prefs.setStringList(_backupListKey, backupsList);
 
-      Logger.info(
-          '💾 [BackupManager] Local backup created successfully: $backupId (Version: $version)');
+      Logger.info('💾 [BackupManager] Local backup created successfully: $backupId (Version: $version)');
 
       // Optionally upload backup to Cloud Firestore under 'backups' collection for off-device safety
       try {
-        await FirebaseFirestore.instance
-            .collection('backups')
-            .doc(backupId)
-            .set({
+        await FirebaseFirestore.instance.collection('backups').doc(backupId).set({
           'timestamp': FieldValue.serverTimestamp(),
           'version': version,
           'reagents_data': reagentsData,
@@ -54,18 +50,15 @@ class SafeStoreBackupManager {
           'references_data': referencesData,
           'source': 'iOS App Backup Manager',
         });
-        Logger.info(
-            '☁️ [BackupManager] Backup uploaded to Firestore successfully: $backupId');
+        Logger.info('☁️ [BackupManager] Backup uploaded to Firestore successfully: $backupId');
       } catch (firestoreError) {
         // Log firestore error but do not fail the backup process
-        Logger.warning(
-            '⚠️ [BackupManager] Optional Firestore backup upload skipped/failed: $firestoreError');
+        Logger.warning('⚠️ [BackupManager] Optional Firestore backup upload skipped/failed: $firestoreError');
       }
 
       return true;
     } catch (e, st) {
-      Logger.error('❌ [BackupManager] Failed to create backup: $e',
-          error: e, stackTrace: st);
+      Logger.error('❌ [BackupManager] Failed to create backup: $e', error: e, stackTrace: st);
       return false;
     }
   }
@@ -76,7 +69,7 @@ class SafeStoreBackupManager {
     try {
       final prefs = await SharedPreferences.getInstance();
       final backupsList = prefs.getStringList(_backupListKey) ?? [];
-
+      
       if (backupsList.isEmpty) {
         Logger.warning('⚠️ [BackupManager] No backups found for restoration');
         return null;
@@ -84,30 +77,25 @@ class SafeStoreBackupManager {
 
       // Get the latest backup ID
       final latestBackupId = backupsList.last;
-      final backupDataStr =
-          prefs.getString('safe_store_backup_$latestBackupId');
-
+      final backupDataStr = prefs.getString('safe_store_backup_$latestBackupId');
+      
       if (backupDataStr == null) {
-        Logger.warning(
-            '⚠️ [BackupManager] Backup data for $latestBackupId is empty');
+        Logger.warning('⚠️ [BackupManager] Backup data for $latestBackupId is empty');
         return null;
       }
 
       final Map<String, dynamic> backupPayload = jsonDecode(backupDataStr);
-
-      Logger.info(
-          '🔄 [BackupManager] Restoring latest backup from: ${backupPayload['timestamp']}');
-
+      
+      Logger.info('🔄 [BackupManager] Restoring latest backup from: ${backupPayload['timestamp']}');
+      
       return {
         'reagents_data': backupPayload['reagents_data']?.toString() ?? '{}',
-        'safety_instructions':
-            backupPayload['safety_instructions']?.toString() ?? '{}',
+        'safety_instructions': backupPayload['safety_instructions']?.toString() ?? '{}',
         'references_data': backupPayload['references_data']?.toString() ?? '{}',
         'version': backupPayload['version']?.toString() ?? '1.0.0',
       };
     } catch (e, st) {
-      Logger.error('❌ [BackupManager] Restore failed: $e',
-          error: e, stackTrace: st);
+      Logger.error('❌ [BackupManager] Restore failed: $e', error: e, stackTrace: st);
       return null;
     }
   }

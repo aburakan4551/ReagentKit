@@ -100,15 +100,10 @@ class SafeStoreSanitizer {
 
     // Remove confidence percentages and labels if in review mode
     if (appStoreReviewMode) {
-      sanitizedText = sanitizedText.replaceAll(
-          RegExp(r'\(\s*\d+%\s*(confidence|ثقة)?\s*\)', caseSensitive: false),
-          '');
-      sanitizedText = sanitizedText.replaceAll(
-          RegExp(r'\d+%\s*(confidence|ثقة)?', caseSensitive: false), '');
-      sanitizedText = sanitizedText.replaceAll(
-          RegExp(r'confidence', caseSensitive: false), '');
-      sanitizedText =
-          sanitizedText.replaceAll(RegExp(r'ثقة', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'\(\s*\d+%\s*(confidence|ثقة)?\s*\)', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'\d+%\s*(confidence|ثقة)?', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'confidence', caseSensitive: false), '');
+      sanitizedText = sanitizedText.replaceAll(RegExp(r'ثقة', caseSensitive: false), '');
     }
 
     // Apply Arabic replacements
@@ -139,13 +134,12 @@ class SafeStoreSanitizer {
   }
 
   /// Helper to perform case-insensitive replacements while maintaining appropriate casing where possible.
-  static String _replaceIgnoreCase(
-      String text, String target, String replacement) {
+  static String _replaceIgnoreCase(String text, String target, String replacement) {
     if (text.isEmpty || target.isEmpty) return text;
 
     final lowerText = text.toLowerCase();
     final lowerTarget = target.toLowerCase();
-
+    
     int index = lowerText.indexOf(lowerTarget);
     if (index == -1) return text;
 
@@ -154,16 +148,13 @@ class SafeStoreSanitizer {
 
     while (index != -1) {
       buffer.write(text.substring(lastIndex, index));
-
+      
       // Determine original casing to try and match it
       final originalSnippet = text.substring(index, index + target.length);
-      final isAllUpper = originalSnippet == originalSnippet.toUpperCase() &&
-          originalSnippet != originalSnippet.toLowerCase();
-      final isFirstUpper = originalSnippet.isNotEmpty &&
-          originalSnippet[0] == originalSnippet[0].toUpperCase() &&
-          (originalSnippet.length == 1 ||
-              originalSnippet.substring(1) ==
-                  originalSnippet.substring(1).toLowerCase());
+      final isAllUpper = originalSnippet == originalSnippet.toUpperCase() && originalSnippet != originalSnippet.toLowerCase();
+      final isFirstUpper = originalSnippet.isNotEmpty && 
+                           originalSnippet[0] == originalSnippet[0].toUpperCase() && 
+                           (originalSnippet.length == 1 || originalSnippet.substring(1) == originalSnippet.substring(1).toLowerCase());
 
       if (isAllUpper) {
         buffer.write(replacement.toUpperCase());

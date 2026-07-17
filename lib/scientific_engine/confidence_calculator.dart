@@ -37,8 +37,7 @@ class ConfidenceCalculator {
       return 0.0;
     }
     // Interpolate between perfect match and max limit
-    final range =
-        ScientificConstants.deltaEMaxLimit - ScientificConstants.deltaEPerfect;
+    final range = ScientificConstants.deltaEMaxLimit - ScientificConstants.deltaEPerfect;
     final diff = deltaE - ScientificConstants.deltaEPerfect;
     return max(0.0, min(1.0, 1.0 - (diff / range)));
   }
@@ -61,10 +60,8 @@ class ConfidenceCalculator {
     double envMultiplier = 1.0;
     if (ambientBrightness < ScientificConstants.minAmbientBrightness) {
       // Degrade confidence due to low light
-      final deficit =
-          ScientificConstants.minAmbientBrightness - ambientBrightness;
-      envMultiplier -=
-          (deficit / ScientificConstants.minAmbientBrightness) * 0.4;
+      final deficit = ScientificConstants.minAmbientBrightness - ambientBrightness;
+      envMultiplier -= (deficit / ScientificConstants.minAmbientBrightness) * 0.4;
     }
     if (cameraExposure > ScientificConstants.maxCameraExposure) {
       // Degrade confidence due to overexposure
@@ -77,9 +74,9 @@ class ConfidenceCalculator {
     // 4. Calculate overall confidence: weighted average
     // Weights: color match (40%), stability (30%), AI (20%), environment (10%)
     double overall = (colorMatchConf * 0.4) +
-        (stabilityIndex * 0.3) +
-        (aiConf * 0.2) +
-        (envMultiplier * 0.1);
+                     (stabilityIndex * 0.3) +
+                     (aiConf * 0.2) +
+                     (envMultiplier * 0.1);
 
     overall = max(0.0, min(1.0, overall));
 

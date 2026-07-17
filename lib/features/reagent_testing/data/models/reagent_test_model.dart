@@ -20,18 +20,16 @@ class ReagentTestInstructionStep {
   factory ReagentTestInstructionStep.fromJson(Map<String, dynamic> json) {
     return ReagentTestInstructionStep(
       step: SafeJsonParser.safeInt(json['step']),
-      instruction: SafeJsonParser.safeString(
-          json['instruction'] ?? json['text'] ?? json['textEn']),
-      instructionAr: SafeJsonParser.safeString(
-          json['instruction_ar'] ?? json['instructionAr'] ?? json['textAr']),
+      instruction: SafeJsonParser.safeString(json['instruction'] ?? json['text'] ?? json['textEn']),
+      instructionAr: SafeJsonParser.safeString(json['instruction_ar'] ?? json['instructionAr'] ?? json['textAr']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'step': step,
-        'instruction': instruction,
-        'instruction_ar': instructionAr,
-      };
+    'step': step,
+    'instruction': instruction,
+    'instruction_ar': instructionAr,
+  };
 }
 
 class ReagentTestSafetyInfo {
@@ -49,22 +47,19 @@ class ReagentTestSafetyInfo {
 
   factory ReagentTestSafetyInfo.fromJson(Map<String, dynamic> json) {
     return ReagentTestSafetyInfo(
-      requiredEquipment:
-          SafeJsonParser.safeList<String>(json['requiredEquipment']),
-      handlingProcedures:
-          SafeJsonParser.safeList<String>(json['handlingProcedures']),
+      requiredEquipment: SafeJsonParser.safeList<String>(json['requiredEquipment']),
+      handlingProcedures: SafeJsonParser.safeList<String>(json['handlingProcedures']),
       specificHazards: SafeJsonParser.safeList<String>(json['specificHazards']),
-      storageRequirements: SafeJsonParser.safeList<String>(
-          json['storageRequirements'] ?? json['storage']),
+      storageRequirements: SafeJsonParser.safeList<String>(json['storageRequirements'] ?? json['storage']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'requiredEquipment': requiredEquipment,
-        'handlingProcedures': handlingProcedures,
-        'specificHazards': specificHazards,
-        'storageRequirements': storageRequirements,
-      };
+    'requiredEquipment': requiredEquipment,
+    'handlingProcedures': handlingProcedures,
+    'specificHazards': specificHazards,
+    'storageRequirements': storageRequirements,
+  };
 }
 
 class ReagentTestModel {
@@ -138,16 +133,14 @@ class ReagentTestModel {
 
       // 2. Soft validation & parsing
       final List<ReagentTestInstructionStep> instructions = [];
-      final rawInstructions =
-          json['testInstructions'] ?? json['instructions'] ?? json['steps'];
+      final rawInstructions = json['testInstructions'] ?? json['instructions'] ?? json['steps'];
       if (rawInstructions is List) {
         for (final step in rawInstructions) {
           if (step is Map<String, dynamic>) {
             try {
               instructions.add(ReagentTestInstructionStep.fromJson(step));
             } catch (e) {
-              developer.log('Error parsing instruction step: $e',
-                  name: 'ScientificParser');
+              developer.log('Error parsing instruction step: $e', name: 'ScientificParser');
             }
           }
         }
@@ -169,16 +162,14 @@ class ReagentTestModel {
       }
 
       final List<DrugResultModel> reactionResults = [];
-      final resultsList =
-          json['reactionResults'] ?? json['drugResults'] ?? json['results'];
+      final resultsList = json['reactionResults'] ?? json['drugResults'] ?? json['results'];
       if (resultsList is List) {
         for (final res in resultsList) {
           if (res is Map<String, dynamic>) {
             try {
               reactionResults.add(DrugResultModel.fromJson(res));
             } catch (e) {
-              developer.log('Error parsing reaction result: $e',
-                  name: 'ScientificParser');
+              developer.log('Error parsing reaction result: $e', name: 'ScientificParser');
             }
           }
         }
@@ -231,32 +222,18 @@ class ReagentTestModel {
       return ReagentTestModel(
         id: id,
         reagentName: name,
-        reagentNameAr: SafeJsonParser.safeString(json['reagentName_ar'] ??
-            json['reagentNameAr'] ??
-            json['name_ar'] ??
-            json['nameAr']),
-        description:
-            SafeJsonParser.safeString(json['description'] ?? json['desc']),
-        descriptionAr: SafeJsonParser.safeString(json['description_ar'] ??
-            json['descriptionAr'] ??
-            json['desc_ar'] ??
-            json['descAr']),
-        safetyLevel: SafeJsonParser.safeString(
-            json['safetyLevel'] ?? json['safety_level'] ?? 'MEDIUM'),
-        safetyLevelAr: SafeJsonParser.safeString(json['safetyLevel_ar'] ??
-            json['safetyLevelAr'] ??
-            json['safety_level_ar'] ??
-            json['safetyLevelAr']),
+        reagentNameAr: SafeJsonParser.safeString(json['reagentName_ar'] ?? json['reagentNameAr'] ?? json['name_ar'] ?? json['nameAr']),
+        description: SafeJsonParser.safeString(json['description'] ?? json['desc']),
+        descriptionAr: SafeJsonParser.safeString(json['description_ar'] ?? json['descriptionAr'] ?? json['desc_ar'] ?? json['descAr']),
+        safetyLevel: SafeJsonParser.safeString(json['safetyLevel'] ?? json['safety_level'] ?? 'MEDIUM'),
+        safetyLevelAr: SafeJsonParser.safeString(json['safetyLevel_ar'] ?? json['safetyLevelAr'] ?? json['safety_level_ar'] ?? json['safetyLevelAr']),
         category: category,
-        testDuration:
-            SafeJsonParser.safeInt(json['testDuration'] ?? json['duration'], 5),
-        chemicals: SafeJsonParser.safeList<String>(
-            json['chemicals'] ?? json['chemicalList']),
+        testDuration: SafeJsonParser.safeInt(json['testDuration'] ?? json['duration'], 5),
+        chemicals: SafeJsonParser.safeList<String>(json['chemicals'] ?? json['chemicalList']),
         testInstructions: instructions,
         reactionResults: reactionResults,
         references: referencesList,
-        safety: ReagentTestSafetyInfo.fromJson(
-            SafeJsonParser.safeMap(json['safety'] ?? json['safetyInfo'])),
+        safety: ReagentTestSafetyInfo.fromJson(SafeJsonParser.safeMap(json['safety'] ?? json['safetyInfo'])),
       );
     } catch (e, st) {
       developer.log(

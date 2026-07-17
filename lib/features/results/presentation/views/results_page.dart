@@ -56,16 +56,15 @@ class ResultsPage extends StatelessWidget {
             final item = recentTests[index];
             return Card(
               elevation: 2,
-              shadowColor: theme.brightness == Brightness.dark
-                  ? Colors.transparent
+              shadowColor: theme.brightness == Brightness.dark 
+                  ? Colors.transparent 
                   : theme.colorScheme.shadow.withOpacity(0.05),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(color: theme.dividerColor),
               ),
               child: ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 leading: Container(
                   width: 12,
                   height: 12,
@@ -81,14 +80,13 @@ class ResultsPage extends StatelessWidget {
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    item['sample'],
+                    item['sample'], 
                     style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                   ),
                 ),
                 trailing: Text(
                   item['time'],
-                  style: TextStyle(
-                      color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
+                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                 ),
                 onTap: () {},
               ),

@@ -13,7 +13,8 @@ class LanguageSettingsScreen extends ConsumerStatefulWidget {
       _LanguageSettingsScreenState();
 }
 
-class _LanguageSettingsScreenState extends ConsumerState<LanguageSettingsScreen>
+class _LanguageSettingsScreenState
+    extends ConsumerState<LanguageSettingsScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
@@ -172,9 +173,7 @@ class _LanguageSettingsScreenState extends ConsumerState<LanguageSettingsScreen>
   }) {
     final isSelected = currentLanguage == lang['code'];
     final cardColor = theme.colorScheme.surfaceContainerHighest;
-    final borderColor = isSelected
-        ? theme.colorScheme.primary
-        : theme.colorScheme.outlineVariant;
+    final borderColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -249,8 +248,7 @@ class _LanguageSettingsScreenState extends ConsumerState<LanguageSettingsScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color:
-                                  theme.colorScheme.primary.withOpacity(0.15),
+                              color: theme.colorScheme.primary.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -303,7 +301,7 @@ class _LanguageSettingsScreenState extends ConsumerState<LanguageSettingsScreen>
 
   Widget _buildDirectionNote(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
-
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -316,7 +314,8 @@ class _LanguageSettingsScreenState extends ConsumerState<LanguageSettingsScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, color: Colors.amber, size: 20),
+          const Icon(Icons.info_outline_rounded,
+              color: Colors.amber, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

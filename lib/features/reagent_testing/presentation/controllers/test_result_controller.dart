@@ -13,8 +13,8 @@ class TestResultController extends StateNotifier<TestResultState> {
   final TestResultHistoryController? _historyController;
 
   TestResultController({TestResultHistoryController? historyController})
-      : _historyController = historyController,
-        super(const TestResultInitial());
+    : _historyController = historyController,
+      super(const TestResultInitial());
 
   void analyzeTestResult({
     required ReagentEntity reagent,
@@ -26,18 +26,14 @@ class TestResultController extends StateNotifier<TestResultState> {
     try {
       // 1. Convert observed color description to RGBColor
       final rgbColors = ColorMatcher.parseColorDescription(observedColor);
-      final observedRGB = rgbColors.isNotEmpty
-          ? rgbColors.first
-          : const RGBColor(128, 128, 128);
+      final observedRGB = rgbColors.isNotEmpty ? rgbColors.first : const RGBColor(128, 128, 128);
 
       // 2. Map reagent's drug results to scientific reaction targets
-      final targets = reagent.drugResults
-          .map((r) => ReagentReactionTarget(
-                analyteName: r.drugName,
-                colorText: r.color,
-                colorTextAr: r.colorAr,
-              ))
-          .toList();
+      final targets = reagent.drugResults.map((r) => ReagentReactionTarget(
+        analyteName: r.drugName,
+        colorText: r.color,
+        colorTextAr: r.colorAr,
+      )).toList();
 
       // 3. Interpret using Scientific Engine
       final interpretation = ReagentInterpreter.interpret(
@@ -54,16 +50,12 @@ class TestResultController extends StateNotifier<TestResultState> {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         reagentName: reagent.reagentName,
         observedColor: observedColor,
-        possibleSubstances: possibleSubstances.isNotEmpty
-            ? possibleSubstances
-            : ['Unknown substance or impure sample'],
-        confidencePercentage:
-            (interpretation.confidence.overallConfidence * 100).toInt(),
+        possibleSubstances: possibleSubstances.isNotEmpty ? possibleSubstances : ['Unknown substance or impure sample'],
+        confidencePercentage: (interpretation.confidence.overallConfidence * 100).toInt(),
         notes: notes,
         testCompletedAt: DateTime.now(),
         colorMatchConfidence: interpretation.confidence.colorMatchConfidence,
-        aiInterpretationConfidence:
-            interpretation.confidence.aiInterpretationConfidence,
+        aiInterpretationConfidence: interpretation.confidence.aiInterpretationConfidence,
         stabilityIndex: interpretation.confidence.stabilityIndex,
         deltaE: interpretation.deltaE,
         observedHex: observedRGB.toHex(),
@@ -115,20 +107,15 @@ class TestResultController extends StateNotifier<TestResultState> {
       }
 
       // 1. Convert observed color description to RGBColor
-      final rgbColors =
-          ColorMatcher.parseColorDescription(aiResult.observedColorDescription);
-      final observedRGB = rgbColors.isNotEmpty
-          ? rgbColors.first
-          : const RGBColor(128, 128, 128);
+      final rgbColors = ColorMatcher.parseColorDescription(aiResult.observedColorDescription);
+      final observedRGB = rgbColors.isNotEmpty ? rgbColors.first : const RGBColor(128, 128, 128);
 
       // 2. Map reagent's drug results to scientific reaction targets
-      final targets = reagent.drugResults
-          .map((r) => ReagentReactionTarget(
-                analyteName: r.drugName,
-                colorText: r.color,
-                colorTextAr: r.colorAr,
-              ))
-          .toList();
+      final targets = reagent.drugResults.map((r) => ReagentReactionTarget(
+        analyteName: r.drugName,
+        colorText: r.color,
+        colorTextAr: r.colorAr,
+      )).toList();
 
       // 3. Interpret using Scientific Engine
       final interpretation = ReagentInterpreter.interpret(
@@ -154,13 +141,11 @@ class TestResultController extends StateNotifier<TestResultState> {
         reagentName: reagent.reagentName,
         observedColor: aiResult.observedColorDescription,
         possibleSubstances: possibleSubstances,
-        confidencePercentage:
-            (interpretation.confidence.overallConfidence * 100).toInt(),
+        confidencePercentage: (interpretation.confidence.overallConfidence * 100).toInt(),
         notes: notes,
         testCompletedAt: DateTime.now(),
         colorMatchConfidence: interpretation.confidence.colorMatchConfidence,
-        aiInterpretationConfidence:
-            interpretation.confidence.aiInterpretationConfidence,
+        aiInterpretationConfidence: interpretation.confidence.aiInterpretationConfidence,
         stabilityIndex: interpretation.confidence.stabilityIndex,
         deltaE: interpretation.deltaE,
         observedHex: observedRGB.toHex(),
@@ -304,10 +289,14 @@ class TestResultController extends StateNotifier<TestResultState> {
 
   bool _isCompoundColorMatch(String observed, String expected) {
     // Handle compound colors like "yellow-green" matching "yellow > green"
-    final observedColors =
-        observed.split(RegExp(r'[-/]')).map((c) => c.trim()).toList();
-    final expectedColors =
-        expected.split(RegExp(r'[>\-/,]')).map((c) => c.trim()).toList();
+    final observedColors = observed
+        .split(RegExp(r'[-/]'))
+        .map((c) => c.trim())
+        .toList();
+    final expectedColors = expected
+        .split(RegExp(r'[>\-/,]'))
+        .map((c) => c.trim())
+        .toList();
 
     // If observed is a compound color, check if all parts match expected progression
     if (observedColors.length > 1) {

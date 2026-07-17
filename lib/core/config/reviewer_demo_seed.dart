@@ -11,10 +11,7 @@ class ReviewerDemoSeed {
         reagentName: 'Chemical Analysis Kit', // Sanitized Marquis
         testCompletedAt: now.subtract(const Duration(hours: 1, minutes: 20)),
         observedColor: 'Purple',
-        possibleSubstances: const [
-          'Analytical Compound A',
-          'Chemical Compound B'
-        ],
+        possibleSubstances: const ['Analytical Compound A', 'Chemical Compound B'],
         confidencePercentage: 95,
         notes: 'Observed clean reaction on cobalt test kit sample.\n\n'
             'Analytical Observation:\n'

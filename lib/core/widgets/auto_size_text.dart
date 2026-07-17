@@ -27,15 +27,12 @@ class AutoSizeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final defaultStyle =
-        style ?? theme.textTheme.bodyMedium ?? const TextStyle();
+    final defaultStyle = style ?? theme.textTheme.bodyMedium ?? const TextStyle();
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxWidth = constraints.maxWidth;
-        final double maxHeight = constraints.maxHeight.isInfinite
-            ? double.infinity
-            : constraints.maxHeight;
+        final double maxHeight = constraints.maxHeight.isInfinite ? double.infinity : constraints.maxHeight;
 
         double fontSize = defaultStyle.fontSize ?? 14.0;
         if (fontSize > maxFontSize) {
@@ -70,9 +67,8 @@ class AutoSizeText extends StatelessWidget {
           }
 
           // If the text exceeds allowed lines, overflows height, or any individual word exceeds constraints, reduce font size
-          if (textPainter.didExceedMaxLines ||
-              (maxHeight != double.infinity &&
-                  textPainter.height > maxHeight) ||
+          if (textPainter.didExceedMaxLines || 
+              (maxHeight != double.infinity && textPainter.height > maxHeight) ||
               anyWordExceedsWidth) {
             fontSize -= stepGranularity;
           } else {

@@ -81,8 +81,7 @@ class ReagentHeaderCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           LocalizationHelper.getLocalizedDescription(context, reagent),
-          style: AppTypography.getMetadataValue(
-            context,
+          style: AppTypography.getMetadataValue(context,
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
@@ -114,8 +113,7 @@ class ReagentHeaderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMetadataChip(
-      BuildContext context, ThemeData theme, IconData icon, String text) {
+  Widget _buildMetadataChip(BuildContext context, ThemeData theme, IconData icon, String text) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -130,8 +128,7 @@ class ReagentHeaderCard extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: AppTypography.getCaption(
-                context,
+              style: AppTypography.getCaption(context,
                 color: theme.colorScheme.onSurfaceVariant,
               ).copyWith(
                 fontWeight: FontWeight.w600,
