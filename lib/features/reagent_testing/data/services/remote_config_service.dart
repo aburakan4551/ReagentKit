@@ -270,6 +270,16 @@ class RemoteConfigService {
     return raw.isNotEmpty && raw != '{}';
   }
 
+  /// Returns the raw JSON string from `reagents_data`, or null when empty.
+  ///
+  /// Used by [UnifiedDataService] as the primary scientific data source
+  /// (Remote Config first → Local Cache → Asset).
+  String? getReagentsDataRaw() {
+    final raw = _remoteConfig.getString(_reagentsDataKey);
+    if (raw.isEmpty || raw == '{}') return null;
+    return raw;
+  }
+
   /// Parse and return all reagents from `reagents_data` (legacy).
   Future<List<ReagentModel>> getReagents() async {
     final raw = _remoteConfig.getString(_reagentsDataKey);
