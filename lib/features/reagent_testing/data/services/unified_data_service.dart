@@ -690,13 +690,15 @@ class UnifiedDataService {
       developer.log('⚠️ Circuit breaker is active. Skipping load pipeline and using fallback.', name: 'CircuitBreaker');
       _currentLifecycleState = DatasetLifecycleState.fallback;
       _currentWarningSeverity = WarningSeverity.critical;
-      return _createFallbackSnapshot(
+      final snapshot = _createFallbackSnapshot(
         source: DataSource.local,
         lifecycleState: DatasetLifecycleState.fallback,
         integrity: ScientificIntegrity.fallback,
         warningSeverity: WarningSeverity.critical,
         warningMsg: 'Circuit breaker active. Primary parsing bypassed.',
       );
+      _traceLayer('Circuit Breaker Fallback', snapshot);
+      return snapshot;
     }
 
     _currentLifecycleState = DatasetLifecycleState.loading;
@@ -821,6 +823,7 @@ class UnifiedDataService {
         lineage: lineage,
       );
 
+      _traceLayer('Layer 1 Remote Config', snapshot);
       _snapshotController.add(snapshot);
       stopRecoveryWatchdog();
       _logTelemetry('dataset_load_success', {'source': 'remote_config', 'version': parseOutput.version});
@@ -888,6 +891,7 @@ class UnifiedDataService {
           metadata: metadata,
         );
 
+        _traceLayer('Layer 2 Cache Recovery', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'cache', 'version': parseOutput.version});
@@ -943,8 +947,9 @@ class UnifiedDataService {
           integrity: ScientificIntegrity.fallback,
           warningSeverity: WarningSeverity.warning,
           warningMessage: 'Primary & current cache failed. Loaded from previous cache.',
-        );
+);
 
+        _traceLayer('Layer 6 Emergency In-Memory', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'prev_cache', 'version': parseOutput.version});
@@ -1002,6 +1007,7 @@ class UnifiedDataService {
           warningMessage: 'Loaded from decompressed snapshot.',
         );
 
+        _traceLayer('Layer 4 Snapshot', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'gzip_snapshot', 'version': version});
@@ -1074,6 +1080,7 @@ class UnifiedDataService {
         lineage: lineage,
       );
 
+      _traceLayer('Layer 5 Asset Fallback', snapshot);
       await _atomicWriteCache('scientific_dataset_cache', migratedRaw);
       _snapshotController.add(snapshot);
       stopRecoveryWatchdog();
@@ -1101,10 +1108,11 @@ class UnifiedDataService {
       integrity: ScientificIntegrity.fallback,
       warningSeverity: WarningSeverity.critical,
       warningMsg: 'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
-    );
+);
 
-    _snapshotController.add(snapshot);
-    startRecoveryWatchdog();
+        _traceLayer('Layer 3 Previous Cache', snapshot);
+        _snapshotController.add(snapshot);
+        startRecoveryWatchdog();
     return snapshot;
   }
 
@@ -1316,6 +1324,13 @@ class UnifiedDataService {
     _recoveryAttemptsInSession = 0;
   }
 
+  // ─── Runtime trace helper ───
+  void _traceLayer(String layer, DataSnapshot snapshot) {
+    final names = snapshot.reagents.map((r) => r.reagentName).take(8).toList();
+    developer.log('[TRACE] $layer emitted: count=${snapshot.reagents.length} first=$names',
+        name: 'PipelineTrace');
+  }
+
   void _logTelemetry(String eventName, Map<String, dynamic> metadata, {bool isWarning = false, bool isFatal = false}) {
     if (isWarning) {
       final random = double.parse((DateTime.now().microsecondsSinceEpoch % 100 / 100.0).toStringAsFixed(2));
@@ -1337,6 +1352,14 @@ class UnifiedDataService {
     final batchToSend = List<DatasetTelemetryEvent>.from(_telemetryBatch);
     _telemetryBatch.clear();
     developer.log('Uploading deferred telemetry batch of ${batchToSend.length} events.', name: 'ScientificTelemetry');
+  }
+
+  void _traceLayer(String layerName, DataSnapshot snapshot) {
+    final names = snapshot.reagents.map((r) => r.id).toList();
+    final first10 = names.length > 10 ? names.sublist(0, 10) : names;
+    final hasMarquis = names.any((n) => n.contains('Marquis'));
+    final hasMecke = names.any((n) => n.contains('Mecke'));
+    developer.log('[PIPELINE TRACE] $layerName selected | count=${names.length} | first10=$first10 | marquis=$hasMarquis | mecke=$hasMecke', name: 'PipelineTrace');
   }
 
   DataSnapshot _createFallbackSnapshot({

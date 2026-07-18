@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/reagent_entity.dart';
 import '../../domain/repositories/reagent_testing_repository.dart';
@@ -20,6 +21,8 @@ class ReagentTestingController extends StateNotifier<ReagentTestingState> {
     try {
       _allReagents = await _repository.getAllReagents();
       final warning = _repository.warningMessage;
+      final names = _allReagents.map((e) => e.name).take(8).toList();
+      developer.log('[TRACE] Controller loadAllReagents: count=${_allReagents.length} first=$names', name: 'PipelineTrace');
       if (_allReagents.isEmpty) {
         state = const ReagentTestingEmpty('No reagents found');
       } else {
