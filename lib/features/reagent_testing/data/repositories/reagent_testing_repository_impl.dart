@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
 import '../../domain/entities/reagent_entity.dart';
 import '../../domain/repositories/reagent_testing_repository.dart';
 import '../services/unified_data_service.dart';
@@ -44,7 +44,7 @@ class ReagentTestingRepositoryImpl implements ReagentTestingRepository {
       _lifecycleState = snapshot.lifecycleState;
       final entities = snapshot.reagents.map((model) => model.toEntity()).toList();
       final names = entities.map((e) => e.reagentName).take(8).toList();
-      developer.log('[TRACE] Repository getAllReagents: count=${entities.length} source=${snapshot.source} first=$names', name: 'PipelineTrace');
+      dev.log('[TRACE] Repository getAllReagents: count=${entities.length} source=${snapshot.source} first=$names', name: 'PipelineTrace');
       return entities;
     } catch (e) {
       throw Exception('Failed to load reagents: $e');
