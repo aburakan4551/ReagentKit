@@ -949,7 +949,7 @@ class UnifiedDataService {
           warningMessage: 'Primary & current cache failed. Loaded from previous cache.',
 );
 
-        _traceLayer('Layer 6 Emergency In-Memory', snapshot);
+        _traceLayer('Layer 3 Previous Cache', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'prev_cache', 'version': parseOutput.version});
@@ -1110,7 +1110,7 @@ class UnifiedDataService {
       warningMsg: 'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
 );
 
-        _traceLayer('Layer 3 Previous Cache', snapshot);
+        _traceLayer('Layer 6 Emergency In-Memory', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
     return snapshot;
@@ -1322,13 +1322,6 @@ class UnifiedDataService {
     _recoveryTimer?.cancel();
     _recoveryTimer = null;
     _recoveryAttemptsInSession = 0;
-  }
-
-  // ─── Runtime trace helper ───
-  void _traceLayer(String layer, DataSnapshot snapshot) {
-    final names = snapshot.reagents.map((r) => r.reagentName).take(8).toList();
-    developer.log('[TRACE] $layer emitted: count=${snapshot.reagents.length} first=$names',
-        name: 'PipelineTrace');
   }
 
   void _logTelemetry(String eventName, Map<String, dynamic> metadata, {bool isWarning = false, bool isFatal = false}) {
