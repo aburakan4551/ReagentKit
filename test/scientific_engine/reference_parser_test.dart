@@ -11,7 +11,7 @@ void main() {
       expect(ref.year, '');
       expect(ref.publisherOrLocation, '');
       expect(ref.details, '');
-      
+
       expect(ref.toAPAFormat(), '(n.d.).');
       expect(ref.toShortCitation(), 'Anon. (n.d.)');
     });
@@ -43,13 +43,14 @@ void main() {
 
       expect(ref.authors, 'Kovar, K.-A');
       expect(ref.year, '1989');
-      
+
       final short = ref.toShortCitation();
       expect(short, equals('Kovar (1989)'));
     });
 
     test('Parses book publisher format', () {
-      final raw = 'Clarke, E.G.C. Isolation and Identification of Drugs. London: The Pharmaceutical Press (1975)';
+      final raw =
+          'Clarke, E.G.C. Isolation and Identification of Drugs. London: The Pharmaceutical Press (1975)';
       final ref = ReferenceParser.parse(raw);
 
       expect(ref.authors, 'Clarke, E.G.C');

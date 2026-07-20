@@ -16,11 +16,7 @@ class FakeFirebaseRemoteConfig extends Fake implements FirebaseRemoteConfig {
         "testDuration": 30,
         "chemicals": ["Formaldehyde", "Sulfuric acid"],
         "drugResults": [
-          {
-            "drugName": "MDMA",
-            "color": "#Purple",
-            "color_ar": "أرجواني"
-          }
+          {"drugName": "MDMA", "color": "#Purple", "color_ar": "أرجواني"}
         ]
       }
     }),
@@ -75,15 +71,16 @@ void main() {
 
       // Note: We don't call Firebase.initializeApp() here because we are injecting a fake.
       await rcService.initialize();
-      
+
       final reagents = await rcService.getReagents();
-      
+
       debugPrint('TOTAL REAGENTS LOADED: ${reagents.length}');
       for (var r in reagents) {
         debugPrint(' - Loaded Reagent: ${r.reagentName}');
       }
 
-      expect(reagents, isNotEmpty, reason: 'Should have loaded at least one reagent from mock data');
+      expect(reagents, isNotEmpty,
+          reason: 'Should have loaded at least one reagent from mock data');
       expect(reagents.first.reagentName, equals('Marquis Test'));
       expect(rcService.getReagentVersion(), equals('1.0.0'));
     });

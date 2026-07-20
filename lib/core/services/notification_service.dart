@@ -122,29 +122,6 @@ class NotificationService {
     );
   }
 
-  // Registration success notification
-  static void showRegistrationSuccess({
-    required String username,
-  }) {
-    showSuccess(
-      title: '🎉 Welcome to the Lab!',
-      message:
-          'Account created successfully for $username. You can now start testing reagents!',
-      duration: const Duration(seconds: 5),
-    );
-  }
-
-  // Login success notification
-  static void showLoginSuccess({
-    required String username,
-  }) {
-    showSuccess(
-      title: '🔬 Welcome Back!',
-      message: 'Successfully signed in as $username. Ready for testing?',
-      duration: const Duration(seconds: 3),
-    );
-  }
-
   // Test completion notification
   static void showTestCompleted({
     required String testName,

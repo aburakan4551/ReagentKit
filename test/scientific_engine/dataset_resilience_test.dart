@@ -27,11 +27,13 @@ void main() {
               {'step': 1, 'instruction': 'Do A', 'instructionAr': 'افعل أ'}
             ],
             'reactionResults': [
-              {'analyteName': 'Analyte X', 'color': '#FF0000', 'colorAr': 'أحمر'}
+              {
+                'analyteName': 'Analyte X',
+                'color': '#FF0000',
+                'colorAr': 'أحمر'
+              }
             ],
-            'references': [
-              'Auterhoff & Braun, Arch.Pharm. (1973)'
-            ],
+            'references': ['Auterhoff & Braun, Arch.Pharm. (1973)'],
             'safety': {
               'requiredEquipment': ['Gloves'],
               'handlingProcedures': ['Ventilate'],
@@ -42,7 +44,8 @@ void main() {
         ]
       });
 
-      final output = parseScientificDatasetIsolate(ParseParams(jsonStr, ValidationProfile.balanced));
+      final output = parseScientificDatasetIsolate(
+          ParseParams(jsonStr, ValidationProfile.balanced));
 
       expect(output.error, isEmpty);
       expect(output.version, '2.0.1');
@@ -91,19 +94,23 @@ void main() {
         ]
       });
 
-      final output = parseScientificDatasetIsolate(ParseParams(jsonStr, ValidationProfile.balanced));
+      final output = parseScientificDatasetIsolate(
+          ParseParams(jsonStr, ValidationProfile.balanced));
 
       // Valid item and invalid_refs_colors should parse, but corrupted_item will be skipped
       expect(output.version, '3.0.0');
       expect(output.parsedReagents.length, 2);
       expect(output.rawItemsCount, 3);
-      expect(output.skippedItemsCount, 1); // corrupted_item failed to parse and is skipped
-      expect(output.invalidColorsCount, 1); // not-a-real-color falls back to grey (128,128,128)
+      expect(output.skippedItemsCount,
+          1); // corrupted_item failed to parse and is skipped
+      expect(output.invalidColorsCount,
+          1); // not-a-real-color falls back to grey (128,128,128)
       expect(output.invalidReferencesCount, 2); // 1 empty string, 1 null
     });
 
     test('Handles malformed JSON string FormatException safely', () {
-      final output = parseScientificDatasetIsolate(ParseParams('{"reagents": [invalid JSON}', ValidationProfile.balanced));
+      final output = parseScientificDatasetIsolate(ParseParams(
+          '{"reagents": [invalid JSON}', ValidationProfile.balanced));
       expect(output.parsedReagents, isEmpty);
       expect(output.error, contains('JSON decode FormatException'));
     });
@@ -137,7 +144,8 @@ void main() {
 
       expect(reagentsList.length, 2);
       expect(reagentsList[0].id, 'reagent_a');
-      expect(reagentsList[0].reagentName, 'Reagent A Duplicate'); // Overwritten by last duplicate
+      expect(reagentsList[0].reagentName,
+          'Reagent A Duplicate'); // Overwritten by last duplicate
       expect(reagentsList[1].id, 'reagent_b');
     });
 
@@ -155,12 +163,14 @@ void main() {
 
       // 1. Direct Model instantiation with ValidationProfile.strict should throw DatasetParsingException
       expect(
-        () => ReagentTestModel.fromJson(jsonNoInstructions, profile: ValidationProfile.strict),
+        () => ReagentTestModel.fromJson(jsonNoInstructions,
+            profile: ValidationProfile.strict),
         throwsA(isA<DatasetParsingException>()),
       );
 
       // 2. Direct Model instantiation with ValidationProfile.balanced should succeed (just logs warning)
-      final model = ReagentTestModel.fromJson(jsonNoInstructions, profile: ValidationProfile.balanced);
+      final model = ReagentTestModel.fromJson(jsonNoInstructions,
+          profile: ValidationProfile.balanced);
       expect(model.id, 'strict_test_reagent');
 
       // 3. parseScientificDatasetIsolate with ValidationProfile.strict skips this reagent
@@ -169,29 +179,36 @@ void main() {
         'reagents': [jsonNoInstructions]
       });
 
-      final output = parseScientificDatasetIsolate(ParseParams(datasetJson, ValidationProfile.strict));
+      final output = parseScientificDatasetIsolate(
+          ParseParams(datasetJson, ValidationProfile.strict));
       expect(output.parsedReagents, isEmpty);
       expect(output.skippedItemsCount, 1);
     });
 
-    test('Budgets: Payload size (>5MB), reagent count (>500), and reference count (>1000) are rejected', () {
+    test(
+        'Budgets: Payload size (>5MB), reagent count (>500), and reference count (>1000) are rejected',
+        () {
       // 1. Payload size > 5MB
       final hugePayload = 'x' * (5 * 1024 * 1024 + 1);
-      final sizeOutput = parseScientificDatasetIsolate(ParseParams(hugePayload, ValidationProfile.balanced));
+      final sizeOutput = parseScientificDatasetIsolate(
+          ParseParams(hugePayload, ValidationProfile.balanced));
       expect(sizeOutput.parsedReagents, isEmpty);
       expect(sizeOutput.error, contains('Payload size exceeds budget'));
 
       // 2. Reagent count > 500
-      final manyReagents = List.generate(501, (index) => {
-        'id': 'reagent_$index',
-        'reagentName': 'Reagent $index',
-        'category': 'Screening',
-      });
+      final manyReagents = List.generate(
+          501,
+          (index) => {
+                'id': 'reagent_$index',
+                'reagentName': 'Reagent $index',
+                'category': 'Screening',
+              });
       final countJson = jsonEncode({
         'version': '1.0.0',
         'reagents': manyReagents,
       });
-      final countOutput = parseScientificDatasetIsolate(ParseParams(countJson, ValidationProfile.balanced));
+      final countOutput = parseScientificDatasetIsolate(
+          ParseParams(countJson, ValidationProfile.balanced));
       expect(countOutput.parsedReagents, isEmpty);
       expect(countOutput.error, contains('Reagent count exceeds budget'));
 
@@ -206,15 +223,17 @@ void main() {
         'version': '1.0.0',
         'reagents': [reagentWithManyRefs],
       });
-      final refOutput = parseScientificDatasetIsolate(ParseParams(refJson, ValidationProfile.balanced));
+      final refOutput = parseScientificDatasetIsolate(
+          ParseParams(refJson, ValidationProfile.balanced));
       expect(refOutput.parsedReagents, isEmpty);
       expect(refOutput.error, contains('Total references exceed budget'));
     });
 
     test('Gzip compression and decompression round-trip', () {
       final service = UnifiedDataService();
-      const originalText = '{"key": "value", "description": "some scientific text to compress"}';
-      
+      const originalText =
+          '{"key": "value", "description": "some scientific text to compress"}';
+
       final compressed = service.compressGzip(originalText);
       expect(compressed, isNotEmpty);
       expect(compressed, isNot(equals(originalText)));
@@ -242,7 +261,10 @@ void main() {
         }
       ];
 
-      final reagents = list.map((e) => ReagentTestModel.fromJson(e, profile: ValidationProfile.permissive)).toList();
+      final reagents = list
+          .map((e) => ReagentTestModel.fromJson(e,
+              profile: ValidationProfile.permissive))
+          .toList();
       expect(reagents[0].id, 'zeta_reagent');
       expect(reagents[1].id, 'alpha_reagent');
       expect(reagents[2].id, 'beta_reagent');
@@ -257,7 +279,9 @@ void main() {
   });
 
   group('Safe Parsers Logic Tests', () {
-    test('safeEnum parses values correctly, case insensitively, and handles nulls', () {
+    test(
+        'safeEnum parses values correctly, case insensitively, and handles nulls',
+        () {
       final values = _TestEnum.values;
 
       expect(safeEnum(values, 'firstOption'), _TestEnum.firstOption);
@@ -267,7 +291,9 @@ void main() {
       expect(safeEnum(values, null), isNull);
     });
 
-    test('SafeColorParser supports various formats and fallback to grey on failure', () {
+    test(
+        'SafeColorParser supports various formats and fallback to grey on failure',
+        () {
       // Hex formats
       final colorHex1 = SafeColorParser.parseRobustColor('#FF0000');
       expect(colorHex1.r, 255);
@@ -290,7 +316,8 @@ void main() {
       expect(colorRgb1.g, 255);
       expect(colorRgb1.b, 0);
 
-      final colorRgb2 = SafeColorParser.parseRobustColor('rgb(  0  ,  255  ,  0  )');
+      final colorRgb2 =
+          SafeColorParser.parseRobustColor('rgb(  0  ,  255  ,  0  )');
       expect(colorRgb2.r, 0);
       expect(colorRgb2.g, 255);
       expect(colorRgb2.b, 0);
@@ -302,7 +329,8 @@ void main() {
       expect(colorRed.b, 0);
 
       // Invalid input fallback to grey (128, 128, 128)
-      final colorInvalid = SafeColorParser.parseRobustColor('invalid-color-value');
+      final colorInvalid =
+          SafeColorParser.parseRobustColor('invalid-color-value');
       expect(colorInvalid.r, 128);
       expect(colorInvalid.g, 128);
       expect(colorInvalid.b, 128);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reagentkit/core/globals.dart';
-import 'package:reagentkit/core/navigation/auth_wrapper.dart';
+import 'package:reagentkit/core/navigation/main_navigation_page.dart';
 import 'package:reagentkit/features/premium/presentation/screens/paywall_screen.dart';
 import 'package:reagentkit/core/utils/logger.dart';
 
@@ -19,7 +19,7 @@ class AppRouter {
           settings.name == paywallPage) {
         Logger.info('🛡️ [Router Guard] Intercepted navigation attempt to: "${settings.name}". Redirecting to Home.');
         return MaterialPageRoute(
-          builder: (context) => const AuthWrapper(),
+          builder: (context) => const MainNavigationPage(),
           settings: const RouteSettings(name: home),
         );
       }
@@ -28,7 +28,7 @@ class AppRouter {
     switch (settings.name) {
       case home:
         return MaterialPageRoute(
-          builder: (context) => const AuthWrapper(),
+          builder: (context) => const MainNavigationPage(),
           settings: settings,
         );
       case paywallPage:
@@ -40,7 +40,7 @@ class AppRouter {
         );
       default:
         return MaterialPageRoute(
-          builder: (context) => const AuthWrapper(),
+          builder: (context) => const MainNavigationPage(),
           settings: settings,
         );
     }

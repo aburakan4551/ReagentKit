@@ -74,7 +74,7 @@ final Map<String, String> replacements = {
   'abused': 'analyzed',
   'barbiturates/methaqualone': 'organic reference compounds',
   'clonazepam/flunitrazepam': 'organic reference compounds',
-  
+
   // Arabic drug/narcotic names
   'كشف المخدرات': 'التحليل الكيميائي',
   'فحص المخدرات': 'التحليل الكيميائي',
@@ -216,14 +216,22 @@ String sanitizeText(String text) {
 
   // Double check if any sensitive terms remain
   final lower = sanitized.toLowerCase();
-  if (lower.contains('heroin') || lower.contains('cocaine') || lower.contains('cannabis') || lower.contains('opium') || lower.contains('morphine')) {
+  if (lower.contains('heroin') ||
+      lower.contains('cocaine') ||
+      lower.contains('cannabis') ||
+      lower.contains('opium') ||
+      lower.contains('morphine')) {
     // Force replace if still lingering
     sanitized = sanitized
-      .replaceAll(RegExp('heroin', caseSensitive: false), 'laboratory reference compound')
-      .replaceAll(RegExp('cocaine', caseSensitive: false), 'educational analytical compound')
-      .replaceAll(RegExp('cannabis', caseSensitive: false), 'botanical specimen')
-      .replaceAll(RegExp('opium', caseSensitive: false), 'organic compound')
-      .replaceAll(RegExp('morphine', caseSensitive: false), 'alkaloid compound');
+        .replaceAll(RegExp('heroin', caseSensitive: false),
+            'laboratory reference compound')
+        .replaceAll(RegExp('cocaine', caseSensitive: false),
+            'educational analytical compound')
+        .replaceAll(
+            RegExp('cannabis', caseSensitive: false), 'botanical specimen')
+        .replaceAll(RegExp('opium', caseSensitive: false), 'organic compound')
+        .replaceAll(
+            RegExp('morphine', caseSensitive: false), 'alkaloid compound');
   }
 
   return sanitized;
@@ -238,7 +246,7 @@ String replaceIgnoreCase(String text, String target, String replacement) {
 
   final lowerText = text.toLowerCase();
   final lowerTarget = target.toLowerCase();
-  
+
   int index = lowerText.indexOf(lowerTarget);
   if (index == -1) return text;
 
@@ -247,12 +255,15 @@ String replaceIgnoreCase(String text, String target, String replacement) {
 
   while (index != -1) {
     buffer.write(text.substring(lastIndex, index));
-    
+
     final originalSnippet = text.substring(index, index + target.length);
-    final isAllUpper = originalSnippet == originalSnippet.toUpperCase() && originalSnippet != originalSnippet.toLowerCase();
-    final isFirstUpper = originalSnippet.isNotEmpty && 
-                         originalSnippet[0] == originalSnippet[0].toUpperCase() && 
-                         (originalSnippet.length == 1 || originalSnippet.substring(1) == originalSnippet.substring(1).toLowerCase());
+    final isAllUpper = originalSnippet == originalSnippet.toUpperCase() &&
+        originalSnippet != originalSnippet.toLowerCase();
+    final isFirstUpper = originalSnippet.isNotEmpty &&
+        originalSnippet[0] == originalSnippet[0].toUpperCase() &&
+        (originalSnippet.length == 1 ||
+            originalSnippet.substring(1) ==
+                originalSnippet.substring(1).toLowerCase());
 
     if (isAllUpper) {
       buffer.write(replacement.toUpperCase());
@@ -272,14 +283,14 @@ String replaceIgnoreCase(String text, String target, String replacement) {
 
 String sanitizeReference(String ref) {
   final lower = ref.toLowerCase();
-  if (lower.contains('drug') || 
-      lower.contains('narc') || 
-      lower.contains('abuse') || 
-      lower.contains('rausch') || 
-      lower.contains('sucht') || 
-      lower.contains('cocaine') || 
-      lower.contains('heroin') || 
-      lower.contains('morphine') || 
+  if (lower.contains('drug') ||
+      lower.contains('narc') ||
+      lower.contains('abuse') ||
+      lower.contains('rausch') ||
+      lower.contains('sucht') ||
+      lower.contains('cocaine') ||
+      lower.contains('heroin') ||
+      lower.contains('morphine') ||
       lower.contains('cannabis') ||
       lower.contains('poison')) {
     return 'Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)';
@@ -298,7 +309,8 @@ dynamic sanitizeNode(dynamic node) {
       final String safeKey = sanitizeText(key);
       if (key == 'reference' || key == 'references') {
         if (val is List) {
-          result[safeKey] = val.map((ref) => sanitizeReference(ref.toString())).toList();
+          result[safeKey] =
+              val.map((ref) => sanitizeReference(ref.toString())).toList();
         } else {
           result[safeKey] = sanitizeReference(val.toString());
         }

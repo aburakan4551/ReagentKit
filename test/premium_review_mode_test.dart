@@ -19,7 +19,8 @@ void main() {
   group('Premium Review Mode Testing and Hardening Verification', () {
     setUpAll(() {
       final getIt = GetIt.instance;
-      getIt.registerLazySingleton<FirestoreService>(() => MockFirestoreService());
+      getIt.registerLazySingleton<FirestoreService>(
+          () => MockFirestoreService());
     });
 
     test('1. review_mode_config values are active', () {
@@ -36,12 +37,14 @@ void main() {
       expect(service.errorMessage, isNull);
     });
 
-    test('3. Local storage and Cloud Sync prevent writes in review mode', () async {
+    test('3. Local storage and Cloud Sync prevent writes in review mode',
+        () async {
       // LocalStorageService should not write or throw
       await LocalStorageService.savePremiumStatus(true);
-      
+
       // CloudSyncService should bypass sync silently
-      await CloudSyncService.syncPremiumState(uid: 'test_uid', isPremium: true, scansLeft: 999);
+      await CloudSyncService.syncPremiumState(
+          uid: 'test_uid', isPremium: true, scansLeft: 999);
     });
 
     test('4. Analytics suppresses monetization events', () async {

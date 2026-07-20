@@ -16,7 +16,9 @@ void main() {
       SafeStoreSanitizer.appStoreReviewMode = false;
     });
 
-    test('1. Strictly asserts NO forbidden English or Arabic terms appear in sanitized output', () {
+    test(
+        '1. Strictly asserts NO forbidden English or Arabic terms appear in sanitized output',
+        () {
       final dangerousTexts = [
         'Heroin detection test',
         'Cocaine presence in sample',
@@ -42,26 +44,46 @@ void main() {
       ];
 
       final forbiddenKeywords = [
-        'heroin', 'cocaine', 'cannabis', 'thc', 'diazepam', 'narcotic', 'opiate',
-        'amphetamine', 'methamphetamine', 'mdma', 'lsd',
-        'هيروين', 'كوكايين', 'حشيش', 'قات', 'مخدر', 'ديازيبام', 'بنزوديازيبين',
-        'أفيون', 'سموم', 'إم دي إم إيه', 'المؤثرات العقلية'
+        'heroin',
+        'cocaine',
+        'cannabis',
+        'thc',
+        'diazepam',
+        'narcotic',
+        'opiate',
+        'amphetamine',
+        'methamphetamine',
+        'mdma',
+        'lsd',
+        'هيروين',
+        'كوكايين',
+        'حشيش',
+        'قات',
+        'مخدر',
+        'ديازيبام',
+        'بنزوديازيبين',
+        'أفيون',
+        'سموم',
+        'إم دي إم إيه',
+        'المؤثرات العقلية'
       ];
 
       for (final text in dangerousTexts) {
         final sanitized = SafeStoreSanitizer.sanitize(text);
-        
+
         for (final keyword in forbiddenKeywords) {
           expect(
             sanitized.toLowerCase().contains(keyword.toLowerCase()),
             isFalse,
-            reason: 'Sanitized text "$sanitized" still contains forbidden keyword "$keyword" (from source: "$text")',
+            reason:
+                'Sanitized text "$sanitized" still contains forbidden keyword "$keyword" (from source: "$text")',
           );
         }
       }
     });
 
-    test('2. Strictly asserts original test names do not appear in review mode', () {
+    test('2. Strictly asserts original test names do not appear in review mode',
+        () {
       final testNames = {
         'Marquis Test': 'Reagent A',
         'Mecke Test': 'Reagent B',
@@ -94,14 +116,18 @@ void main() {
       });
     });
 
-    test('3. Verifies share/export text and AI output patterns are fully sanitized', () {
-      final rawAiOutput = 'AI Interpretation: Possible Substances Detected - Heroin (95% confidence). Color Match: Purple. Stability Index: Stable.';
+    test(
+        '3. Verifies share/export text and AI output patterns are fully sanitized',
+        () {
+      final rawAiOutput =
+          'AI Interpretation: Possible Substances Detected - Heroin (95% confidence). Color Match: Purple. Stability Index: Stable.';
       final sanitizedAi = SafeStoreSanitizer.sanitize(rawAiOutput);
 
       expect(sanitizedAi.toLowerCase().contains('heroin'), isFalse);
       expect(sanitizedAi.toLowerCase().contains('confidence'), isFalse);
       expect(sanitizedAi.toLowerCase().contains('ai interpretation'), isFalse);
-      expect(sanitizedAi.toLowerCase().contains('possible substances'), isFalse);
+      expect(
+          sanitizedAi.toLowerCase().contains('possible substances'), isFalse);
 
       expect(sanitizedAi, contains('Analytical Observation'));
       expect(sanitizedAi, contains('Observed Analytical Pattern'));

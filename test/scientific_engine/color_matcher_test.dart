@@ -54,7 +54,7 @@ void main() {
       final colors = ColorMatcher.parseColorDescription('red-brown to violet');
       // Should find red, brown, and violet
       expect(colors, isNotEmpty);
-      
+
       final hexList = colors.map((c) => c.toHex()).toList();
       // Red: #FF0000, #B22222, #8B0000
       // Brown: #8B4513, #A0522D, #A52A2A
@@ -65,7 +65,8 @@ void main() {
     });
 
     test('parseColorDescription fallbacks to grey for unknown text', () {
-      final colors = ColorMatcher.parseColorDescription('completely unknown pattern');
+      final colors =
+          ColorMatcher.parseColorDescription('completely unknown pattern');
       expect(colors.length, 1);
       expect(colors.first.toHex(), '#808080'); // Neutral grey
     });
@@ -91,7 +92,8 @@ void main() {
       expect(deltaE, 0.0);
     });
 
-    test('calculateDeltaE matches deltaE between red and green as substantial', () {
+    test('calculateDeltaE matches deltaE between red and green as substantial',
+        () {
       const red = RGBColor(255, 0, 0);
       const green = RGBColor(0, 255, 0);
       final deltaE = ColorMatcher.calculateDeltaE(red, green);
@@ -99,7 +101,8 @@ void main() {
       expect(deltaE, greaterThan(80.0));
     });
 
-    test('getMinDeltaE finds closest distance to target colors in description', () {
+    test('getMinDeltaE finds closest distance to target colors in description',
+        () {
       const observed = RGBColor(255, 10, 10); // Very close to red
       // Target matches "red" which contains RGB(255,0,0)
       final minDelta = ColorMatcher.getMinDeltaE(observed, 'red-brown');

@@ -1,6 +1,5 @@
 import Flutter
 import UIKit
-import GoogleSignIn
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -16,23 +15,16 @@ import GoogleSignIn
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  // 🔑 REQUIRED: Handle Google Sign-In OAuth callback URL
-  // Without this, the app cannot receive the auth token after Google login
+  // Forward incoming URLs to Flutter's deep link handler
   override func application(
     _ app: UIApplication,
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
-    // Let GoogleSignIn handle its OAuth callback first
-    if GIDSignIn.sharedInstance.handle(url) {
-      return true
-    }
-    // Fall through to Flutter's URL handler for other deep links
     return super.application(app, open: url, options: options)
   }
 
-  // 🔑 REQUIRED for iOS 13+: Handle Universal Links & OAuth callback via Scene
-  // This is needed when using UISceneDelegate (modern iOS architecture)
+  // Handle Universal Links via Scene (iOS 13+)
   override func application(
     _ application: UIApplication,
     continue userActivity: NSUserActivity,

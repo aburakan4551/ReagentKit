@@ -321,7 +321,6 @@ class _ReagentTestingPageState extends ConsumerState<ReagentTestingPage> {
         icon = HeroIcons.exclamation_triangle;
         break;
       case WarningSeverity.info:
-      default:
         color = Colors.blue;
         icon = HeroIcons.information_circle;
         break;

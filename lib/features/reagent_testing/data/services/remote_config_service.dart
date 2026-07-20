@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import '../models/reagent_model.dart';
@@ -9,24 +10,38 @@ import '../../../../core/globals.dart';
 // ═════════════════════════════════════════════════════════════════════════════
 // RemoteConfigService — Production-Grade
 //
-// Firebase Remote Config key contract:
-//   • reagents_data         — JSON object: { "Marquis Test": { … }, … }
-//   • safety_instructions   — JSON object: { "Marquis Test": { … }, … }
-//   • references_data       — JSON object: { "Marquis Test": { "reference": […] }, … }
-//   • reagent_version       — String: semantic version ("1.2.0")
-//   • gemini_api_key        — String: Gemini AI key (blank = use env var)
+// Firebase Remote Config key contract (Scientific Database Sync):
+//   • database_version              — String: current database semantic version ("2.1.0")
+//   • minimum_database_version      — String: minimum supported version ("1.5.0")
+//   • scientific_database_hash      — String: SHA-256 hash of full scientific dataset for integrity
+//   • featured_reagents             — JSON array: ["Marquis Test", "Mecke Test", ...] for home screen
+//   • maintenance_message           — String: optional maintenance banner text
+//   • enable_new_reagents           — bool: feature flag for new reagent rollout
+//   • force_database_refresh        — bool: force client to refetch from Firestore
+//   • scientific_reference_version  — String: version of scientific references dataset
+//   • gemini_api_key                — String: Gemini AI key (blank = use env var)
 //
-// ALL keys default to empty JSON so that the app never crashes if Remote
+// ALL keys default to safe values so that the app never crashes if Remote
 // Config has not been published yet — it falls through to local assets.
 // ═════════════════════════════════════════════════════════════════════════════
 
 class RemoteConfigService {
   // ── Key constants ──────────────────────────────────────────────────────────
+  static const String _databaseVersionKey         = 'database_version';
+  static const String _minimumDatabaseVersionKey  = 'minimum_database_version';
+  static const String _scientificDatabaseHashKey  = 'scientific_database_hash';
+  static const String _featuredReagentsKey        = 'featured_reagents';
+  static const String _maintenanceMessageKey      = 'maintenance_message';
+  static const String _enableNewReagentsKey       = 'enable_new_reagents';
+  static const String _forceDatabaseRefreshKey    = 'force_database_refresh';
+  static const String _scientificReferenceVersionKey = 'scientific_reference_version';
+  static const String _geminiApiKeyKey            = 'gemini_api_key';
+
+  // Legacy keys (kept for backward compatibility during transition)
   static const String _reagentsDataKey      = 'reagents_data';
   static const String _safetyKey            = 'safety_instructions';
   static const String _referencesDataKey    = 'references_data';
   static const String _reagentVersionKey    = 'reagent_version';
-  static const String _geminiApiKeyKey      = 'gemini_api_key';
 
   static const String _educationalModeKey = 'educational_mode';
   static const String _safeStoreModeKey = 'safe_store_mode';
@@ -56,11 +71,20 @@ class RemoteConfigService {
 
       // Defaults ensure the app boots cleanly with no published config.
       await _remoteConfig.setDefaults({
+        _databaseVersionKey:             '1.0.0',
+        _minimumDatabaseVersionKey:      '1.0.0',
+        _scientificDatabaseHashKey:      '',
+        _featuredReagentsKey:            '[]',
+        _maintenanceMessageKey:          '',
+        _enableNewReagentsKey:           true,
+        _forceDatabaseRefreshKey:        false,
+        _scientificReferenceVersionKey:  '1.0.0',
+        _geminiApiKeyKey:                '',
+        // Legacy defaults
         _reagentsDataKey:   '{}',
         _safetyKey:         '{}',
         _referencesDataKey: '{}',
         _reagentVersionKey: '1.0.0',
-        _geminiApiKeyKey:   '',
         _educationalModeKey: false,
         _safeStoreModeKey: false,
         _showSensitiveNamesKey: true,
@@ -91,14 +115,20 @@ class RemoteConfigService {
   Future<bool> fetchAndActivate() async {
     try {
       final oldReviewMode = appStoreReviewMode;
+      final oldForceRefresh = forceDatabaseRefresh;
       final updated = await _remoteConfig.fetchAndActivate();
       final newReviewMode = appStoreReviewMode;
+      final newForceRefresh = forceDatabaseRefresh;
       
-      if (updated || oldReviewMode != newReviewMode) {
+      if (updated || oldReviewMode != newReviewMode || oldForceRefresh != newForceRefresh) {
         Logger.info('🔄 [RemoteConfig] New values activated');
         if (oldReviewMode != newReviewMode) {
           Logger.info('⚠️ [RemoteConfig] App Store Review Mode changed from $oldReviewMode to $newReviewMode');
           await _handleReviewModeChange(newReviewMode);
+        }
+        if (oldForceRefresh != newForceRefresh && newForceRefresh) {
+          Logger.info('⚠️ [RemoteConfig] Force database refresh triggered');
+          await _handleForceRefresh();
         }
       }
       SafeStoreSanitizer.safeStoreMode = safeStoreMode;
@@ -114,13 +144,19 @@ class RemoteConfigService {
   Future<bool> activate() async {
     try {
       final oldReviewMode = appStoreReviewMode;
+      final oldForceRefresh = forceDatabaseRefresh;
       final success = await _remoteConfig.activate();
       final newReviewMode = appStoreReviewMode;
+      final newForceRefresh = forceDatabaseRefresh;
       
       if (success) {
         if (oldReviewMode != newReviewMode) {
           Logger.info('⚠️ [RemoteConfig] App Store Review Mode changed from $oldReviewMode to $newReviewMode');
           await _handleReviewModeChange(newReviewMode);
+        }
+        if (oldForceRefresh != newForceRefresh && newForceRefresh) {
+          Logger.info('⚠️ [RemoteConfig] Force database refresh triggered');
+          await _handleForceRefresh();
         }
       }
       SafeStoreSanitizer.safeStoreMode = safeStoreMode;
@@ -149,7 +185,85 @@ class RemoteConfigService {
     }
   }
 
-  // ── Reagent Data ───────────────────────────────────────────────────────────
+  Future<void> _handleForceRefresh() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('scientific_dataset_cache');
+      await prefs.remove('scientific_dataset_cache_prev');
+      await prefs.remove('scientific_dataset_snapshot');
+      Logger.info('🧹 [RemoteConfig] Cache wiped due to force_database_refresh');
+    } catch (e) {
+      Logger.error('❌ [RemoteConfig] Failed to handle force refresh: $e');
+    }
+  }
+
+  // ── Scientific Database Sync Keys ──────────────────────────────────────────
+
+  /// Current database version from Remote Config
+  String get databaseVersion => _remoteConfig.getString(_databaseVersionKey);
+
+  /// Minimum supported database version
+  String get minimumDatabaseVersion => _remoteConfig.getString(_minimumDatabaseVersionKey);
+
+  /// SHA-256 hash of the full scientific dataset for integrity verification
+  String get scientificDatabaseHash => _remoteConfig.getString(_scientificDatabaseHashKey);
+
+  /// Featured reagents for home screen display
+  List<String> get featuredReagents {
+    final raw = _remoteConfig.getString(_featuredReagentsKey);
+    if (raw.isEmpty || raw == '[]') return [];
+    try {
+      return List<String>.from(json.decode(raw) as List);
+    } catch (e) {
+      Logger.error('❌ [RemoteConfig] Failed to parse featured_reagents: $e');
+      return [];
+    }
+  }
+
+  /// Optional maintenance message to display to users
+  String get maintenanceMessage => _remoteConfig.getString(_maintenanceMessageKey);
+
+  /// Feature flag for new reagent rollout
+  bool get enableNewReagents => _remoteConfig.getBool(_enableNewReagentsKey);
+
+  /// Force client to refetch scientific data from Firestore
+  bool get forceDatabaseRefresh => _remoteConfig.getBool(_forceDatabaseRefreshKey);
+
+  /// Version of scientific references dataset
+  String get scientificReferenceVersion => _remoteConfig.getString(_scientificReferenceVersionKey);
+
+  // ── Version Compatibility Checks ──────────────────────────────────────────
+
+  /// Check if current local database version meets minimum requirement
+  bool isDatabaseVersionSupported(String localVersion) {
+    try {
+      final minVersion = minimumDatabaseVersion;
+      final local = localVersion;
+      
+      final minParts = minVersion.split('.').map(int.parse).toList();
+      final localParts = local.split('.').map(int.parse).toList();
+      
+      for (int i = 0; i < 3; i++) {
+        final minPart = i < minParts.length ? minParts[i] : 0;
+        final localPart = i < localParts.length ? localParts[i] : 0;
+        if (localPart > minPart) return true;
+        if (localPart < minPart) return false;
+      }
+      return true; // equal
+    } catch (e) {
+      Logger.warning('⚠️ [RemoteConfig] Version comparison failed, allowing: $e');
+      return true;
+    }
+  }
+
+  /// Check if scientific database hash matches (for cache validation)
+  bool isDatabaseHashValid(String localHash) {
+    final remoteHash = scientificDatabaseHash;
+    if (remoteHash.isEmpty) return true; // No hash set = skip check
+    return remoteHash == localHash;
+  }
+
+  // ── Reagent Data (Legacy - for backward compatibility) ─────────────────────
 
   /// Returns true only when `reagents_data` has non-empty content.
   bool hasReagentData() {
@@ -157,13 +271,17 @@ class RemoteConfigService {
     return raw.isNotEmpty && raw != '{}';
   }
 
-  /// Parse and return all reagents from `reagents_data`.
+  /// Returns the raw JSON string from `reagents_data`, or null when empty.
   ///
-  /// The value must be a JSON object keyed by test name, e.g.:
-  ///   { "Marquis Test": { "reagentName": "Marquis Test", … }, … }
-  ///
-  /// Returns an empty list (not an error) when the key is unpublished,
-  /// letting [UnifiedDataService] fall back to local JSON.
+  /// Used by [UnifiedDataService] as the primary scientific data source
+  /// (Remote Config first → Local Cache → Asset).
+  String? getReagentsDataRaw() {
+    final raw = _remoteConfig.getString(_reagentsDataKey);
+    if (raw.isEmpty || raw == '{}') return null;
+    return raw;
+  }
+
+  /// Parse and return all reagents from `reagents_data` (legacy).
   Future<List<ReagentModel>> getReagents() async {
     final raw = _remoteConfig.getString(_reagentsDataKey);
 
@@ -182,7 +300,6 @@ class RemoteConfigService {
           if (value is! Map<String, dynamic>) {
             throw FormatException('Expected object for "$key"');
           }
-          // Inject the key as reagentName when the field is absent
           final Map<String, dynamic> entry = {
             'reagentName': key,
             ...value,
@@ -211,7 +328,7 @@ class RemoteConfigService {
     }
   }
 
-  /// Get a single reagent by name.
+  /// Get a single reagent by name (legacy).
   Future<ReagentModel?> getReagentByName(String name) async {
     final all = await getReagents();
     try {
@@ -224,12 +341,8 @@ class RemoteConfigService {
     }
   }
 
-  // ── References Data ────────────────────────────────────────────────────────
+  // ── References Data (Legacy) ───────────────────────────────────────────────
 
-  /// Returns scientific references for [reagentName] from Remote Config.
-  ///
-  /// The `references_data` key should hold:
-  ///   { "Marquis Test": { "reference": ["…", "…"] }, … }
   Future<List<String>> getReferencesForReagent(String reagentName) async {
     final raw = _remoteConfig.getString(_referencesDataKey);
     if (raw.isEmpty || raw == '{}') return [];
@@ -252,12 +365,8 @@ class RemoteConfigService {
     }
   }
 
-  // ── Safety Data ────────────────────────────────────────────────────────────
+  // ── Safety Data (Legacy) ───────────────────────────────────────────────────
 
-  /// Returns the raw safety JSON map from Remote Config, or `{}` on error.
-  ///
-  /// Used by [UnifiedDataService._loadSafetyData()] to parse safety data
-  /// without coupling it to [SafetyInstructionsModel].
   Map<String, dynamic> getSafetyJsonMap() {
     final raw = _remoteConfig.getString(_safetyKey);
     if (raw.isEmpty || raw == '{}') return {};
@@ -276,7 +385,7 @@ class RemoteConfigService {
     return raw.isNotEmpty && raw != '{}';
   }
 
-  // ── Version ────────────────────────────────────────────────────────────────
+  // ── Version (Legacy) ────────────────────────────────────────────────────────
 
   String getReagentVersion() => _remoteConfig.getString(_reagentVersionKey);
 
@@ -295,8 +404,6 @@ class RemoteConfigService {
   bool hasGeminiApiKey() =>
       _remoteConfig.getString(_geminiApiKeyKey).isNotEmpty;
 
-  /// Returns the Gemini key from Remote Config, falling back to the
-  /// compile-time GEMINI_API_KEY environment variable.
   String getGeminiApiKeyWithFallback() {
     final remote = getGeminiApiKey();
     if (remote.isNotEmpty) return remote;
@@ -317,7 +424,6 @@ class RemoteConfigService {
 
   bool get safeStoreMode {
     final mode = _remoteConfig.getBool(_safeStoreModeKey) || appStoreReviewMode;
-    // Set sanitizer mode dynamically
     SafeStoreSanitizer.safeStoreMode = mode;
     return mode;
   }
@@ -346,6 +452,10 @@ class RemoteConfigService {
 
   // ── Real-time updates ──────────────────────────────────────────────────────
 
-  Stream<RemoteConfigUpdate> onConfigUpdated() =>
-      _remoteConfig.onConfigUpdated;
+  Stream<RemoteConfigUpdate> onConfigUpdated() {
+    if (kIsWeb) {
+      return const Stream<RemoteConfigUpdate>.empty();
+    }
+    return _remoteConfig.onConfigUpdated;
+  }
 }

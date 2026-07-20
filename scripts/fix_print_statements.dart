@@ -5,9 +5,6 @@ import 'dart:io';
 void main() async {
   final files = [
     'lib/core/services/firestore_service.dart',
-    'lib/core/services/auth_service.dart',
-    'lib/features/auth/presentation/controllers/auth_controller.dart',
-    'lib/features/auth/presentation/views/firestore_debug_page.dart',
     'lib/features/reagent_testing/data/repositories/test_result_history_repository.dart',
     'lib/features/reagent_testing/data/services/json_data_service.dart',
     'lib/features/reagent_testing/data/services/remote_config_service.dart',
