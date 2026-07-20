@@ -499,7 +499,7 @@ class SettingsPage extends ConsumerWidget {
             ),
             SettingsTile(
               title: l10n.version,
-              subtitle: '1.0.0',
+              subtitle: '1.0.1',
               leadingIcon: HeroIcons.tag,
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -531,7 +531,7 @@ class SettingsPage extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Text(
-              'Reagent ColorTest - Version 1.0.0\nResearch Use Only - Dataset Version: 2026.05',
+              'Reagent ColorTest - Version 1.0.1\nResearch Use Only - Dataset Version: 2026.05',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
