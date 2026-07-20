@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/test_result_entity.dart';
 import '../../../../core/utils/logger.dart';
-import '../../../../core/globals.dart';
 class TestResultHistoryRepository {
   static const String _localStorageKey = 'test_result_history';
 
