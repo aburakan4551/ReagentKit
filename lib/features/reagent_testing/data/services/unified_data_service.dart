@@ -17,6 +17,7 @@ import '../../../../core/services/crash_analytics.dart';
 import 'remote_config_service.dart';
 import '../../../../core/services/safe_store_sanitizer.dart';
 import '../../../../core/services/safe_store_backup_manager.dart';
+import '../../../../core/services/firestore_scientific_service.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Enums & Value Objects
@@ -533,17 +534,19 @@ ParseOutput parseScientificDatasetIsolate(ParseParams params) {
 class UnifiedDataService {
   final RemoteConfigService? _remoteConfig;
   // ignore: unused_field
+  final FirestoreScientificService? _firestoreScientific;
+  // ignore: unused_field
   final dynamic _connectivity;
 
   List<ReagentTestModel>? _cachedReagents;
   String _cacheVersion = '1.0.0';
   bool _initialized = false;
+  bool _firebaseEverLoaded = false;
 
-  String get _datasetAsset {
-    final rc = _remoteConfig;
-    final isReview = rc?.appStoreReviewMode ?? SafeStoreSanitizer.appStoreReviewMode;
-    return isReview ? 'assets/data/reagents_safe_store.json' : 'assets/data/reagents.json';
-  }
+  // Bundled asset used only as the last emergency fallback (Layer 5).
+  // app_store_review_mode no longer selects the dataset; reagents.json is the
+  // sole fallback so Remote Config is the single primary source.
+  static const String _fallbackAsset = 'assets/data/reagents.json';
 
   final _snapshotController = StreamController<DataSnapshot>.broadcast();
   Stream<DataSnapshot> get onSnapshot => _snapshotController.stream;
@@ -551,7 +554,7 @@ class UnifiedDataService {
   DataSource get lastSource => _lastDataSource;
   DataSource _lastDataSource = DataSource.local;
   bool get hasCachedData => _cachedReagents != null;
-  bool get firebaseEverLoaded => false;
+  bool get firebaseEverLoaded => _firebaseEverLoaded;
   String get cacheVersion => _cacheVersion;
 
   // New Lifecycle State and warning severity tracking
@@ -582,8 +585,10 @@ class UnifiedDataService {
   UnifiedDataService({
     dynamic remoteConfig,
     dynamic connectivity,
+    FirestoreScientificService? firestoreScientific,
   })  : _remoteConfig = remoteConfig,
-        _connectivity = connectivity;
+        _connectivity = connectivity,
+        _firestoreScientific = firestoreScientific;
 
   /// Initialises the dataset and validates integrity in the background
   Future<void> initialize() async {
@@ -636,16 +641,47 @@ class UnifiedDataService {
   }) async {
     developer.log('Starting loadPipelineImpl (forceAssetReload: $forceAssetReload, clearCache: $clearCache)', name: 'ScientificParser');
 
+    // ── Remote Config Sync Check ─────────────────────────────────────────────
+    // Check if we need to refresh from Firestore based on Remote Config
+    bool shouldForceRefresh = false;
+    String remoteDatabaseVersion = '';
+    String remoteDatabaseHash = '';
+    
+    if (_remoteConfig != null) {
+      shouldForceRefresh = _remoteConfig.forceDatabaseRefresh;
+      remoteDatabaseVersion = _remoteConfig.databaseVersion;
+      remoteDatabaseHash = _remoteConfig.scientificDatabaseHash;
+      
+      if (shouldForceRefresh) {
+        developer.log('🔄 [UnifiedDataService] Remote Config force_database_refresh=true - forcing Firestore refresh', name: 'ScientificParser');
+      }
+      if (remoteDatabaseVersion.isNotEmpty) {
+        developer.log('📦 [UnifiedDataService] Remote Config database_version: $remoteDatabaseVersion', name: 'ScientificParser');
+      }
+      if (remoteDatabaseHash.isNotEmpty) {
+        developer.log('🔐 [UnifiedDataService] Remote Config scientific_database_hash: $remoteDatabaseHash', name: 'ScientificParser');
+      }
+    }
+
     final isSafeStore = _remoteConfig?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
-    if (clearCache || isSafeStore) {
+    final prefs = await SharedPreferences.getInstance();
+    if (clearCache || isSafeStore || shouldForceRefresh) {
       try {
-        final prefs = await SharedPreferences.getInstance();
         await prefs.remove('scientific_dataset_cache');
         await prefs.remove('scientific_dataset_cache_prev');
         await prefs.remove('scientific_dataset_snapshot');
-        developer.log('Local caches cleared due to Safe Store Mode or force clear.', name: 'ScientificParser');
+        await prefs.remove('scientific_dataset_hash'); // Remove stored hash
+        developer.log('Local caches cleared due to Safe Store Mode, force clear, or Remote Config force refresh.', name: 'ScientificParser');
       } catch (e) {
         developer.log('Failed to clear cache: $e', name: 'ScientificParser');
+      }
+    }
+
+    // Check if cached hash matches Remote Config hash (cache is up-to-date)
+    if (remoteDatabaseHash.isNotEmpty) {
+      final cachedHash = prefs.getString('scientific_dataset_hash');
+      if (cachedHash == remoteDatabaseHash) {
+        developer.log('✅ [UnifiedDataService] Local cache hash matches Remote Config - dataset is current', name: 'ScientificParser');
       }
     }
 
@@ -654,32 +690,37 @@ class UnifiedDataService {
       developer.log('⚠️ Circuit breaker is active. Skipping load pipeline and using fallback.', name: 'CircuitBreaker');
       _currentLifecycleState = DatasetLifecycleState.fallback;
       _currentWarningSeverity = WarningSeverity.critical;
-      return _createFallbackSnapshot(
+      final snapshot = _createFallbackSnapshot(
         source: DataSource.local,
         lifecycleState: DatasetLifecycleState.fallback,
         integrity: ScientificIntegrity.fallback,
         warningSeverity: WarningSeverity.critical,
         warningMsg: 'Circuit breaker active. Primary parsing bypassed.',
       );
+      _traceLayer('Circuit Breaker Fallback', snapshot);
+      return snapshot;
     }
 
     _currentLifecycleState = DatasetLifecycleState.loading;
-    final prefs = await SharedPreferences.getInstance();
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Layer 1: Primary Asset Source
+    // Layer 1: Remote Config - Primary Source (reagents_data key)
     // ─────────────────────────────────────────────────────────────────────────
     try {
-      final raw = await rootBundle.loadString(_datasetAsset).timeout(const Duration(seconds: 10));
-      
-      // JSON Decode & Migrate
+      developer.log('[DATA SOURCE] Attempting Remote Config: reagents_data...', name: 'ScientificParser');
+
+      final raw = _remoteConfig?.getReagentsDataRaw();
+      if (raw == null) {
+        throw FormatException('reagents_data is empty or missing from Remote Config');
+      }
+      developer.log('[DATA SOURCE] Remote Config reagents_data retrieved', name: 'ScientificParser');
+
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       final (migratedJson, appliedMigrations) = _migrator.migrate(decoded);
       final migratedRaw = jsonEncode(migratedJson);
 
       final parseOutput = await _verifyAndParse(migratedRaw, profile);
-      
-      // Trigger backup of the original dataset before any review modes or modifications
+
       await SafeStoreBackupManager.createBackup(
         reagentsData: migratedRaw,
         safetyData: '{}',
@@ -691,7 +732,6 @@ class UnifiedDataService {
           .map((e) => ReagentTestModel.fromJson(e, profile: profile))
           .toList();
 
-      // Enforce deterministic sorting (alphabetical by ID)
       reagentsList.sort((a, b) => a.id.compareTo(b.id));
 
       _circuitBreaker.reset();
@@ -699,16 +739,18 @@ class UnifiedDataService {
           ? DatasetLifecycleState.degraded
           : DatasetLifecycleState.healthy;
 
-      // Rotate Cache
       final currentCache = prefs.getString('scientific_dataset_cache');
       if (currentCache != null && currentCache != migratedRaw) {
         await prefs.setString('scientific_dataset_cache_prev', currentCache);
       }
 
-      // Atomic cache write with SHA-256 validation
       await _atomicWriteCache('scientific_dataset_cache', migratedRaw);
 
-      // Write Gzip Compressed Snapshot
+      if (remoteDatabaseHash.isNotEmpty) {
+        await prefs.setString('scientific_dataset_hash', remoteDatabaseHash);
+        developer.log('💾 [UnifiedDataService] Stored scientific_dataset_hash for sync validation', name: 'ScientificParser');
+      }
+
       final snapshotMap = {
         'version': parseOutput.version,
         'reagents': parseOutput.parsedReagents,
@@ -718,8 +760,8 @@ class UnifiedDataService {
       await prefs.setString('scientific_dataset_snapshot', compressed);
 
       final metadata = DatasetMetadata(
-        source: 'asset',
-        author: decoded['author']?.toString() ?? 'System',
+        source: 'remote_config',
+        author: decoded['author']?.toString() ?? 'Remote Config',
         generatedAt: DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ?? DateTime.now(),
         scientificRevision: decoded['scientificRevision']?.toString() ?? parseOutput.version,
         expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
@@ -732,7 +774,8 @@ class UnifiedDataService {
 
       _cachedReagents = reagentsList;
       _cacheVersion = parseOutput.version;
-      _lastDataSource = DataSource.local;
+      _lastDataSource = DataSource.firebase;
+      _firebaseEverLoaded = true;
 
       final diagnostics = DatasetDiagnostics(
         rawItems: parseOutput.rawItemsCount,
@@ -753,7 +796,6 @@ class UnifiedDataService {
           ? 'Loaded with degraded status: ${parseOutput.skippedItemsCount} items skipped.'
           : null;
 
-      // Enforce Dataset Aging Policy
       final age = DateTime.now().difference(metadata.generatedAt);
       if (age.inDays > 90) {
         _currentLifecycleState = DatasetLifecycleState.degraded;
@@ -769,7 +811,7 @@ class UnifiedDataService {
 
       final snapshot = _makeSnapshot(
         reagents: reagentsList,
-        source: DataSource.local,
+        source: DataSource.firebase,
         health: parseOutput.skippedItemsCount > 0 ? DataHealthStatus.degraded : DataHealthStatus.healthy,
         version: parseOutput.version,
         diagnostics: diagnostics,
@@ -781,16 +823,18 @@ class UnifiedDataService {
         lineage: lineage,
       );
 
+      _traceLayer('Layer 1 Remote Config', snapshot);
       _snapshotController.add(snapshot);
       stopRecoveryWatchdog();
-      _logTelemetry('dataset_load_success', {'source': 'asset', 'version': parseOutput.version});
+      _logTelemetry('dataset_load_success', {'source': 'remote_config', 'version': parseOutput.version});
+      developer.log('[DATA SOURCE] ✅ Loaded ${reagentsList.length} reagents from Remote Config', name: 'ScientificParser');
       return snapshot;
 
     } catch (e, st) {
-      developer.log('Primary asset load failed, trying cached dataset recovery...', error: e, stackTrace: st, name: 'ScientificParser');
-      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'asset'}, isWarning: true);
+      developer.log('[DATA SOURCE] Remote Config load failed, falling back to local cache...', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'remote_config'}, isWarning: true);
       _circuitBreaker.recordFailure();
-      CrashAnalytics.recordError(e, st, reason: 'Primary scientific dataset load failed');
+      CrashAnalytics.recordError(e, st, reason: 'Remote Config scientific dataset load failed');
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -847,6 +891,7 @@ class UnifiedDataService {
           metadata: metadata,
         );
 
+        _traceLayer('Layer 2 Cache Recovery', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'cache', 'version': parseOutput.version});
@@ -902,8 +947,9 @@ class UnifiedDataService {
           integrity: ScientificIntegrity.fallback,
           warningSeverity: WarningSeverity.warning,
           warningMessage: 'Primary & current cache failed. Loaded from previous cache.',
-        );
+);
 
+        _traceLayer('Layer 3 Previous Cache', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'prev_cache', 'version': parseOutput.version});
@@ -961,6 +1007,7 @@ class UnifiedDataService {
           warningMessage: 'Loaded from decompressed snapshot.',
         );
 
+        _traceLayer('Layer 4 Snapshot', snapshot);
         _snapshotController.add(snapshot);
         startRecoveryWatchdog();
         _logTelemetry('dataset_load_success', {'source': 'gzip_snapshot', 'version': version});
@@ -973,21 +1020,118 @@ class UnifiedDataService {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Layer 5: Emergency In-Memory Fallback Source
+    // Layer 5: Bundled Asset Fallback (Emergency)
     // ─────────────────────────────────────────────────────────────────────────
-    developer.log('Running emergency recovery to in-memory dataset', name: 'ScientificParser');
+    try {
+      developer.log('[DATA SOURCE] Attempting bundled asset fallback: $_fallbackAsset...', name: 'ScientificParser');
+      final raw = await rootBundle.loadString(_fallbackAsset).timeout(const Duration(seconds: 10));
+
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+
+      final (migratedJson, appliedMigrations) = _migrator.migrate(decoded);
+      final migratedRaw = jsonEncode(migratedJson);
+
+      final parseOutput = await _verifyAndParse(migratedRaw, profile);
+
+      final List<ReagentTestModel> reagentsList = parseOutput.parsedReagents
+          .map((e) => ReagentTestModel.fromJson(e, profile: profile))
+          .toList();
+      reagentsList.sort((a, b) => a.id.compareTo(b.id));
+
+      _circuitBreaker.reset();
+      _currentLifecycleState = DatasetLifecycleState.fallback;
+      _cachedReagents = reagentsList;
+      _cacheVersion = parseOutput.version;
+      _lastDataSource = DataSource.local;
+
+      final metadata = DatasetMetadata(
+        source: 'asset',
+        author: decoded['author']?.toString() ?? 'System',
+        generatedAt: DateTime.tryParse(decoded['generatedAt']?.toString() ?? '') ?? DateTime.now(),
+        scientificRevision: decoded['scientificRevision']?.toString() ?? parseOutput.version,
+        expiresAt: DateTime.tryParse(decoded['expiresAt']?.toString() ?? '') ?? DateTime.now().add(const Duration(days: 365)),
+      );
+
+      final lineage = DatasetLineage(
+        parentDataset: decoded['version']?.toString() ?? 'unknown',
+        migrationsApplied: appliedMigrations,
+      );
+
+      final diagnostics = DatasetDiagnostics(
+        rawItems: parseOutput.rawItemsCount,
+        parsedItems: reagentsList.length,
+        skippedItems: parseOutput.skippedItemsCount,
+        invalidReferences: parseOutput.invalidReferencesCount,
+        invalidColors: parseOutput.invalidColorsCount,
+        usedFallback: true,
+        datasetVersion: parseOutput.version,
+      );
+
+      final snapshot = _makeSnapshot(
+        reagents: reagentsList,
+        source: DataSource.local,
+        health: DataHealthStatus.fallback,
+        version: parseOutput.version,
+        diagnostics: diagnostics,
+        lifecycleState: DatasetLifecycleState.fallback,
+        integrity: ScientificIntegrity.fallback,
+        warningSeverity: WarningSeverity.critical,
+        warningMessage: 'Loaded from bundled asset fallback (Remote Config unavailable).',
+        metadata: metadata,
+        lineage: lineage,
+      );
+
+      _traceLayer('Layer 5 Asset Fallback', snapshot);
+      await _atomicWriteCache('scientific_dataset_cache', migratedRaw);
+      _snapshotController.add(snapshot);
+      stopRecoveryWatchdog();
+      _logTelemetry('dataset_load_success', {'source': 'asset_fallback', 'version': parseOutput.version});
+      developer.log('[DATA SOURCE] Loaded from bundled asset fallback: ${reagentsList.length} reagents', name: 'ScientificParser');
+      return snapshot;
+    } catch (e, st) {
+      developer.log('[DATA SOURCE] Bundled asset fallback failed, using emergency in-memory dataset', error: e, stackTrace: st, name: 'ScientificParser');
+      _logTelemetry('dataset_load_warning', {'error': e.toString(), 'layer': 'asset_fallback'}, isWarning: true);
+      _circuitBreaker.recordFailure();
+      CrashAnalytics.recordError(e, st, reason: 'Bundled asset fallback load failed');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Layer 6: Emergency Fallback — try bundled asset with direct sync parse
+    // ─────────────────────────────────────────────────────────────────────────
+    developer.log('Running emergency recovery — attempting bundled asset with direct parse', name: 'ScientificParser');
     _currentLifecycleState = DatasetLifecycleState.corrupted;
     _currentWarningSeverity = WarningSeverity.critical;
-    _logTelemetry('dataset_load_fatal', {'reason': 'All loading layers failed, falling back to emergency in-memory'}, isFatal: true);
-    
-    final snapshot = _createFallbackSnapshot(
-      source: DataSource.local,
-      lifecycleState: DatasetLifecycleState.corrupted,
-      integrity: ScientificIntegrity.fallback,
-      warningSeverity: WarningSeverity.critical,
-      warningMsg: 'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
+    _logTelemetry('dataset_load_fatal', {'reason': 'All loading layers failed, attempting emergency asset parse'}, isFatal: true);
+
+    // Try one more time with the bundled asset, but bypass compute() entirely
+    final emergencyReagents = await _loadEmergencyFromAsset();
+    _cachedReagents = emergencyReagents;
+    _cacheVersion = 'emergency_1.0.0';
+    _lastDataSource = DataSource.local;
+
+    final emergencyDiagnostics = DatasetDiagnostics(
+      rawItems: emergencyReagents.length,
+      parsedItems: emergencyReagents.length,
+      skippedItems: 0,
+      invalidReferences: 0,
+      invalidColors: 0,
+      usedFallback: true,
+      datasetVersion: 'emergency_1.0.0',
     );
 
+    final snapshot = _makeSnapshot(
+      reagents: emergencyReagents,
+      source: DataSource.local,
+      health: emergencyReagents.length > 2 ? DataHealthStatus.fallback : DataHealthStatus.corrupted,
+      version: 'emergency_1.0.0',
+      diagnostics: emergencyDiagnostics,
+      lifecycleState: DatasetLifecycleState.fallback,
+      integrity: ScientificIntegrity.fallback,
+      warningSeverity: WarningSeverity.critical,
+      warningMessage: 'Loaded from emergency fallback. Primary pipeline layers failed.',
+    );
+
+    _traceLayer('Layer 6 Emergency Fallback', snapshot);
     _snapshotController.add(snapshot);
     startRecoveryWatchdog();
     return snapshot;
@@ -995,6 +1139,10 @@ class UnifiedDataService {
 
   /// Runs JSON parsing in a separate isolate. Falls back to synchronous parsing in tests or on unsupported platforms.
   Future<ParseOutput> _runParse(String rawJson, ValidationProfile profile) async {
+    // On web, compute() can be unreliable — always prefer synchronous parsing
+    if (kIsWeb) {
+      return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+    }
     try {
       return await compute(parseScientificDatasetIsolate, ParseParams(rawJson, profile));
     } catch (e, st) {
@@ -1004,7 +1152,17 @@ class UnifiedDataService {
         stackTrace: st,
         name: 'ScientificParser',
       );
-      return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+      try {
+        return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+      } catch (syncError, syncSt) {
+        developer.log(
+          'Synchronous parsing also failed.',
+          error: syncError,
+          stackTrace: syncSt,
+          name: 'ScientificParser',
+        );
+        rethrow;
+      }
     }
   }
 
@@ -1100,9 +1258,9 @@ class UnifiedDataService {
     return loadPipeline();
   }
 
-  /// Refreshes the local cache from JSON asset
+  /// Forces a fresh load from Remote Config
   Future<DataSnapshot> refresh() async {
-    developer.log('🔄 [UnifiedDataService] Refreshing local dataset', name: 'ScientificParser');
+    developer.log('[DATA SOURCE] Refreshing dataset from Remote Config', name: 'ScientificParser');
     _cachedReagents = null;
     return loadPipeline();
   }
@@ -1224,6 +1382,14 @@ class UnifiedDataService {
     developer.log('Uploading deferred telemetry batch of ${batchToSend.length} events.', name: 'ScientificTelemetry');
   }
 
+  void _traceLayer(String layerName, DataSnapshot snapshot) {
+    final names = snapshot.reagents.map((r) => r.id).toList();
+    final first10 = names.length > 10 ? names.sublist(0, 10) : names;
+    final hasMarquis = names.any((n) => n.contains('Marquis'));
+    final hasMecke = names.any((n) => n.contains('Mecke'));
+    developer.log('[PIPELINE TRACE] $layerName selected | count=${names.length} | first10=$first10 | marquis=$hasMarquis | mecke=$hasMecke', name: 'PipelineTrace');
+  }
+
   DataSnapshot _createFallbackSnapshot({
     required DataSource source,
     required DatasetLifecycleState lifecycleState,
@@ -1259,12 +1425,42 @@ class UnifiedDataService {
     );
   }
 
+  /// Attempts a synchronous direct parse of bundled asset for emergency fallback.
+  /// Returns the full dataset from the bundled asset, or the hardcoded minimum list.
+  Future<List<ReagentTestModel>> _loadEmergencyFromAsset() async {
+    try {
+      final raw = await rootBundle.loadString(_fallbackAsset);
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final (migratedJson, _) = _migrator.migrate(decoded);
+      final migratedRaw = jsonEncode(migratedJson);
+      // Parse synchronously — never use compute() for emergency path
+      final parseOutput = parseScientificDatasetIsolate(ParseParams(migratedRaw, ValidationProfile.permissive));
+      if (parseOutput.parsedReagents.isNotEmpty) {
+        final list = parseOutput.parsedReagents
+            .map((e) => ReagentTestModel.fromJson(e, profile: ValidationProfile.permissive))
+            .toList();
+        list.sort((a, b) => a.id.compareTo(b.id));
+        developer.log('[DATA SOURCE] Emergency asset parse succeeded: ${list.length} reagents', name: 'ScientificParser');
+        return list;
+      }
+    } catch (e, st) {
+      developer.log('[DATA SOURCE] Emergency asset parse also failed: $e', error: e, stackTrace: st, name: 'ScientificParser');
+    }
+    return _hardcodedMinimumReagents;
+  }
+
+  List<ReagentTestModel> get _emergencyFallbackReagents {
+    // This getter is synchronous so it returns the hardcoded list.
+    // The async version _loadEmergencyFromAsset should be preferred.
+    return _hardcodedMinimumReagents;
+  }
+
   void dispose() {
     stopRecoveryWatchdog();
     _snapshotController.close();
   }
 
-  static final List<ReagentTestModel> _emergencyFallbackReagents = [
+  static final List<ReagentTestModel> _hardcodedMinimumReagents = [
     ReagentTestModel(
       id: 'marquis_test',
       reagentName: 'Marquis Test',
@@ -1373,40 +1569,18 @@ class UnifiedDataService {
   List<ReagentTestModel> _processAndSanitizeReagents(List<ReagentTestModel> originalList) {
     final rc = _remoteConfig;
     final isSafeStore = rc?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
-    final isScottEnabled = rc?.enableScottTest ?? true;
-    final isHighRiskEnabled = rc?.enableHighRiskTests ?? true;
     final isScientificReferencesEnabled = rc?.enableScientificReferences ?? true;
 
-    // Filter reagents
-    List<ReagentTestModel> filtered = originalList.where((reagent) {
-      final idLower = reagent.id.toLowerCase();
-      
-      // 1. Filter out Scott Test if disabled
-      if (!isScottEnabled && idLower.contains('scott')) {
-        return false;
-      }
-      
-      // 2. Filter out High Risk Tests if disabled
-      if (!isHighRiskEnabled) {
-        final highRiskKeywords = ['scott', 'heroin', 'morphine', 'codeine', 'simon', 'ehrlich', 'liebermann', 'mandelin'];
-        if (highRiskKeywords.any((kw) => idLower.contains(kw))) {
-          return false;
-        }
-      }
-      
-      return true;
-    }).toList();
+    // No reagents are filtered out. Every parsed reagent reaches the UI.
+    // SafeStoreSanitizer may only rename display strings — never remove items.
 
-    // If safe store mode is disabled, we return the filtered list immediately
     if (!isSafeStore) {
-      return filtered;
+      return originalList;
     }
 
-    // Set sanitizer mode dynamically
     SafeStoreSanitizer.safeStoreMode = true;
 
-    // Clone and sanitize visible UI strings
-    return filtered.map((reagent) {
+    final sanitizedList = originalList.map((reagent) {
       final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName);
       final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr);
       final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description);
@@ -1421,8 +1595,7 @@ class UnifiedDataService {
         );
       }).toList();
 
-      List<DrugResultModel> sanitizedReactionResults = reagent.reactionResults;
-      sanitizedReactionResults = reagent.reactionResults.map((result) {
+      final sanitizedReactionResults = reagent.reactionResults.map((result) {
         return DrugResultModel(
           drugName: SafeStoreSanitizer.sanitize(result.drugName),
           color: SafeStoreSanitizer.sanitize(result.color),
@@ -1430,14 +1603,13 @@ class UnifiedDataService {
         );
       }).toList();
 
-      final sanitizedReferences = isScientificReferencesEnabled 
+      // Always include references — never drop them
+      final sanitizedReferences = isScientificReferencesEnabled
           ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref)).toList()
-          : <String>[];
+          : reagent.references;
 
-      // Sanitize chemicals list
       final sanitizedChemicals = reagent.chemicals.map((c) => SafeStoreSanitizer.sanitize(c)).toList();
 
-      // Sanitize ReagentTestSafetyInfo
       final sanitizedSafety = ReagentTestSafetyInfo(
         requiredEquipment: reagent.safety.requiredEquipment.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
         handlingProcedures: reagent.safety.handlingProcedures.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
@@ -1462,5 +1634,7 @@ class UnifiedDataService {
         safety: sanitizedSafety,
       );
     }).toList();
+
+    return sanitizedList;
   }
 }

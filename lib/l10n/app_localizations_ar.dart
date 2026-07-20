@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -108,7 +110,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aboutTheApp => '🧪 حول التطبيق:';
 
   @override
-  String get aboutTheAppContent => 'هذا التطبيق يساعد المستخدمين على اختبار المواد بأمان باستخدام الكواشف الكيميائية.';
+  String get aboutTheAppContent =>
+      'هذا التطبيق يساعد المستخدمين على اختبار المواد بأمان باستخدام الكواشف الكيميائية.';
 
   @override
   String get contact => '📧 للتواصل: testscolors@gmail.com';
@@ -138,7 +141,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noReagentsAvailable => 'لا توجد كواشف متاحة';
 
   @override
-  String get unableToLoadReagentData => 'غير قادر على تحميل بيانات الكواشف من الملفات.\nيرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.';
+  String get unableToLoadReagentData =>
+      'غير قادر على تحميل بيانات الكواشف من الملفات.\nيرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.';
 
   @override
   String get retryLoading => 'إعادة تحميل';
@@ -160,7 +164,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get readyToStart => 'جاهز لبدء الاختبار';
 
   @override
-  String get readyToStartDescription => 'يرجى التأكد من قراءة وفهم جميع تعليمات السلامة قبل المتابعة مع الاختبار.';
+  String get readyToStartDescription =>
+      'يرجى التأكد من قراءة وفهم جميع تعليمات السلامة قبل المتابعة مع الاختبار.';
 
   @override
   String get testProcedure => 'إجراء الاختبار';
@@ -189,7 +194,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get observedColor => 'اللون المُلاحظ';
 
   @override
-  String get observedColorDescription => 'اختر اللون الذي لاحظته بعد إضافة الكاشف';
+  String get observedColorDescription =>
+      'اختر اللون الذي لاحظته بعد إضافة الكاشف';
 
   @override
   String get tapColorInstruction => 'اضغط على اللون الذي يطابق ما لاحظته';
@@ -198,7 +204,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get testNotes => 'ملاحظات الاختبار';
 
   @override
-  String get testNotesPlaceholder => 'أضف أي ملاحظات أو مشاهدات إضافية حول الاختبار...';
+  String get testNotesPlaceholder =>
+      'أضف أي ملاحظات أو مشاهدات إضافية حول الاختبار...';
 
   @override
   String get completeTest => 'إكمال الاختبار';
@@ -228,7 +235,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetyAcknowledgment => 'إقرار السلامة';
 
   @override
-  String get safetyAcknowledgmentText => 'لقد قرأت وفهمت جميع تعليمات السلامة وسأتبع إجراءات السلامة المناسبة أثناء الاختبار.';
+  String get safetyAcknowledgmentText =>
+      'لقد قرأت وفهمت جميع تعليمات السلامة وسأتبع إجراءات السلامة المناسبة أثناء الاختبار.';
 
   @override
   String get startTest => 'بدء الاختبار';
@@ -269,7 +277,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noTestResultsYet => 'لا توجد نتائج اختبار بعد';
 
   @override
-  String get completeTestsToSeeHistory => 'أكمل بعض الاختبارات لرؤية تاريخك هنا';
+  String get completeTestsToSeeHistory =>
+      'أكمل بعض الاختبارات لرؤية تاريخك هنا';
 
   @override
   String get searchBySubstanceOrNotes => 'البحث بالمادة أو الملاحظات...';
@@ -342,13 +351,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteTest => 'حذف نتيجة الاختبار';
 
   @override
-  String get deleteTestConfirmation => 'هل أنت متأكد من أنك تريد حذف نتيجة هذا الاختبار؟';
+  String get deleteTestConfirmation =>
+      'هل أنت متأكد من أنك تريد حذف نتيجة هذا الاختبار؟';
 
   @override
   String get confirmExit => 'تأكيد الخروج';
 
   @override
-  String get testProgressWillBeLost => 'ستفقد تقدم الاختبار. هل أنت متأكد من أنك تريد الخروج؟';
+  String get testProgressWillBeLost =>
+      'ستفقد تقدم الاختبار. هل أنت متأكد من أنك تريد الخروج؟';
 
   @override
   String get exit => 'خروج';
@@ -390,7 +401,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get syncingToCloud => 'مزامنة مع السحابة...';
 
   @override
-  String get clearAllConfirmation => 'هل أنت متأكد من رغبتك في مسح جميع نتائج الاختبار؟ لا يمكن التراجع عن هذا الإجراء.';
+  String get clearAllConfirmation =>
+      'هل أنت متأكد من رغبتك في مسح جميع نتائج الاختبار؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
   String get clearAll => 'مسح الكل';
@@ -399,7 +411,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get captureImage => 'التقاط صورة';
 
   @override
-  String get captureImageDescription => 'التقط صورة لنتيجة اختبارك لتحليل الذكاء الاصطناعي';
+  String get captureImageDescription =>
+      'التقط صورة لنتيجة اختبارك لتحليل الذكاء الاصطناعي';
 
   @override
   String get analyzeWithAI => 'تحليل بالذكاء الاصطناعي';
@@ -435,7 +448,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get analysisIntelligenceTitle => 'ذكاء التحليل';
 
   @override
-  String get analysisIntelligenceDescription => 'تحقق الذكاء الاصطناعي من لون التفاعل مقابل آلاف العينات المرجعية لضمان أقصى دقة.';
+  String get analysisIntelligenceDescription =>
+      'تحقق الذكاء الاصطناعي من لون التفاعل مقابل آلاف العينات المرجعية لضمان أقصى دقة.';
 
   @override
   String get switchLanguage => 'تغيير اللغة';
@@ -468,7 +482,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fromGallery => ' الصور';
 
   @override
-  String get uploadImageDescription => 'ارفع صورة لنتيجة اختبارك لتحليل الذكاء الاصطناعي';
+  String get uploadImageDescription =>
+      'ارفع صورة لنتيجة اختبارك لتحليل الذكاء الاصطناعي';
 
   @override
   String get red => 'أحمر';
@@ -609,7 +624,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetyReminder => 'تذكير السلامة';
 
   @override
-  String get safetyReminderText => 'ارتدي دائماً معدات الحماية عند التعامل مع الكواشف. تأكد من التهوية المناسبة واتبع بروتوكولات السلامة.';
+  String get safetyReminderText =>
+      'ارتدي دائماً معدات الحماية عند التعامل مع الكواشف. تأكد من التهوية المناسبة واتبع بروتوكولات السلامة.';
 
   @override
   String get accountInformation => 'معلومات الحساب';
@@ -622,129 +638,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get memberSince => 'عضو منذ';
-
-  @override
-  String get signOut => 'تسجيل الخروج';
-
-  @override
-  String get welcomeBack => 'أهلاً بك';
-
-  @override
-  String get joinOurLab => 'انضم لمختبرنا';
-
-  @override
-  String get accessYourLab => 'ادخل إلى مختبر اختبار الكواشف الخاص بك';
-
-  @override
-  String get startYourJourney => 'ابدأ رحلتك في تحليل المواد';
-
-  @override
-  String get loginMode => 'تسجيل الدخول';
-
-  @override
-  String get registerMode => 'التسجيل';
-
-  @override
-  String get password => 'كلمة المرور';
-
-  @override
-  String get confirmPassword => 'تأكيد كلمة المرور';
-
-  @override
-  String get signInWithGoogle => 'تسجيل الدخول بجوجل';
-
-  @override
-  String get signUpWithGoogle => 'إنشاء حساب بجوجل';
-
-  @override
-  String get dontHaveAccount => 'ليس لديك حساب؟';
-
-  @override
-  String get alreadyHaveAccount => 'لديك حساب بالفعل؟';
-
-  @override
-  String get dontHaveLabAccess => 'ليس لديك وصول للمختبر؟';
-
-  @override
-  String get alreadyHaveLabAccess => 'لديك وصول للمختبر بالفعل؟';
-
-  @override
-  String get joinNow => 'انضم الآن';
-
-  @override
-  String get signUp => 'إنشاء حساب';
-
-  @override
-  String get signIn => 'تسجيل الدخول';
-
-  @override
-  String get orContinueWith => 'أو تابع مع';
-
-  @override
-  String get emailAddress => 'عنوان البريد الإلكتروني';
-
-  @override
-  String get accessLaboratory => 'دخول المختبر';
-
-  @override
-  String get signingIn => 'جاري تسجيل الدخول...';
-
-  @override
-  String get creatingAccount => 'جاري إنشاء الحساب...';
-
-  @override
-  String get pleaseEnterUsername => 'يرجى إدخال اسم المستخدم';
-
-  @override
-  String get usernameMinLength => 'يجب أن يكون اسم المستخدم على الأقل 3 أحرف';
-
-  @override
-  String get usernameInvalidChars => 'يمكن أن يحتوي اسم المستخدم على أحرف وأرقام وشرطات سفلية فقط';
-
-  @override
-  String get pleaseEnterEmail => 'يرجى إدخال بريدك الإلكتروني';
-
-  @override
-  String get pleaseEnterValidEmail => 'يرجى إدخال عنوان بريد إلكتروني صحيح';
-
-  @override
-  String get pleaseEnterPassword => 'يرجى إدخال كلمة المرور';
-
-  @override
-  String get passwordMinLength => 'يجب أن تكون كلمة المرور على الأقل 6 أحرف';
-
-  @override
-  String get pleaseConfirmPassword => 'يرجى تأكيد كلمة المرور';
-
-  @override
-  String get passwordsDoNotMatch => 'كلمات المرور غير متطابقة';
-
-  @override
-  String get forgotPassword => 'نسيت كلمة المرور؟';
-
-  @override
-  String get resetPassword => 'إعادة تعيين كلمة المرور';
-
-  @override
-  String get resetPasswordTitle => 'إعادة تعيين كلمة المرور';
-
-  @override
-  String get resetPasswordDescription => 'أدخل عنوان بريدك الإلكتروني وسنرسل لك تعليمات لإعادة تعيين كلمة المرور.';
-
-  @override
-  String get sendResetEmail => 'إرسال بريد الإعادة';
-
-  @override
-  String get backToLogin => 'العودة لتسجيل الدخول';
-
-  @override
-  String get enterEmailToReset => 'أدخل عنوان بريدك الإلكتروني لإعادة تعيين كلمة المرور';
-
-  @override
-  String get passwordResetEmailSent => 'تم إرسال بريد إعادة تعيين كلمة المرور! تحقق من صندوق الوارد.';
-
-  @override
-  String get resetEmailSending => 'جاري إرسال بريد الإعادة...';
 
   @override
   String get useAiResults => 'استخدام نتائج الذكاء الاصطناعي';
@@ -793,7 +686,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get researchMode => 'وضع البحث العلمي';
 
   @override
-  String get researchModeSubtitle => 'تمكين النتائج التحليلية الأولية (قيم Delta E و HEX/RGB)';
+  String get researchModeSubtitle =>
+      'تمكين النتائج التحليلية الأولية (قيم Delta E و HEX/RGB)';
 
   @override
   String get referencesLibrary => 'مكتبة المراجع العلمية';
@@ -805,10 +699,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aboutReferences => 'حول المراجع العلمية';
 
   @override
-  String get noCompatibleReferences => 'لم يتم العثور على مراجع علمية متوافقة لمجموعة بيانات الكاشف هذه.';
+  String get noCompatibleReferences =>
+      'لم يتم العثور على مراجع علمية متوافقة لمجموعة بيانات الكاشف هذه.';
 
   @override
-  String get legalConsentDisclaimer => 'النتائج المعروضة هي تفسيرات تحليلية احتمالية لأغراض تعليمية وبحثية فقط، ولا تمثل نتائج علمية أو مخبرية معتمدة.';
+  String get legalConsentDisclaimer =>
+      'النتائج المعروضة هي تفسيرات تحليلية احتمالية لأغراض تعليمية وبحثية فقط، ولا تمثل نتائج علمية أو مخبرية معتمدة.';
 
   @override
   String get understandLimitations => 'أفهم حدود التطبيق وأوافق عليها';

@@ -17,7 +17,7 @@ void main() {
     test('Valid transition sequence and listeners notification', () {
       final sm = ScientificStateMachine();
       final statesVisited = <ScientificAnalysisState>[];
-      
+
       sm.addListener((state) {
         statesVisited.add(state);
       });
@@ -119,7 +119,8 @@ void main() {
       expect(manager.exposure, 0.45);
     });
 
-    test('addColorObservation calculates high stability for static readings', () {
+    test('addColorObservation calculates high stability for static readings',
+        () {
       // Adding identical colors
       for (int i = 0; i < 5; i++) {
         manager.addColorObservation(const RGBColor(128, 0, 128));
@@ -127,12 +128,14 @@ void main() {
       expect(manager.stabilityIndex, 1.0);
     });
 
-    test('addColorObservation reduces stability index for wild color fluctuations', () {
+    test(
+        'addColorObservation reduces stability index for wild color fluctuations',
+        () {
       // Add very different colors to simulate instability
       manager.addColorObservation(const RGBColor(128, 0, 128)); // Purple
-      manager.addColorObservation(const RGBColor(255, 0, 0));   // Red
-      manager.addColorObservation(const RGBColor(0, 255, 0));   // Green
-      manager.addColorObservation(const RGBColor(0, 0, 255));   // Blue
+      manager.addColorObservation(const RGBColor(255, 0, 0)); // Red
+      manager.addColorObservation(const RGBColor(0, 255, 0)); // Green
+      manager.addColorObservation(const RGBColor(0, 0, 255)); // Blue
       manager.addColorObservation(const RGBColor(255, 255, 0)); // Yellow
 
       expect(manager.stabilityIndex, lessThan(1.0));
@@ -150,9 +153,10 @@ void main() {
       manager.addColorObservation(const RGBColor(128, 0, 128));
       manager.addColorObservation(const RGBColor(128, 0, 128));
       manager.addColorObservation(const RGBColor(128, 0, 128));
-      
-      manager.stateMachine.transitionToCalibrating(); // State machine expects calibrating state before analyzing
-      
+
+      manager.stateMachine
+          .transitionToCalibrating(); // State machine expects calibrating state before analyzing
+
       final result = manager.performAnalysis(targets: targets);
       expect(result.isSuccessful, true);
       expect(result.matchedAnalyte, 'Test Target');

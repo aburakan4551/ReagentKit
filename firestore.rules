@@ -1,97 +1,82 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Users collection rules - for authentication and user registration
-    match /users/{documentId} {
-      // Allow reading documents for username availability checks (even without auth)
-      // This is essential for registration flow where we check if username exists BEFORE creating account
-      allow read: if true;
-      
-      // Allow updating user's own document only (requires authentication)
-      allow update: if request.auth != null && 
-                    resource != null &&
-                    resource.data.uid == request.auth.uid &&
-                    request.resource.data.uid == request.auth.uid &&
-                    (
-                      // Ensure scansLeft cannot be modified to be larger than before (prevent bypass)
-                      (!('scansLeft' in request.resource.data)) || 
-                      (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
-                      (request.resource.data.scansLeft <= resource.data.scansLeft)
-                    );
-      
-      // Allow creating user documents during registration (requires authentication)
-      // Must match authenticated user's UID
-      allow create: if request.auth != null && 
-                    request.resource.data.uid == request.auth.uid &&
-                    (
-                      // Ensure new accounts cannot set scansLeft > 3
-                      (!('scansLeft' in request.resource.data)) ||
-                      (request.resource.data.scansLeft <= 3)
-                    );
-      
-      // Allow deleting user's own document only (requires authentication)
-      allow delete: if request.auth != null && 
-                    resource != null &&
-                    resource.data.uid == request.auth.uid;
-      
-      // Allow listing for username availability checks (even without auth)
-      allow list: if true;
-    }
-
     // Anonymous devices collection rules - secure tracking of guest device limits
     match /anonymous_devices/{deviceId} {
       // Access requires knowing the specific generated deviceId
       allow read: if true;
       allow create: if request.resource.data.scansLeft <= 3;
       allow update: if (
-                      // Only allow decreasing or keeping the scansLeft count (prevent bypass)
-                      (!('scansLeft' in request.resource.data)) ||
-                      (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
-                      (request.resource.data.scansLeft <= resource.data.scansLeft)
-                    );
+                        // Only allow decreasing or keeping the scansLeft count (prevent bypass)
+                        (!('scansLeft' in request.resource.data)) ||
+                        (!('scansLeft' in resource.data) && request.resource.data.scansLeft <= 3) ||
+                        (request.resource.data.scansLeft <= resource.data.scansLeft)
+                      );
       allow delete: if false; // Guests cannot delete tracking records
     }
 
-    // Result History collection rules - using email as document ID for test data
-    match /resultHistory/{userEmail} {
-      // Allow authenticated users to create their own user document
-      // Check that the document ID (userEmail) matches their authenticated email
-      allow create: if request.auth != null && 
-                    userEmail == request.auth.token.email &&
-                    request.resource.data.uid == request.auth.uid;
-      
-      // Users can read their own user document
-      // Check that the document ID (userEmail) matches their authenticated email
-      allow read: if request.auth != null && 
-                  userEmail == request.auth.token.email;
-      
-      // Users can update their own user document
-      allow update: if request.auth != null && 
-                    userEmail == request.auth.token.email &&
-                    request.resource.data.uid == request.auth.uid;
-      
-      // Users can delete their own user document
-      allow delete: if request.auth != null && 
-                    userEmail == request.auth.token.email;
+    // ═════════════════════════════════════════════════════════════════════════
+    // Scientific Collections — Public Read-Only, No Authentication Required
+    // ═════════════════════════════════════════════════════════════════════════
 
-      // Tests subcollection rules
-      match /tests/{testId} {
-        // Users can create tests in their own subcollection
-        allow create: if request.auth != null && 
-                      userEmail == request.auth.token.email;
-        
-        // Users can read tests from their own subcollection
-        allow read: if request.auth != null && 
-                    userEmail == request.auth.token.email;
-        
-        // Users can update tests in their own subcollection
-        allow update: if request.auth != null && 
-                      userEmail == request.auth.token.email;
-        
-        // Users can delete tests from their own subcollection
-        allow delete: if request.auth != null && 
-                      userEmail == request.auth.token.email;
-      }
+    // Reagents collection — reagent definitions and test data
+    match /reagents/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Reagent groups — categorization of reagents
+    match /reagent_groups/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Color profiles — color reference tables for reaction interpretation
+    match /color_profiles/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Substances — substance definitions and properties
+    match /substances/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Reaction results — expected color reactions for substance/reagent combinations
+    match /reaction_results/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Scientific references — citations and source information
+    match /scientific_references/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Reference images — images for color comparison
+    match /reference_images/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Hazard information — safety and hazard data for substances
+    match /hazard_information/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Safety notes — handling and safety instructions
+    match /safety_notes/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Reagent metadata — version info and dataset metadata
+    match /reagent_metadata/{document} {
+      allow read: if true;
+      allow write: if false;
     }
   }
-} 
+}

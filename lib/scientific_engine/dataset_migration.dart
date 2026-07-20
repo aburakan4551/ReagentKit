@@ -71,9 +71,27 @@ class LegacyToV1Migration implements DatasetMigration {
     copy['version'] = '1.0.0';
     copy['dataset_version'] = '1.0.0';
     
-    // Perform safety structural standardizations if any keys are missing
+    // Perform safety structural standardizations if any keys are missing.
+    // If there is no top-level 'reagents' key, the JSON is flat format:
+    // every top-level key IS a reagent. Wrap them into the 'reagents' map.
     if (!copy.containsKey('reagents')) {
-      copy['reagents'] = <String, dynamic>{};
+      // Collect all known non-reagent metadata keys to skip
+      const metaKeys = {
+        'version', 'dataset_version', 'schemaVersion', 'databaseVersion',
+        'author', 'generatedAt', 'scientificRevision', 'expiresAt',
+        'description', 'license',
+      };
+      final reagentsMap = <String, dynamic>{};
+      for (final key in copy.keys) {
+        if (!metaKeys.contains(key) && copy[key] is Map<String, dynamic>) {
+          reagentsMap[key] = copy[key];
+        }
+      }
+      // Remove all reagent keys from root and nest them under 'reagents'
+      for (final key in reagentsMap.keys) {
+        copy.remove(key);
+      }
+      copy['reagents'] = reagentsMap;
     }
     return copy;
   }

@@ -16,6 +16,7 @@ import '../states/test_result_state.dart';
 import '../states/test_result_history_state.dart';
 import 'package:reagentkit/core/services/gemini_image_analysis_service.dart';
 import 'package:reagentkit/core/services/premium_service.dart';
+import 'package:reagentkit/core/services/firestore_scientific_service.dart';
 
 import 'package:reagentkit/core/config/get_it_config.dart';
 
@@ -29,10 +30,19 @@ final remoteConfigServiceProvider = Provider<RemoteConfigService>((ref) {
   return RemoteConfigService();
 });
 
+// Firestore Scientific Service Provider
+final firestoreScientificServiceProvider = Provider<FirestoreScientificService>((ref) {
+  return FirestoreScientificService();
+});
+
 // Unified Data Service Provider
 final unifiedDataServiceProvider = Provider<UnifiedDataService>((ref) {
   final remoteConfigService = ref.watch(remoteConfigServiceProvider);
-  return UnifiedDataService(remoteConfig: remoteConfigService);
+  final firestoreScientific = ref.watch(firestoreScientificServiceProvider);
+  return UnifiedDataService(
+    remoteConfig: remoteConfigService,
+    firestoreScientific: firestoreScientific,
+  );
 });
 
 // Safety Instructions Service Provider

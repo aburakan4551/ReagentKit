@@ -5,7 +5,8 @@ import 'package:reagentkit/scientific_engine/scientific_constants.dart';
 void main() {
   group('ConfidenceCalculator Color Match Tests', () {
     test('Perfect Delta E returns 1.0 confidence', () {
-      final conf = ConfidenceCalculator.calculateColorMatchConfidence(ScientificConstants.deltaEPerfect);
+      final conf = ConfidenceCalculator.calculateColorMatchConfidence(
+          ScientificConstants.deltaEPerfect);
       expect(conf, 1.0);
     });
 
@@ -15,8 +16,10 @@ void main() {
     });
 
     test('Delta E at or above Max Limit returns 0.0 confidence', () {
-      final confAtLimit = ConfidenceCalculator.calculateColorMatchConfidence(ScientificConstants.deltaEMaxLimit);
-      final confAboveLimit = ConfidenceCalculator.calculateColorMatchConfidence(ScientificConstants.deltaEMaxLimit + 5.0);
+      final confAtLimit = ConfidenceCalculator.calculateColorMatchConfidence(
+          ScientificConstants.deltaEMaxLimit);
+      final confAboveLimit = ConfidenceCalculator.calculateColorMatchConfidence(
+          ScientificConstants.deltaEMaxLimit + 5.0);
       expect(confAtLimit, 0.0);
       expect(confAboveLimit, 0.0);
     });
@@ -30,7 +33,9 @@ void main() {
   });
 
   group('ConfidenceCalculator Overall Confidence Tests', () {
-    test('Calculates High confidence with perfect environment and stable result', () {
+    test(
+        'Calculates High confidence with perfect environment and stable result',
+        () {
       // deltaE = 0.0 -> colorMatchConf = 1.0
       // stabilityIndex = 1.0
       // customAiConfidence = 1.0
@@ -61,12 +66,14 @@ void main() {
       expect(result.isReliable, true);
     });
 
-    test('Degrades overall confidence under low light (brightness penalty)', () {
+    test('Degrades overall confidence under low light (brightness penalty)',
+        () {
       final result = ConfidenceCalculator.calculateConfidence(
         deltaE: 0.0,
         stabilityIndex: 1.0,
         customAiConfidence: 1.0,
-        ambientBrightness: 0.1, // deficit = 0.3 - 0.1 = 0.2. envMultiplier = 1.0 - (0.2/0.3)*0.4 = 1.0 - 0.266 = 0.733
+        ambientBrightness:
+            0.1, // deficit = 0.3 - 0.1 = 0.2. envMultiplier = 1.0 - (0.2/0.3)*0.4 = 1.0 - 0.266 = 0.733
       );
 
       // envMultiplier = 0.733
@@ -79,7 +86,8 @@ void main() {
         deltaE: 0.0,
         stabilityIndex: 1.0,
         customAiConfidence: 1.0,
-        cameraExposure: 0.95, // excess = 0.95 - 0.8 = 0.15. Range = 0.2. envMultiplier = 1 - (0.15/0.2)*0.3 = 0.775
+        cameraExposure:
+            0.95, // excess = 0.95 - 0.8 = 0.15. Range = 0.2. envMultiplier = 1 - (0.15/0.2)*0.3 = 0.775
       );
 
       // envMultiplier = 0.775
@@ -87,7 +95,9 @@ void main() {
       expect(result.overallConfidence, closeTo(0.9775, 0.01));
     });
 
-    test('Classifies Low confidence and marks unreliable when overall falls below threshold', () {
+    test(
+        'Classifies Low confidence and marks unreliable when overall falls below threshold',
+        () {
       // deltaE = 14.0 -> colorMatchConf = (15 - 14)/13 = 0.0769
       // stabilityIndex = 0.1
       // customAiConfidence = 0.1
@@ -101,7 +111,8 @@ void main() {
 
       // overall = (0.0769 * 0.4) + (0.1 * 0.3) + (0.1 * 0.2) + (0.2 * 0.1)
       //         = 0.0307 + 0.03 + 0.02 + 0.02 = 0.1007
-      expect(result.overallConfidence, lessThan(ScientificConstants.confidenceThresholdLow));
+      expect(result.overallConfidence,
+          lessThan(ScientificConstants.confidenceThresholdLow));
       expect(result.confidenceRating, 'Low');
       expect(result.isReliable, false);
     });
@@ -112,7 +123,7 @@ void main() {
         stabilityIndex: 1.0,
         customAiConfidence: 0.9,
       );
-      
+
       final str = result.toString();
       expect(str, contains('ColorMatch: 100.0%'));
       expect(str, contains('AI: 90.0%'));

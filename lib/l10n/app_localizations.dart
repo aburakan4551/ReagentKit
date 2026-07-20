@@ -62,7 +62,8 @@ import 'app_localizations_en.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,7 +84,8 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -1301,252 +1304,6 @@ abstract class AppLocalizations {
   /// **'Member Since'**
   String get memberSince;
 
-  /// No description provided for @signOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign Out'**
-  String get signOut;
-
-  /// No description provided for @welcomeBack.
-  ///
-  /// In en, this message translates to:
-  /// **'Welcome'**
-  String get welcomeBack;
-
-  /// No description provided for @joinOurLab.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Our Lab'**
-  String get joinOurLab;
-
-  /// No description provided for @accessYourLab.
-  ///
-  /// In en, this message translates to:
-  /// **'Access your reagent testing laboratory'**
-  String get accessYourLab;
-
-  /// No description provided for @startYourJourney.
-  ///
-  /// In en, this message translates to:
-  /// **'Start your journey in substance analysis'**
-  String get startYourJourney;
-
-  /// No description provided for @loginMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Login'**
-  String get loginMode;
-
-  /// No description provided for @registerMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Register'**
-  String get registerMode;
-
-  /// No description provided for @password.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get password;
-
-  /// No description provided for @confirmPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Password'**
-  String get confirmPassword;
-
-  /// No description provided for @signInWithGoogle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in with Google'**
-  String get signInWithGoogle;
-
-  /// No description provided for @signUpWithGoogle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign up with Google'**
-  String get signUpWithGoogle;
-
-  /// No description provided for @dontHaveAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Don\'t have an account?'**
-  String get dontHaveAccount;
-
-  /// No description provided for @alreadyHaveAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Already have an account?'**
-  String get alreadyHaveAccount;
-
-  /// No description provided for @dontHaveLabAccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Don\'t have lab access?'**
-  String get dontHaveLabAccess;
-
-  /// No description provided for @alreadyHaveLabAccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Already have lab access?'**
-  String get alreadyHaveLabAccess;
-
-  /// No description provided for @joinNow.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Now'**
-  String get joinNow;
-
-  /// No description provided for @signUp.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign Up'**
-  String get signUp;
-
-  /// No description provided for @signIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign In'**
-  String get signIn;
-
-  /// No description provided for @orContinueWith.
-  ///
-  /// In en, this message translates to:
-  /// **'Or continue with'**
-  String get orContinueWith;
-
-  /// No description provided for @emailAddress.
-  ///
-  /// In en, this message translates to:
-  /// **'Email Address'**
-  String get emailAddress;
-
-  /// No description provided for @accessLaboratory.
-  ///
-  /// In en, this message translates to:
-  /// **'Access Laboratory'**
-  String get accessLaboratory;
-
-  /// No description provided for @signingIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Signing In...'**
-  String get signingIn;
-
-  /// No description provided for @creatingAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Creating Account...'**
-  String get creatingAccount;
-
-  /// No description provided for @pleaseEnterUsername.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a username'**
-  String get pleaseEnterUsername;
-
-  /// No description provided for @usernameMinLength.
-  ///
-  /// In en, this message translates to:
-  /// **'Username must be at least 3 characters'**
-  String get usernameMinLength;
-
-  /// No description provided for @usernameInvalidChars.
-  ///
-  /// In en, this message translates to:
-  /// **'Username can only contain letters, numbers, and underscores'**
-  String get usernameInvalidChars;
-
-  /// No description provided for @pleaseEnterEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your email'**
-  String get pleaseEnterEmail;
-
-  /// No description provided for @pleaseEnterValidEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a valid email address'**
-  String get pleaseEnterValidEmail;
-
-  /// No description provided for @pleaseEnterPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter your password'**
-  String get pleaseEnterPassword;
-
-  /// No description provided for @passwordMinLength.
-  ///
-  /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
-  String get passwordMinLength;
-
-  /// No description provided for @pleaseConfirmPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Please confirm your password'**
-  String get pleaseConfirmPassword;
-
-  /// No description provided for @passwordsDoNotMatch.
-  ///
-  /// In en, this message translates to:
-  /// **'Passwords do not match'**
-  String get passwordsDoNotMatch;
-
-  /// No description provided for @forgotPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Forgot Password?'**
-  String get forgotPassword;
-
-  /// No description provided for @resetPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Password'**
-  String get resetPassword;
-
-  /// No description provided for @resetPasswordTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset Your Password'**
-  String get resetPasswordTitle;
-
-  /// No description provided for @resetPasswordDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your email address and we\'ll send you instructions to reset your password.'**
-  String get resetPasswordDescription;
-
-  /// No description provided for @sendResetEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Send Reset Email'**
-  String get sendResetEmail;
-
-  /// No description provided for @backToLogin.
-  ///
-  /// In en, this message translates to:
-  /// **'Back to Login'**
-  String get backToLogin;
-
-  /// No description provided for @enterEmailToReset.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your email address to reset your password'**
-  String get enterEmailToReset;
-
-  /// No description provided for @passwordResetEmailSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Password reset email sent! Check your inbox.'**
-  String get passwordResetEmailSent;
-
-  /// No description provided for @resetEmailSending.
-  ///
-  /// In en, this message translates to:
-  /// **'Sending reset email...'**
-  String get resetEmailSending;
-
   /// No description provided for @useAiResults.
   ///
   /// In en, this message translates to:
@@ -1698,7 +1455,8 @@ abstract class AppLocalizations {
   String get confidenceBasedAnalysis;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1707,25 +1465,25 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ar', 'en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar': return AppLocalizationsAr();
-    case 'en': return AppLocalizationsEn();
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
   }
 
   throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
-  );
+      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+      'an issue with the localizations generation tool. Please file an issue '
+      'on GitHub with a reproducible sample app and the gen-l10n configuration '
+      'that was used.');
 }
