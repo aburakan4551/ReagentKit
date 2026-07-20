@@ -3,8 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/entities/test_result_entity.dart';
 import '../../../../core/utils/logger.dart';
 import '../../../../core/globals.dart';
-import '../../../../core/config/reviewer_demo_seed.dart';
-
 class TestResultHistoryRepository {
   static const String _localStorageKey = 'test_result_history';
 
@@ -24,35 +22,19 @@ class TestResultHistoryRepository {
       final jsonString = prefs.getString(_localStorageKey);
 
       if (jsonString == null) {
-        if (isPremiumReviewMode) {
-          return ReviewerDemoSeed.getDemoResults();
-        }
         return [];
       }
 
       final List<dynamic> jsonList = json.decode(jsonString);
       final list = jsonList.map((json) => TestResultEntity.fromJson(json)).toList();
-      if (list.isEmpty && isPremiumReviewMode) {
-        return ReviewerDemoSeed.getDemoResults();
-      }
       return list..sort((a, b) => b.testCompletedAt.compareTo(a.testCompletedAt));
     } catch (e) {
-      if (isPremiumReviewMode) {
-        return ReviewerDemoSeed.getDemoResults();
-      }
       throw Exception('Failed to load local test results: $e');
     }
   }
 
   // Get all test results (local-only after authentication removal)
   Future<List<TestResultEntity>> getAllTestResults() async {
-    if (isPremiumReviewMode) {
-      final local = await getLocalTestResults();
-      if (local.isEmpty) {
-        return ReviewerDemoSeed.getDemoResults();
-      }
-      return local;
-    }
     return getLocalTestResults();
   }
 

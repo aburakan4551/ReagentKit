@@ -1,9 +1,9 @@
 {
-  "Reagent A": {
-    "reagentName": "Reagent A",
-    "reagentName_ar": "الكاشف أ",
-    "description": "For detecting laboratory reference compounds and controlled compounds",
-    "description_ar": "للكشف عن المركبات قلوية والمركبات أمينية",
+  "Marquis Test": {
+    "reagentName": "Marquis Test",
+    "reagentName_ar": "اختبار ماركيز",
+    "description": "For detecting opiates and amphetamines",
+    "description_ar": "للكشف عن الأفيونات والأمفيتامينات",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -13,29 +13,29 @@
       "Glacial Acetic Acid",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Organic compound, Alkaloid compound, Laboratory reference compounds",
+        "drugName": "Opium, Morphine, Heroin",
         "color": "Purple to violet",
         "color_ar": "بنفسجي إلى بنفسجي داكن"
       },
       {
-        "compoundName": "Controlled compounds, Laboratory reference compounds",
+        "drugName": "Amphetamine, Methamphetamine",
         "color": "Brownish purple",
         "color_ar": "بنفسجي بني"
       },
       {
-        "compoundName": "ORGANIC CHEMISTRY REFERENCES, Forensic chemistry compounds",
+        "drugName": "MDMA, Ecstasy",
         "color": "Orange to brown",
         "color_ar": "برتقالي إلى بني"
       },
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Methadone",
         "color": "Pink to violet",
         "color_ar": "وردي إلى بنفسجي"
       },
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Pethidine",
         "color": "Orange",
         "color_ar": "برتقالي"
       }
@@ -46,8 +46,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -76,11 +76,11 @@
       }
     ]
   },
-  "Reagent B": {
-    "reagentName": "Reagent B",
-    "reagentName_ar": "الكاشف ب",
-    "description": "For detecting alkaloid compound and alkaloid compound",
-    "description_ar": "للكشف عن المركب القلوي المرجعي والمركب القلوي المرجعي",
+  "Mecke Test": {
+    "reagentName": "Mecke Test",
+    "reagentName_ar": "اختبار ميكي",
+    "description": "For detecting morphine and codeine",
+    "description_ar": "للكشف عن المورفين والكودايين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -89,32 +89,32 @@
       "Selenious Acid",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Alkaloid compound, Alkaloid compound",
+        "drugName": "Morphine, Codeine",
         "color": "Blue to green",
         "color_ar": "أزرق إلى أخضر"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "Yellow to brown",
         "color_ar": "أصفر إلى بني"
       },
       {
-        "compoundName": "ORGANIC CHEMISTRY REFERENCES",
+        "drugName": "MDMA",
         "color": "Orange",
         "color_ar": "برتقالي"
       }
     ],
     "reference": [
       "Rehse, K.. Arch.Pharm.(Weinheim), 302 (1969) 487",
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Kovar, K.-A., Laudszun, M.. Chemistry and Reaction Mechanisms of Rapid Tests for Drugs of Abuse and Precursor Chemicals. United Nations - Scientific and Technical Notes, SCITEC/6, Vienna (1989), p. 16"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -128,11 +128,11 @@
       }
     ]
   },
-  "Chemical Analysis Kit": {
-    "reagentName": "Chemical Analysis Kit",
-    "reagentName_ar": "حقيبة التحليل الكيميائي",
-    "description": "For detecting educational analytical compounds and botanical compounds",
-    "description_ar": "للكشف عن المركب المرجعي والمركب النباتي المرجعي",
+  "Ferric Sulfate Test": {
+    "reagentName": "Ferric Sulfate Test",
+    "reagentName_ar": "اختبار كبريتات الحديد",
+    "description": "For detecting cocaine and cannabis",
+    "description_ar": "للكشف عن الكوكايين والقنب",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
     "category": "Secondary Tests",
@@ -141,19 +141,19 @@
       "Ferric Sulfate",
       "Water"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Educational analytical compounds HCl",
+        "drugName": "Cocaine HCl",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Botanical compounds compounds",
+        "drugName": "Cannabis compounds",
         "color": "Green",
         "color_ar": "أخضر"
       },
       {
-        "compoundName": "Phenothiazines",
+        "drugName": "Phenothiazines",
         "color": "Red to brown",
         "color_ar": "أحمر إلى بني"
       }
@@ -164,8 +164,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -180,7 +180,7 @@
       {
         "step": 4,
         "instruction": "Add one drop of reagent 2 (Dissolve 5 g of ferric sulfate in 100 ml of water).",
-        "instruction_ar": "أضف قطرة واحدة من الكاشف 2 (اذب 5 غرامات من حقيبة التحليل الكيميائي في 100 مل من الماء)."
+        "instruction_ar": "أضف قطرة واحدة من الكاشف 2 (اذب 5 غرامات من كبريتات الحديد في 100 مل من الماء)."
       },
       {
         "step": 5,
@@ -189,11 +189,11 @@
       }
     ]
   },
-  "Nitric Acid Test A": {
-    "reagentName": "Nitric Acid Test A",
-    "reagentName_ar": "اختبار حمض النيتريك أ",
-    "description": "For detecting laboratory reference compounds and alkaloid compound",
-    "description_ar": "للكشف عن المركب القلوي والمركب القلوي المرجعي",
+  "Nitric Acid Test": {
+    "reagentName": "Nitric Acid Test",
+    "reagentName_ar": "اختبار حمض النيتريك",
+    "description": "For detecting heroin and morphine",
+    "description_ar": "للكشف عن الهيروين والمورفين",
     "safetyLevel": "EXTREME",
     "safetyLevel_ar": "خطر شديد",
     "category": "Specialized Tests",
@@ -201,32 +201,32 @@
     "chemicals": [
       "Concentrated Nitric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "Yellow",
         "color_ar": "أصفر"
       },
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Morphine",
         "color": "Orange",
         "color_ar": "برتقالي"
       },
       {
-        "compoundName": "Salicylates",
+        "drugName": "Salicylates",
         "color": "Red",
         "color_ar": "أحمر"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)",
+      "Ditzel, P., Kovar, K.-A.. Rausch- und Suchtmittel. Deutscher Apotheker Verlag, Stuttgart (1983)",
       "Kovar, K.-A., Noy, M., Pieper, R.. Dtsch.Apoth.Ztg., 122 (1982) 3"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -240,11 +240,11 @@
       }
     ]
   },
-  "Botanical Indicator Test": {
-    "reagentName": "Botanical Indicator Test",
-    "reagentName_ar": "اختبار المؤشر النباتي",
-    "description": "For detecting botanical compounds (BOTANICAL COMPOUNDS)",
-    "description_ar": "للكشف عن المركب النباتي المرجعي (BOTANICAL COMPOUNDS)",
+  "Fast Blue B Salt Test": {
+    "reagentName": "Fast Blue B Salt Test",
+    "reagentName_ar": "اختبار الملح الأزرق السريع",
+    "description": "For detecting cannabis (THC)",
+    "description_ar": "للكشف عن القنب (THC)",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -255,31 +255,31 @@
       "Chloroform",
       "Sodium Hydroxide"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "BOTANICAL COMPOUNDS, Botanical compounds",
+        "drugName": "THC, Cannabis",
         "color": "Dark green",
         "color_ar": "أخضر داكن"
       },
       {
-        "compoundName": "Botanical compounds derivatives",
+        "drugName": "Cannabis derivatives",
         "color": "Light blue",
         "color_ar": "أزرق فاتح"
       },
       {
-        "compoundName": "Other botanical compounds",
+        "drugName": "Other cannabinoids",
         "color": "Purple",
         "color_ar": "بنفسجي"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Ditzel, P., Kovar, K.-A.. Rausch- und Suchtmittel. Deutscher Apotheker Verlag, Stuttgart (1983)"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -303,11 +303,11 @@
       }
     ]
   },
-  "Botanical Analysis Kit Test": {
-    "reagentName": "Botanical Analysis Kit Test",
-    "reagentName_ar": "اختبار حقيبة التحليل النباتي",
-    "description": "For detecting botanical compounds and derivatives",
-    "description_ar": "للكشف عن المركب النباتي المرجعي ومشتمركب نباتيه",
+  "Duquenois-Levine Test": {
+    "reagentName": "Duquenois-Levine Test",
+    "reagentName_ar": "اختبار دوكينوا-ليفين",
+    "description": "For detecting cannabis and derivatives",
+    "description_ar": "للكشف عن القنب ومشتقاته",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
     "category": "Primary Tests",
@@ -319,19 +319,19 @@
       "Concentrated Hydrochloric Acid",
       "Chloroform"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Botanical compounds, BOTANICAL COMPOUNDS",
+        "drugName": "Cannabis, THC",
         "color": "Purple",
         "color_ar": "بنفسجي"
       },
       {
-        "compoundName": "Botanical compounds derivatives",
+        "drugName": "Cannabis derivatives",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Botanical specimen compounds",
+        "drugName": "Hemp compounds",
         "color": "Green",
         "color_ar": "أخضر"
       }
@@ -342,8 +342,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -367,11 +367,11 @@
       }
     ]
   },
-  "Reagent C (Standard)": {
-    "reagentName": "Reagent C (Standard)",
-    "reagentName_ar": "الكاشف ج (القياسي)",
-    "description": "For detecting educational analytical compounds",
-    "description_ar": "للكشف عن المركب المرجعي",
+  "Cobalt Thiocyanate Test": {
+    "reagentName": "Cobalt Thiocyanate Test",
+    "reagentName_ar": "اختبار كوبالت ثيوسيانات",
+    "description": "For detecting cocaine",
+    "description_ar": "للكشف عن الكوكايين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -380,19 +380,19 @@
       "Hydrochloric Acid",
       "Cobalt(II) Thiocyanate"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Educational analytical compounds",
+        "drugName": "Cocaine",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Local anesthetic reference",
+        "drugName": "Lidocaine",
         "color": "Light blue",
         "color_ar": "أزرق فاتح"
       },
       {
-        "compoundName": "Other local anesthetics",
+        "drugName": "Other local anesthetics",
         "color": "Green",
         "color_ar": "أخضر"
       }
@@ -403,8 +403,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -423,11 +423,11 @@
       }
     ]
   },
-  "Modified Cobalt Thiocyanate (Reagent C)": {
-    "reagentName": "Modified Cobalt Thiocyanate (Reagent C)",
-    "reagentName_ar": "اختبار ثيوسيانات الكوبالت المعدل (الكاشف ج)",
-    "description": "For detecting educational analytical compounds",
-    "description_ar": "للكشف عن المركب المرجعي والليدوكايين",
+  "Modified Cobalt Thiocyanate (Scott Test)": {
+    "reagentName": "Modified Cobalt Thiocyanate (Scott Test)",
+    "reagentName_ar": "اختبار ثيوسيانات الكوبالت المعدل (اختبار سكوت)",
+    "description": "For detecting cocaine",
+    "description_ar": "للكشف عن الكوكايين والليدوكايين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Secondary Tests",
@@ -439,31 +439,31 @@
       "Hydrochloric Acid",
       "Chloroform"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Educational analytical compounds",
+        "drugName": "Cocaine",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Local anesthetic reference",
+        "drugName": "Lidocaine",
         "color": "Pink",
         "color_ar": "وردي"
       },
       {
-        "compoundName": "Local anesthetic reference",
+        "drugName": "Procaine",
         "color": "Purple",
         "color_ar": "بنفسجي"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Kovar, K.-A., Laudszun, M.. Chemistry and Reaction Mechanisms of Rapid Tests for Drugs of Abuse and Precursor Chemicals. United Nations - Scientific and Technical Notes, SCITEC/6, Vienna (1989), p. 15"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -482,16 +482,16 @@
       },
       {
         "step": 5,
-        "instruction": "Observe the color changes: Blue → Pink → Blue (chloroform layer indicates educational analytical compounds presence).",
-        "instruction_ar": "لاحظ تغيرات اللون: أزرق → وردي → أزرق (طبقة الكلوروفورم تشير إلى وجود المركب المرجعي)."
+        "instruction": "Observe the color changes: Blue → Pink → Blue (chloroform layer indicates cocaine presence).",
+        "instruction_ar": "لاحظ تغيرات اللون: أزرق → وردي → أزرق (طبقة الكلوروفورم تشير إلى وجود الكوكايين)."
       }
     ]
   },
-  "Volatile Organic Reagent Test": {
-    "reagentName": "Volatile Organic Reagent Test",
-    "reagentName_ar": "اختبار الكاشف العضوي المتطاير",
-    "description": "For detecting educational analytical compounds by odor comparison",
-    "description_ar": "للكشف عن المركب المرجعي عبر مقارنة الرائحة",
+  "Methyl Benzoate Test": {
+    "reagentName": "Methyl Benzoate Test",
+    "reagentName_ar": "اختبار بنزوات الميثيل",
+    "description": "For detecting cocaine by odor comparison",
+    "description_ar": "للكشف عن الكوكايين عبر مقارنة الرائحة",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Specialized Tests",
@@ -500,21 +500,21 @@
       "Potassium Hydroxide",
       "Absolute Methanol"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Educational analytical compounds",
+        "drugName": "Cocaine",
         "color": "Smell of methyl benzoate",
         "color_ar": "رائحة بنزوات الميثيل"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Grant, f.W., Martin, W.C., Quackenbush, R.W.. Bull.Narc., No.2 (1975) 33"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -533,9 +533,9 @@
       }
     ]
   },
-  "Alkaloid Indicator Test": {
-    "reagentName": "Alkaloid Indicator Test",
-    "reagentName_ar": "اختبار مؤشر القلويدات",
+  "Wagner Test": {
+    "reagentName": "Wagner Test",
+    "reagentName_ar": "اختبار واجنر",
     "description": "For detecting alkaloids",
     "description_ar": "للكشف عن القلويدات",
     "safetyLevel": "MEDIUM",
@@ -546,31 +546,31 @@
       "Iodine",
       "Potassium Iodide"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Alkaloids",
+        "drugName": "Alkaloids",
         "color": "Orange-brown",
         "color_ar": "برتقالي بني"
       },
       {
-        "compoundName": "Alkaloid compound alkaloids",
+        "drugName": "Morphine alkaloids",
         "color": "Yellow-brown",
         "color_ar": "أصفر بني"
       },
       {
-        "compoundName": "Plant alkaloids",
+        "drugName": "Plant alkaloids",
         "color": "Brown",
         "color_ar": "بني"
       }
     ],
     "reference": [
-      "Jungreis, E.. Spot Test Analysis - Clinical, Environmental, Laboratory educational workflow and Geochemical Applications. John Wiley & Sons, Inc., New York (1985), p. 77"
+      "Jungreis, E.. Spot Test Analysis - Clinical, Environmental, Forensic and Geochemical Applications. John Wiley & Sons, Inc., New York (1985), p. 77"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -589,11 +589,11 @@
       }
     ]
   },
-  "Analytical Reagent Kit": {
-    "reagentName": "Analytical Reagent Kit",
-    "reagentName_ar": "حقيبة الكواشف التحليلية",
-    "description": "For detecting ORGANIC CHEMISTRY REFERENCES and laboratory reference compounds",
-    "description_ar": "للكشف عن مركبات عضوية تعليمية والميثمركبات أمينية",
+  "Simon Test": {
+    "reagentName": "Simon Test",
+    "reagentName_ar": "اختبار سايمون",
+    "description": "For detecting MDMA and methamphetamine",
+    "description_ar": "للكشف عن إم دي إم إيه والميثامفيتامين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -603,19 +603,19 @@
       "Acetaldehyde",
       "Sodium Carbonate"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "ORGANIC CHEMISTRY REFERENCES, Forensic chemistry compounds",
+        "drugName": "MDMA, Ecstasy",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Methamphetamine",
         "color": "Green",
         "color_ar": "أخضر"
       },
       {
-        "compoundName": "Controlled compounds",
+        "drugName": "Amphetamine",
         "color": "Purple",
         "color_ar": "بنفسجي"
       }
@@ -626,8 +626,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -646,11 +646,11 @@
       }
     ]
   },
-  "Analytical Reagent Kit with Acetone": {
-    "reagentName": "Analytical Reagent Kit with Acetone",
-    "reagentName_ar": "حقيبة الكواشف التحليلية مع الأسيتون",
-    "description": "For detecting controlled compounds derivatives",
-    "description_ar": "للكشف عن مشتمركب نباتي المركبات أمينية",
+  "Simon Test with Acetone": {
+    "reagentName": "Simon Test with Acetone",
+    "reagentName_ar": "اختبار سايمون مع الأسيتون",
+    "description": "For detecting amphetamine derivatives",
+    "description_ar": "للكشف عن مشتقات الأمفيتامين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Specialized Tests",
@@ -660,14 +660,14 @@
       "Acetone",
       "Sodium Carbonate"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Controlled compounds",
+        "drugName": "Amphetamine",
         "color": "Purple",
         "color_ar": "بنفسجي"
       },
       {
-        "compoundName": "DOB, DMA, DOET",
+        "drugName": "DOB, DMA, DOET",
         "color": "Purple",
         "color_ar": "بنفسجي"
       }
@@ -678,8 +678,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -698,10 +698,10 @@
       }
     ]
   },
-  "Laboratory Indicator Kit": {
-    "reagentName": "Laboratory Indicator Kit",
+  "Ehrlich Test": {
+    "reagentName": "Ehrlich Test",
     "reagentName_ar": "اختبار إيرليش",
-    "description": "For detecting CHEMICAL REAGENTS and botanical reference compound",
+    "description": "For detecting LSD and psilocybin",
     "description_ar": "للكشف عن إل إس دي والسيلوسيبين",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
@@ -712,19 +712,19 @@
       "Methanol",
       "Ortho-Phosphoric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "CHEMICAL REAGENTS",
+        "drugName": "LSD",
         "color": "Purple",
         "color_ar": "بنفسجي"
       },
       {
-        "compoundName": "Botanical reference compound",
+        "drugName": "Psilocybin",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "ORGANIC REFERENCE COMPOUND",
+        "drugName": "DMT",
         "color": "Pink",
         "color_ar": "وردي"
       }
@@ -735,8 +735,8 @@
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -755,11 +755,11 @@
       }
     ]
   },
-  "Secondary Indicator Kit L": {
-    "reagentName": "Secondary Indicator Kit L",
-    "reagentName_ar": "حقيبة المؤشر الثانوي L",
-    "description": "For detecting controlled compounds",
-    "description_ar": "للكشف عن المركبات أمينية",
+  "Liebermann Test": {
+    "reagentName": "Liebermann Test",
+    "reagentName_ar": "اختبار ليبرمان",
+    "description": "For detecting amphetamines",
+    "description_ar": "للكشف عن الأمفيتامينات",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Secondary Tests",
@@ -768,36 +768,36 @@
       "Sodium Nitrite",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Controlled compounds",
+        "drugName": "Amphetamine",
         "color": "Orange",
         "color_ar": "برتقالي"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Methamphetamine",
         "color": "Yellow to light green",
         "color_ar": "أصفر إلى أخضر فاتح"
       },
       {
-        "compoundName": "Organic reference compounds",
+        "drugName": "Barbiturates",
         "color": "Red",
         "color_ar": "أحمر"
       },
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Pethidine",
         "color": "Red-orange",
         "color_ar": "أحمر برتقالي"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Moffat, A.C. (Editor). Clarke's Isolation and Identification of Drugs. The Pharmaceutical Press, London (1986), p. 208"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -811,11 +811,11 @@
       }
     ]
   },
-  "Secondary Indicator Kit M": {
-    "reagentName": "Secondary Indicator Kit M",
+  "Mandelin Test": {
+    "reagentName": "Mandelin Test",
     "reagentName_ar": "اختبار مانديلين",
-    "description": "For detecting alkaloids and controlled compounds",
-    "description_ar": "للكشف عن القلويدات والمركبات أمينية",
+    "description": "For detecting alkaloids and amphetamines",
+    "description_ar": "للكشف عن القلويدات والأمفيتامينات",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Secondary Tests",
@@ -824,41 +824,41 @@
       "Ammonium Vanadate",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Controlled compounds",
+        "drugName": "Amphetamine",
         "color": "Green",
         "color_ar": "أخضر"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Methamphetamine",
         "color": "Blue-green",
         "color_ar": "أزرق مخضر"
       },
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Morphine",
         "color": "Brown",
         "color_ar": "بني"
       },
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Codeine",
         "color": "Olive green",
         "color_ar": "أخضر زيتوني"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "Brown",
         "color_ar": "بني"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Moffat, A.C. (Editor). Clarke's Isolation and Identification of Drugs. The Pharmaceutical Press, London (1986), p. 208"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample on a spot plate.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها على لوحة البقع."
+        "instruction": "Place a small amount of the suspected material on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها على لوحة البقع."
       },
       {
         "step": 2,
@@ -872,11 +872,11 @@
       }
     ]
   },
-  "Secondary Indicator Kit ZM": {
-    "reagentName": "Secondary Indicator Kit ZM",
-    "reagentName_ar": "حقيبة المؤشر الثانوي ZM",
-    "description": "For detecting organic reference compounds",
-    "description_ar": "للكشف عن المركبات العضوية المرجعية",
+  "Zimmermann Test": {
+    "reagentName": "Zimmermann Test",
+    "reagentName_ar": "اختبار زيمرمان",
+    "description": "For detecting barbiturates",
+    "description_ar": "للكشف عن الباربيتورات",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
     "category": "Specialized Tests",
@@ -886,31 +886,31 @@
       "Methanol",
       "Potassium Hydroxide"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Organic reference compounds",
+        "drugName": "Barbiturates",
         "color": "Violet to purple",
         "color_ar": "بنفسجي إلى أرجواني"
       },
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Phenobarbital",
         "color": "Blue",
         "color_ar": "أزرق"
       },
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Amobarbital",
         "color": "Purple",
         "color_ar": "أرجواني"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Moffat, A.C. (Editor). Clarke's Isolation and Identification of Drugs. The Pharmaceutical Press, London (1986), p. 208"
     ],
     "testInstructions": [
       {
         "step": 1,
-        "instruction": "Place a small amount of the chemical sample in a test tube.",
-        "instruction_ar": "ضع كمية صغيرة من المادة المراد تحليلها في أنبوب اختبار."
+        "instruction": "Place a small amount of the suspected material in a test tube.",
+        "instruction_ar": "ضع كمية صغيرة من المادة المشتبه بها في أنبوب اختبار."
       },
       {
         "step": 2,
@@ -934,9 +934,9 @@
       }
     ]
   },
-  "Oxidizing Indicator Kit PD": {
-    "reagentName": "Oxidizing Indicator Kit PD",
-    "reagentName_ar": "حقيبة المؤشر المؤكسد PD",
+  "Potassium Dichromate Test": {
+    "reagentName": "Potassium Dichromate Test",
+    "reagentName_ar": "اختبار ثنائي كرومات البوتاسيوم",
     "description": "Alcohol Detection Test",
     "description_ar": "اختبار فحص الكحول",
     "safetyLevel": "HIGH",
@@ -947,16 +947,16 @@
       "Potassium Dichromate",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Ethanol, Alcohol",
+        "drugName": "Ethanol, Alcohol",
         "color": "Orange to Green color change",
         "color_ar": "تغيير من البرتقالي إلى الأخضر"
       }
     ],
     "reference": [
       "Borkenstein, R. F.. The Breathalyzer and its Applications. Indiana University (1954)",
-      "Jones, A. W.. Measuring Alcohol in Blood and Breath for Laboratory educational workflow Purposes: A Historical Review. (2008)"
+      "Jones, A. W.. Measuring Alcohol in Blood and Breath for Forensic Purposes: A Historical Review. (2008)"
     ],
     "testInstructions": [
       {
@@ -976,11 +976,11 @@
       }
     ]
   },
-  "Ephedrine Indicator Kit CK": {
-    "reagentName": "Ephedrine Indicator Kit CK",
-    "reagentName_ar": "حقيبة مؤشر الإيفيدرين CK",
-    "description": "For detecting BOTANICAL SPECIMENS/CATHINONE/CATHINE",
-    "description_ar": "للكشف عن المركب النباتي / الكاثينون / الكاثين",
+  "Chen-Kao Test": {
+    "reagentName": "Chen-Kao Test",
+    "reagentName_ar": "اختبار تشين-كاو",
+    "description": "For detecting KHAT/CATHINONE/CATHINE",
+    "description_ar": "للكشف عن القات / الكاثينون / الكاثين",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
     "category": "Specialized Tests",
@@ -990,9 +990,9 @@
       "Copper(II) Sulfate",
       "Sodium Hydroxide"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Cathine, Ephedrine, Pseudoephedrine",
+        "drugName": "Cathine, Ephedrine, Pseudoephedrine",
         "color": "Violet",
         "color_ar": "بنفسجي"
       }
@@ -1023,11 +1023,11 @@
       }
     ]
   },
-  "Nitric-Sulfuric Reagent Test": {
-    "reagentName": "Nitric-Sulfuric Reagent Test",
-    "reagentName_ar": "اختبار حمض النيتريك أ-الكبريتيك",
-    "description": "For detecting organic reference compound and related compounds",
-    "description_ar": "للكشف عن المركب عضوي مرجعي والمركبات ذات الصلة",
+  "Nitric-Sulfuric Acid Test": {
+    "reagentName": "Nitric-Sulfuric Acid Test",
+    "reagentName_ar": "اختبار حمض النيتريك-الكبريتيك",
+    "description": "For detecting methadone and related compounds",
+    "description_ar": "للكشف عن الميثادون والمركبات ذات الصلة",
     "safetyLevel": "EXTREME",
     "safetyLevel_ar": "خطر شديد",
     "category": "Specialized Tests",
@@ -1036,9 +1036,9 @@
       "Concentrated Sulfuric Acid",
       "Concentrated Nitric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Organic reference compound",
+        "drugName": "Methadone",
         "color": "Orange to red",
         "color_ar": "برتقالي إلى أحمر"
       }
@@ -1069,11 +1069,11 @@
       }
     ]
   },
-  "Nitric Acid Test A (Laboratory reference compounds)": {
-    "reagentName": "Nitric Acid Test A (Laboratory reference compounds)",
-    "reagentName_ar": "اختبار حمض النيتريك أ (مركب قلوي)",
-    "description": "For detecting laboratory reference compounds using nitric acid reagent",
-    "description_ar": "للكشف عن المركب القلوي باستخدام كاشف حمض النيتريك",
+  "Nitric Acid Test (Heroin)": {
+    "reagentName": "Nitric Acid Test (Heroin)",
+    "reagentName_ar": "اختبار حمض النيتريك (هيروين)",
+    "description": "For detecting heroin using nitric acid reagent",
+    "description_ar": "للكشف عن الهيروين باستخدام كاشف حمض النيتريك",
     "safetyLevel": "EXTREME",
     "safetyLevel_ar": "خطر شديد",
     "category": "Secondary Tests",
@@ -1081,15 +1081,15 @@
     "chemicals": [
       "Concentrated Nitric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "Yellow → Light Green",
         "color_ar": "أصفر ← أخضر فاتح"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)",
+      "Ditzel, P., Kovar, K.-A.. Rausch- und Suchtmittel. Deutscher Apotheker Verlag, Stuttgart (1983)",
       "Kovar, K.-A., Noy, M., Pieper, R.. Dtsch.Apoth.Ztg., 122 (1982) 3"
     ],
     "testInstructions": [
@@ -1110,11 +1110,11 @@
       }
     ]
   },
-  "Nitric Acid Test A (Alkaloid compound)": {
-    "reagentName": "Nitric Acid Test A (Alkaloid compound)",
-    "reagentName_ar": "اختبار حمض النيتريك أ (مركب قلوي مرجعي)",
-    "description": "For detecting alkaloid compound using nitric acid reagent",
-    "description_ar": "للكشف عن المركب القلوي المرجعي باستخدام كاشف حمض النيتريك",
+  "Nitric Acid Test (Morphine)": {
+    "reagentName": "Nitric Acid Test (Morphine)",
+    "reagentName_ar": "اختبار حمض النيتريك (مورفين)",
+    "description": "For detecting morphine using nitric acid reagent",
+    "description_ar": "للكشف عن المورفين باستخدام كاشف حمض النيتريك",
     "safetyLevel": "EXTREME",
     "safetyLevel_ar": "خطر شديد",
     "category": "Secondary Tests",
@@ -1122,15 +1122,56 @@
     "chemicals": [
       "Concentrated Nitric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Morphine",
+        "color": "Orange → Red → Yellow",
+        "color_ar": "برتقالي ← أحمر ← أصفر"
+      }
+    ],
+    "reference": [
+      "Ditzel, P., Kovar, K.-A.. Rausch- und Suchtmittel. Deutscher Apotheker Verlag, Stuttgart (1983)",
+      "Kovar, K.-A., Noy, M., Pieper, R.. Dtsch.Apoth.Ztg., 122 (1982) 3"
+    ],
+    "testInstructions": [
+      {
+        "step": 1,
+        "instruction": "Place a small amount of the sample on a spot plate.",
+        "instruction_ar": "ضع كمية صغيرة من العينة على لوحة البقع."
+      },
+      {
+        "step": 2,
+        "instruction": "Add one drop of concentrated nitric acid.",
+        "instruction_ar": "أضف قطرة واحدة من حمض النيتريك المركز."
+      },
+      {
+        "step": 3,
+        "instruction": "Observe the rapid sequence of color changes (Orange to Red to Yellow).",
+        "instruction_ar": "لاحظ التسلسل السريع لتغيرات اللون (برتقالي إلى أحمر إلى أصفر)."
+      }
+    ]
+  },
+  "Nitric Acid Test (Codeine)": {
+    "reagentName": "Nitric Acid Test (Codeine)",
+    "reagentName_ar": "اختبار حمض النيتريك (كودايين)",
+    "description": "For detecting codeine using nitric acid reagent",
+    "description_ar": "للكشف عن الكودايين باستخدام كاشف حمض النيتريك",
+    "safetyLevel": "EXTREME",
+    "safetyLevel_ar": "خطر شديد",
+    "category": "Secondary Tests",
+    "testDuration": 3,
+    "chemicals": [
+      "Concentrated Nitric Acid"
+    ],
+    "drugResults": [
+      {
+        "drugName": "Codeine",
         "color": "Orange → Yellow",
         "color_ar": "برتقالي ← أصفر"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)",
+      "Ditzel, P., Kovar, K.-A.. Rausch- und Suchtmittel. Deutscher Apotheker Verlag, Stuttgart (1983)",
       "Kovar, K.-A., Noy, M., Pieper, R.. Dtsch.Apoth.Ztg., 122 (1982) 3"
     ],
     "testInstructions": [
@@ -1151,11 +1192,11 @@
       }
     ]
   },
-  "Barbituric Indicator Kit DK": {
-    "reagentName": "Barbituric Indicator Kit DK",
+  "Dille-Koppanyi": {
+    "reagentName": "Dille-Koppanyi",
     "reagentName_ar": "ديل-كوبانيي",
-    "description": "Presumptive test for organic reference compounds",
-    "description_ar": "اختبار مبدئي للمركبات عضوية مرجعية",
+    "description": "Presumptive test for barbiturates",
+    "description_ar": "اختبار مبدئي للباربيتورات",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Secondary Tests",
@@ -1166,9 +1207,9 @@
       "Isopropylamine",
       "Methanol"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Organic reference compounds",
+        "drugName": "Barbiturates",
         "color": "Reddish purple",
         "color_ar": "أرجواني مائل للأحمر"
       }
@@ -1199,11 +1240,11 @@
       }
     ]
   },
-  "Organic Acid Indicator Test": {
-    "reagentName": "Organic Acid Indicator Test",
+  "Gallic Acid Test": {
+    "reagentName": "Gallic Acid Test",
     "reagentName_ar": "اختبار حمض الغاليك",
-    "description": "For detecting ORGANIC CHEMISTRY REFERENCES/ORGANIC CHEMISTRY REFERENCES derivatives",
-    "description_ar": "للكشف عن مشتمركب نباتي إم دي إيه/مركبات عضوية تعليمية",
+    "description": "For detecting MDA/MDMA derivatives",
+    "description_ar": "للكشف عن مشتقات إم دي إيه/إم دي إم إيه",
     "safetyLevel": "EXTREME",
     "safetyLevel_ar": "خطر شديد",
     "category": "Specialized Tests",
@@ -1212,15 +1253,15 @@
       "Gallic Acid",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "ORGANIC CHEMISTRY REFERENCES, ORGANIC CHEMISTRY REFERENCES, MDE",
+        "drugName": "MDA, MDMA, MDE",
         "color": "Bright to dark green",
         "color_ar": "أخضر ساطع إلى داكن"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "World Health Organization - Programme on Substance Abuse. Information Manual on Designer Drugs. WHO/PSA/90.5, Geneva (1991)"
     ],
     "testInstructions": [
       {
@@ -1245,11 +1286,11 @@
       }
     ]
   },
-  "Organic Analysis Kit": {
-    "reagentName": "Organic Analysis Kit",
+  "Vitali-Morin": {
+    "reagentName": "Vitali-Morin",
     "reagentName_ar": "فيتالي-مورين",
-    "description": "Identification of laboratory reference compounds and related educational analytical compounds",
-    "description_ar": "تحديد مركبات مرجعية مخبرية وبعض مشتمركب نباتي المركبات تحليلية تعليمية",
+    "description": "Identification of diazepam and related benzodiazepines",
+    "description_ar": "تحديد ديازيبام وبعض مشتقات البنزوديازيبين",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Specialized Tests",
@@ -1259,15 +1300,15 @@
       "Acetone",
       "Ethanolic Potassium Hydroxide"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Diazepam",
         "color": "Yellow-orange",
         "color_ar": "برتقالي مصفر"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Kovar, K.-A., Laudszun, M.. Chemistry and Reaction Mechanisms of Rapid Tests for Drugs of Abuse and Precursor Chemicals. United Nations - Scientific and Technical Notes, SCITEC/6, Vienna (1989), p. 14"
     ],
     "testInstructions": [
       {
@@ -1297,9 +1338,9 @@
       }
     ]
   },
-  "Sulfuric Reagent Test": {
-    "reagentName": "Sulfuric Reagent Test",
-    "reagentName_ar": "اختبار كاشف الكبريتيك",
+  "Sulfuric Acid Test": {
+    "reagentName": "Sulfuric Acid Test",
+    "reagentName_ar": "اختبار حمض الكبريتيك",
     "description": "Preliminary color test for various alkaloids",
     "description_ar": "اختبار لوني أولي لمختلف القلويدات",
     "safetyLevel": "EXTREME",
@@ -1309,14 +1350,14 @@
     "chemicals": [
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "No change to faint yellow",
         "color_ar": "لا تغيير إلى أصفر باهت"
       },
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Morphine",
         "color": "Faint pink",
         "color_ar": "وردي باهت"
       }
@@ -1342,11 +1383,11 @@
       }
     ]
   },
-  "Hydrochloric Reagent Test": {
-    "reagentName": "Hydrochloric Reagent Test",
-    "reagentName_ar": "اختبار كاشف الهيدروكلوريك",
-    "description": "Test for educational analytical compounds and specific alkaloids",
-    "description_ar": "اختبار للمركب مرجعي وقلويدات محددة",
+  "Hydrochloric Acid Test": {
+    "reagentName": "Hydrochloric Acid Test",
+    "reagentName_ar": "اختبار حمض الهيدروكلوريك",
+    "description": "Test for cocaine and specific alkaloids",
+    "description_ar": "اختبار للكوكايين وقلويدات محددة",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Primary Tests",
@@ -1354,9 +1395,9 @@
     "chemicals": [
       "Concentrated Hydrochloric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Educational analytical compounds",
+        "drugName": "Cocaine",
         "color": "Faint odor of benzoic acid",
         "color_ar": "رائحة خفيفة لحمض البنزويك"
       }
@@ -1382,11 +1423,11 @@
       }
     ]
   },
-  "Secondary Indicator Kit F": {
-    "reagentName": "Secondary Indicator Kit F",
+  "Froehde Test": {
+    "reagentName": "Froehde Test",
     "reagentName_ar": "اختبار فرويد",
-    "description": "Selective test for controlled compounds and alkaloids",
-    "description_ar": "اختبار انتقائي للمركبات قلوية والقلويدات",
+    "description": "Selective test for opioids and alkaloids",
+    "description_ar": "اختبار انتقائي للأفيونات والقلويدات",
     "safetyLevel": "HIGH",
     "safetyLevel_ar": "عالي",
     "category": "Secondary Tests",
@@ -1395,25 +1436,25 @@
       "Ammonium Molybdate",
       "Concentrated Sulfuric Acid"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Morphine",
         "color": "Purple to green",
         "color_ar": "أرجواني إلى أخضر"
       },
       {
-        "compoundName": "Alkaloid compound",
+        "drugName": "Codeine",
         "color": "Green to blue",
         "color_ar": "أخضر إلى أزرق"
       },
       {
-        "compoundName": "Laboratory reference compounds",
+        "drugName": "Heroin",
         "color": "Purple to red",
         "color_ar": "أرجواني إلى أحمر"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Moffat, A.C. (Editor). Clarke's Isolation and Identification of Drugs. The Pharmaceutical Press, London (1986)"
     ],
     "testInstructions": [
       {
@@ -1433,11 +1474,11 @@
       }
     ]
   },
-  "Barbituric Indicator Kit Z": {
-    "reagentName": "Barbituric Indicator Kit Z",
-    "reagentName_ar": "حقيبة مؤشر المركبات العضوية المرجعية Z",
-    "description": "For detecting organic reference compounds",
-    "description_ar": "للكشف عن المركبات العضوية المرجعية",
+  "Zwikker Test": {
+    "reagentName": "Zwikker Test",
+    "reagentName_ar": "اختبار زويكر",
+    "description": "For detecting barbiturates",
+    "description_ar": "للكشف عن الباربيتورات",
     "safetyLevel": "MEDIUM",
     "safetyLevel_ar": "متوسط",
     "category": "Secondary Tests",
@@ -1447,15 +1488,15 @@
       "Pyridine",
       "Water"
     ],
-    "compoundResults": [
+    "drugResults": [
       {
-        "compoundName": "Organic reference compounds",
+        "drugName": "Barbiturates",
         "color": "Light blue-violet",
         "color_ar": "بنفسجي-أزرق فاتح"
       }
     ],
     "reference": [
-      "Journal of Analytical Organic Chemistry, Vol. 48, pp. 204-211 (2018)"
+      "Kovar, K.-A., Laudszun, M.. Chemistry and Reaction Mechanisms of Rapid Tests for Drugs of Abuse and Precursor Chemicals. United Nations - Scientific and Technical Notes, SCITEC/6, Vienna (1989), p. 11"
     ],
     "testInstructions": [
       {

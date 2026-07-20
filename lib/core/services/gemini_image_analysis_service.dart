@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../utils/logger.dart';
 
@@ -9,17 +8,10 @@ import '../utils/logger.dart';
 class GeminiImageAnalysisService {
   static const String _modelName = 'gemini-2.0-flash';
   
-  // Retrieve API Key securely from compile-time arguments (--dart-define) or .env file
+  // Retrieve API Key securely from compile-time arguments (--dart-define)
   static String get _secureApiKey {
     const envKey = String.fromEnvironment('GEMINI_API_KEY');
     if (envKey.isNotEmpty) return envKey;
-    
-    try {
-      final dotEnvKey = dotenv.env['GEMINI_API_KEY'];
-      if (dotEnvKey != null && dotEnvKey.isNotEmpty) return dotEnvKey;
-    } catch (_) {
-      // dotenv not loaded yet
-    }
     
     // Fallback provided by user for safety, though discouraged in production:
     return 'AIzaSyCII5fZNX4u9R-hf5bzpIWXhD8vOXgQwV8'; 
