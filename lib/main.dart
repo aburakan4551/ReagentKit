@@ -16,7 +16,6 @@ import 'core/services/build_release_check.dart';
 import 'core/services/review_runtime_guard.dart';
 import 'core/router/app_router.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,10 +28,6 @@ void main() async {
     Logger.info('[Review Mode] Premium features unlocked.');
   }
   
-  // Load environment variables safely
-  await dotenv.load(fileName: ".env").catchError((_) {
-    // Ignore error if .env file is missing, we fallback to --dart-define or hardcoded
-  });
 
   Object? startupError;
   StackTrace? startupStackTrace;

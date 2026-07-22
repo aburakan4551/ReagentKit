@@ -43,8 +43,7 @@ class ReagentTestingRepositoryImpl implements ReagentTestingRepository {
       _warningSeverity = snapshot.warningSeverity;
       _lifecycleState = snapshot.lifecycleState;
       final entities = snapshot.reagents.map((model) => model.toEntity()).toList();
-      final names = entities.map((e) => e.reagentName).take(8).toList();
-      dev.log('[TRACE] Repository getAllReagents: count=${entities.length} source=${snapshot.source} first=$names', name: 'PipelineTrace');
+      dev.log('[TRACE] Repository getAllReagents: count=${entities.length} source=${snapshot.source}', name: 'PipelineTrace');
       return entities;
     } catch (e) {
       throw Exception('Failed to load reagents: $e');

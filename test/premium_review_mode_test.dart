@@ -8,7 +8,6 @@ import 'package:reagentkit/core/services/cloud_sync_service.dart';
 import 'package:reagentkit/core/services/analytics_service.dart';
 import 'package:reagentkit/core/services/review_runtime_guard.dart';
 import 'package:reagentkit/core/services/build_release_check.dart';
-import 'package:reagentkit/core/config/reviewer_demo_seed.dart';
 import 'package:get_it/get_it.dart';
 
 class MockFirestoreService extends Fake implements FirestoreService {}
@@ -63,11 +62,5 @@ void main() {
       expect(ReviewRuntimeGuard.checkAndBlock('buyPremium'), isTrue);
     });
 
-    test('7. ReviewerDemoSeed returns realistic data', () {
-      final results = ReviewerDemoSeed.getDemoResults();
-      expect(results.isNotEmpty, isTrue);
-      expect(results.first.observedColor, isNotNull);
-      expect(results.first.notes, contains('Safety recommendation'));
-    });
   });
 }

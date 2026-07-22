@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firestore_service.dart';
 import '../config/get_it_config.dart';
 import '../utils/logger.dart';
@@ -102,9 +101,9 @@ class PremiumService extends ChangeNotifier {
   Future<void> _initRevenueCat() async {
     if (isPremiumReviewMode) return;
     try {
-      // Load public API Keys from dotenv, or use mock keys
-      final apiKeyIOS = dotenv.env['REVENUECAT_API_KEY_IOS'] ?? 'api_key_placeholder';
-      final apiKeyAndroid = dotenv.env['REVENUECAT_API_KEY_ANDROID'] ?? 'api_key_placeholder';
+      // Load public API Keys from dart-define, or use mock keys
+      const apiKeyIOS = String.fromEnvironment('REVENUECAT_API_KEY_IOS', defaultValue: 'api_key_placeholder');
+      const apiKeyAndroid = String.fromEnvironment('REVENUECAT_API_KEY_ANDROID', defaultValue: 'api_key_placeholder');
       
       // Select appropriate key
       String apiKey = apiKeyAndroid;

@@ -1027,6 +1027,7 @@ class UnifiedDataService {
       final raw = await rootBundle.loadString(_fallbackAsset).timeout(const Duration(seconds: 10));
 
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
+
       final (migratedJson, appliedMigrations) = _migrator.migrate(decoded);
       final migratedRaw = jsonEncode(migratedJson);
 
@@ -1095,29 +1096,53 @@ class UnifiedDataService {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Layer 6: Emergency In-Memory Fallback Source
+    // Layer 6: Emergency Fallback — try bundled asset with direct sync parse
     // ─────────────────────────────────────────────────────────────────────────
-    developer.log('Running emergency recovery to in-memory dataset', name: 'ScientificParser');
+    developer.log('Running emergency recovery — attempting bundled asset with direct parse', name: 'ScientificParser');
     _currentLifecycleState = DatasetLifecycleState.corrupted;
     _currentWarningSeverity = WarningSeverity.critical;
-    _logTelemetry('dataset_load_fatal', {'reason': 'All loading layers failed, falling back to emergency in-memory'}, isFatal: true);
-    
-    final snapshot = _createFallbackSnapshot(
+    _logTelemetry('dataset_load_fatal', {'reason': 'All loading layers failed, attempting emergency asset parse'}, isFatal: true);
+
+    // Try one more time with the bundled asset, but bypass compute() entirely
+    final emergencyReagents = await _loadEmergencyFromAsset();
+    _cachedReagents = emergencyReagents;
+    _cacheVersion = 'emergency_1.0.0';
+    _lastDataSource = DataSource.local;
+
+    final emergencyDiagnostics = DatasetDiagnostics(
+      rawItems: emergencyReagents.length,
+      parsedItems: emergencyReagents.length,
+      skippedItems: 0,
+      invalidReferences: 0,
+      invalidColors: 0,
+      usedFallback: true,
+      datasetVersion: 'emergency_1.0.0',
+    );
+
+    final snapshot = _makeSnapshot(
+      reagents: emergencyReagents,
       source: DataSource.local,
-      lifecycleState: DatasetLifecycleState.corrupted,
+      health: emergencyReagents.length > 2 ? DataHealthStatus.fallback : DataHealthStatus.corrupted,
+      version: 'emergency_1.0.0',
+      diagnostics: emergencyDiagnostics,
+      lifecycleState: DatasetLifecycleState.fallback,
       integrity: ScientificIntegrity.fallback,
       warningSeverity: WarningSeverity.critical,
-      warningMsg: 'Using emergency fallback dataset. Scientific dataset is corrupted or failed to load.',
-);
+      warningMessage: 'Loaded from emergency fallback. Primary pipeline layers failed.',
+    );
 
-        _traceLayer('Layer 6 Emergency In-Memory', snapshot);
-        _snapshotController.add(snapshot);
-        startRecoveryWatchdog();
+    _traceLayer('Layer 6 Emergency Fallback', snapshot);
+    _snapshotController.add(snapshot);
+    startRecoveryWatchdog();
     return snapshot;
   }
 
   /// Runs JSON parsing in a separate isolate. Falls back to synchronous parsing in tests or on unsupported platforms.
   Future<ParseOutput> _runParse(String rawJson, ValidationProfile profile) async {
+    // On web, compute() can be unreliable — always prefer synchronous parsing
+    if (kIsWeb) {
+      return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+    }
     try {
       return await compute(parseScientificDatasetIsolate, ParseParams(rawJson, profile));
     } catch (e, st) {
@@ -1127,7 +1152,17 @@ class UnifiedDataService {
         stackTrace: st,
         name: 'ScientificParser',
       );
-      return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+      try {
+        return parseScientificDatasetIsolate(ParseParams(rawJson, profile));
+      } catch (syncError, syncSt) {
+        developer.log(
+          'Synchronous parsing also failed.',
+          error: syncError,
+          stackTrace: syncSt,
+          name: 'ScientificParser',
+        );
+        rethrow;
+      }
     }
   }
 
@@ -1390,12 +1425,42 @@ class UnifiedDataService {
     );
   }
 
+  /// Attempts a synchronous direct parse of bundled asset for emergency fallback.
+  /// Returns the full dataset from the bundled asset, or the hardcoded minimum list.
+  Future<List<ReagentTestModel>> _loadEmergencyFromAsset() async {
+    try {
+      final raw = await rootBundle.loadString(_fallbackAsset);
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final (migratedJson, _) = _migrator.migrate(decoded);
+      final migratedRaw = jsonEncode(migratedJson);
+      // Parse synchronously — never use compute() for emergency path
+      final parseOutput = parseScientificDatasetIsolate(ParseParams(migratedRaw, ValidationProfile.permissive));
+      if (parseOutput.parsedReagents.isNotEmpty) {
+        final list = parseOutput.parsedReagents
+            .map((e) => ReagentTestModel.fromJson(e, profile: ValidationProfile.permissive))
+            .toList();
+        list.sort((a, b) => a.id.compareTo(b.id));
+        developer.log('[DATA SOURCE] Emergency asset parse succeeded: ${list.length} reagents', name: 'ScientificParser');
+        return list;
+      }
+    } catch (e, st) {
+      developer.log('[DATA SOURCE] Emergency asset parse also failed: $e', error: e, stackTrace: st, name: 'ScientificParser');
+    }
+    return _hardcodedMinimumReagents;
+  }
+
+  List<ReagentTestModel> get _emergencyFallbackReagents {
+    // This getter is synchronous so it returns the hardcoded list.
+    // The async version _loadEmergencyFromAsset should be preferred.
+    return _hardcodedMinimumReagents;
+  }
+
   void dispose() {
     stopRecoveryWatchdog();
     _snapshotController.close();
   }
 
-  static final List<ReagentTestModel> _emergencyFallbackReagents = [
+  static final List<ReagentTestModel> _hardcodedMinimumReagents = [
     ReagentTestModel(
       id: 'marquis_test',
       reagentName: 'Marquis Test',
@@ -1504,40 +1569,18 @@ class UnifiedDataService {
   List<ReagentTestModel> _processAndSanitizeReagents(List<ReagentTestModel> originalList) {
     final rc = _remoteConfig;
     final isSafeStore = rc?.safeStoreMode ?? SafeStoreSanitizer.safeStoreMode;
-    final isScottEnabled = rc?.enableScottTest ?? true;
-    final isHighRiskEnabled = rc?.enableHighRiskTests ?? true;
     final isScientificReferencesEnabled = rc?.enableScientificReferences ?? true;
 
-    // Filter reagents
-    List<ReagentTestModel> filtered = originalList.where((reagent) {
-      final idLower = reagent.id.toLowerCase();
-      
-      // 1. Filter out Scott Test if disabled
-      if (!isScottEnabled && idLower.contains('scott')) {
-        return false;
-      }
-      
-      // 2. Filter out High Risk Tests if disabled
-      if (!isHighRiskEnabled) {
-        final highRiskKeywords = ['scott', 'heroin', 'morphine', 'codeine', 'simon', 'ehrlich', 'liebermann', 'mandelin'];
-        if (highRiskKeywords.any((kw) => idLower.contains(kw))) {
-          return false;
-        }
-      }
-      
-      return true;
-    }).toList();
+    // No reagents are filtered out. Every parsed reagent reaches the UI.
+    // SafeStoreSanitizer may only rename display strings — never remove items.
 
-    // If safe store mode is disabled, we return the filtered list immediately
     if (!isSafeStore) {
-      return filtered;
+      return originalList;
     }
 
-    // Set sanitizer mode dynamically
     SafeStoreSanitizer.safeStoreMode = true;
 
-    // Clone and sanitize visible UI strings
-    return filtered.map((reagent) {
+    final sanitizedList = originalList.map((reagent) {
       final sanitizedName = SafeStoreSanitizer.sanitize(reagent.reagentName);
       final sanitizedNameAr = SafeStoreSanitizer.sanitize(reagent.reagentNameAr);
       final sanitizedDesc = SafeStoreSanitizer.sanitize(reagent.description);
@@ -1552,8 +1595,7 @@ class UnifiedDataService {
         );
       }).toList();
 
-      List<DrugResultModel> sanitizedReactionResults = reagent.reactionResults;
-      sanitizedReactionResults = reagent.reactionResults.map((result) {
+      final sanitizedReactionResults = reagent.reactionResults.map((result) {
         return DrugResultModel(
           drugName: SafeStoreSanitizer.sanitize(result.drugName),
           color: SafeStoreSanitizer.sanitize(result.color),
@@ -1561,14 +1603,13 @@ class UnifiedDataService {
         );
       }).toList();
 
-      final sanitizedReferences = isScientificReferencesEnabled 
+      // Always include references — never drop them
+      final sanitizedReferences = isScientificReferencesEnabled
           ? reagent.references.map((ref) => SafeStoreSanitizer.sanitize(ref)).toList()
-          : <String>[];
+          : reagent.references;
 
-      // Sanitize chemicals list
       final sanitizedChemicals = reagent.chemicals.map((c) => SafeStoreSanitizer.sanitize(c)).toList();
 
-      // Sanitize ReagentTestSafetyInfo
       final sanitizedSafety = ReagentTestSafetyInfo(
         requiredEquipment: reagent.safety.requiredEquipment.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
         handlingProcedures: reagent.safety.handlingProcedures.map((s) => SafeStoreSanitizer.sanitize(s)).toList(),
@@ -1593,5 +1634,7 @@ class UnifiedDataService {
         safety: sanitizedSafety,
       );
     }).toList();
+
+    return sanitizedList;
   }
 }
